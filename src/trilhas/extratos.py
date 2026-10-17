@@ -233,7 +233,7 @@ def rodar(dados: DadosEntrada, cadastro: Cadastro, premissas: Premissas) -> Resu
                 f"{l.banco} {l.ref} ({l.data}): crédito de {_brl_txt(l.valor)} sem identificação "
                 f"('{l.descricao}'). Lançado em créditos não identificados; não é receita até "
                 "alguém identificar a origem (R-32).",
-                "Helena",
+                "Caio (identifica o pagador com o banco, até o fechamento de outubro)",  # R-55
             )
         )  # fmt: skip
     for l, _ in pend.get("DEVOLUCAO_PIX", []):
