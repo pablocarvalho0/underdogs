@@ -1,7 +1,7 @@
 # Comece aqui
 
 Mapa do projeto para quem chega agora, humano ou agente. Diz onde estamos, qual documento
-manda em quê e como trabalhamos até a entrega. Atualizado em 17/10, 14h16.
+manda em quê e como trabalhamos até a entrega. Atualizado em 17/10, 17h55.
 
 ---
 
@@ -9,19 +9,17 @@ manda em quê e como trabalhamos até a entrega. Atualizado em 17/10, 14h16.
 
 | Peça | Estado | Como foi medido |
 | :--- | :--- | :--- |
-| Regras de negócio | ✅ Quase todas respondidas pela Helena: R-01..R-49, premissas P-01..P-16 | `HIPOTESES.md` na `main` (PR #10) |
-| Números esperados | ✅ Prévia independente: checkout R$ 203.735,34, remessa R$ 39.543,45 etc. | `HIPOTESES.md` §5 |
-| Contrato e fundação | ✅ `model.py`, `writer.py` (recusa rastro que não fecha), `cadastro.py`, loaders, painel | Código na `main` |
-| **Cálculo de negócio** | ❌ **Zero.** As 3 trilhas (`src/trilhas/*.py`) têm 14 linhas cada e devolvem vazio | `run_pipeline` gera os 6 CSVs **só com cabeçalho** |
-| Suíte caixa-preta | ❌ `1 failed` | `npm test` |
-| Entrada | ⚠️ Nome de arquivo fixo de setembro: o `06_` é ignorado (D-01) | `src/core/entrada.py` |
-| `premissas.py` | ⚠️ Defaults de antes das respostas: sem aliases (R-05), `spread_padrao_pct=None` (R-12 diz 1,5%) | `src/premissas.py` |
-| `PROMPTS/` | ❌ Só o `MOMENTOS.md`. O export das sessões, que é **entrega obrigatória**, não existe | `ls PROMPTS` |
-| Pitch | ❌ | — |
+| Regras de negócio | ✅ R-01..R-51 respondidas pela Helena; premissas P-01..P-18 | `HIPOTESES.md` |
+| Cálculo de negócio | ✅ As 3 trilhas no MVP da `main` (b64734f): Mínimo e Alvo completos | `npm run run` gera os 6 CSVs |
+| Números | ✅ Batem com a prévia independente (§5 do `HIPOTESES.md`) e com uma segunda implementação feita à parte (`feat/alvo`): comissões R$ 243.278,79, 115 divergências, 21 notas, 184 lançamentos, 16 pendências | `conferencia/index.html`: 25/25 totais, 12/12 pendências esperadas, 0 invariantes quebrados |
+| Rastro | ✅ Todo `id_saida` com valor fecha com a soma das linhas de origem; reexecução gera `saida/` idêntica | writer recusa rastro que não fecha; conferência |
+| Entrada | ✅ Papel de cada arquivo pelo conteúdo; o 06 entra; outubro com nomes trocados gera a mesma saída (D-01 implementada) | `npm run run -- --input <pasta>` |
+| Suíte caixa-preta | ⚠️ `1 failed`: um valor (gerado 43,80, esperado 53,80). A suíte é anterior às respostas da Helena; triagem humana | `npm test` |
+| `PROMPTS/` | ❌ Só o `MOMENTOS.md`. O export das sessões, **entrega obrigatória**, depende de aprovação do conteúdo (repositório público) | `ls PROMPTS` |
+| Pitch | ❌ Entrega até 19h00 | — |
 
-**Em uma frase:** entendemos o problema e temos a régua para conferir os números, mas nenhum
-número de saída foi calculado ainda. O que parece "muito código" é infraestrutura, documento e
-painel. O nível **Mínimo** do desafio (comissão de checkout com rastro) ainda não existe.
+**Em uma frase:** os números de setembro estão calculados, rastreados e conferidos por dois caminhos
+independentes; faltam o histórico das sessões de IA e o pitch.
 
 ---
 
@@ -40,7 +38,7 @@ Se dois documentos discordarem, vale o da coluna "fonte de verdade".
 | Princípios e onde a IA atua (base do pitch) | `docs/visao-geral.md` §3, §4 e §6 | Vigente só nessas seções. As §8 e §10 foram superadas pelo `HIPOTESES.md` |
 | Arquitetura e contrato do código | `docs/plano-engenharia.md` §2 | Só a §2 vale. Cronograma, perguntas F-xx e decisões D-xx foram superados |
 | Como instalar e rodar | `README.md` | Vigente (a árvore de pastas foi corrigida neste PR) |
-| Momentos de uso da IA | `PROMPTS/MOMENTOS.md` | Momento 5 em aberto |
+| Momentos de uso da IA | `PROMPTS/MOMENTOS.md` | Vigente: 4 momentos, como pede o enunciado |
 
 Não são documentação de trabalho: `docs/Tarvo_Data_Pack_set2026/` é a entrada, `saida/` é
 gerado e `docs/audios/` é a transcrição do briefing.
@@ -51,11 +49,9 @@ gerado e `docs/audios/` é a transcrição do briefing.
 
 Cada item é uma decisão do Pablo. Até ela ser tomada, ninguém deve construir em cima do item.
 
-1. **Quem faz a remessa.** O plano de construção dá a trilha B ao Pablo. A task do dev 2 dá a
-   B e a C ao dev 2. É preciso escolher uma das duas versões antes de distribuir.
+1. ~~**Quem faz a remessa.**~~ Resolvido: o MVP da `main` traz as 3 trilhas.
 2. ~~**Merge do plano e das tasks.**~~ Resolvido: entraram na `main` pelos PRs #13 e #15.
-3. **D-01..D-06** (`HIPOTESES.md` §4.1): continuam como recomendação. A D-01 (entrada pelo
-   cabeçalho) bloqueia o `06_`, e o `06_` muda R$ 3.304,39 no checkout.
+3. **D-01..D-06** (`HIPOTESES.md` §4.1): a D-01 e a D-03 estão implementadas; ver a situação de cada uma lá.
 4. **Áudio no repositório público.** O `docs/audios/briefing.ogg`, com a voz de quem gravou,
    entrou na `main` pelo PR #13. Decidir se fica ou sai.
 
