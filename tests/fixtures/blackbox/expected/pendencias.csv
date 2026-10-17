@@ -1,2 +1,5 @@
 id_saida;tipo;ref_origem;valor_brl;motivo;quem_decide
-PEN-001;SPREAD_NEGATIVO;PC-BB-002;-50.00;Operação de remessa com spread negativo apurado pela Ponte Câmbio;Financeiro Tarvo
+PEN-001;SPREAD_NEGATIVO;PC-BB-002;-50.00;Spread negativo (taxa travada D-1 vencida): fora da comissão e da nota, contestar com a Ponte (R-14);Helena (Ponte Câmbio S.A.)
+PEN-002;DIVERGENCIA_TAXA_ORBE;TX-BB-003;10.00;Orbe aplicou 2,69% onde o contrato é 2,19%: contestar com a Orbe e ressarcir o lojista (R-22, R-25);Helena (contestação com a Orbe)
+PEN-003;DIVERGENCIA_SPREAD;PC-BB-001;49.00;Spread de 2,00% onde o contrato é 1,50%, valor cheio: contestar com a Ponte (R-17, R-23);Helena (Ponte Câmbio S.A.)
+PEN-004;ACOMPANHAMENTO_REPASSE;PC-BB-001;100.00;Conferir o crédito do repasse de 50% do spread da Ponte quando cair no banco;Helena

@@ -106,7 +106,7 @@ def rodar(dados: DadosEntrada, cadastro: Cadastro, premissas: Premissas) -> Resu
 
     for r in registros:
         nop = str(r["Nº Operação"]).strip()
-        spread = _dec(r["Spread R$"])
+        spread = brl(_dec(r["Spread R$"]))
         soma_total += spread
         comp_spread = Componente(arq, nop, spread)
 

@@ -186,7 +186,7 @@ for o in operacoes:
         divergencias.append({"linha_negocio": "REMESSA", "cnpj": cnpj, "taxa_contratada_pct": f"{(contratado * 100).normalize():f}", "diferenca_brl": brl((aplicado - contratado) * Decimal(str(o["Valor ME"])) * Decimal(str(o["PTAX Ref."])))})
 
 # --- Extratos ---
-aurora_csv = next(p for p in PASTA.iterdir() if p.suffix.lower() == ".csv" and "aurora" in ler_texto(p)[:300].lower())
+aurora_csv = next(p for p in PASTA.iterdir() if p.suffix.lower() == ".csv" and "extrato de conta corrente" in (t := ler_texto(p)[:300].lower()) and "aurora" in t)
 aurora = {i: l.split(";") for i, l in enumerate(ler_texto(aurora_csv).splitlines(), 1)}
 movimentos_aurora = [c for c in aurora.values() if re.match(r"\d{2}/\d{2}/\d{4}$", c[0]) and len(c) > 3 and c[3].strip()]
 ofx = next(PASTA.glob("*.ofx"))
