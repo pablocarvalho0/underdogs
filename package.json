@@ -9,6 +9,7 @@
     "run": "node scripts/runner.js -m src.main run",
     "validate": "node scripts/runner.js -m src.main validate",
     "status": "node scripts/runner.js -m src.main status",
+    "report": "node scripts/runner.js -m src.main report",
     "typecheck": "node scripts/runner.js -m mypy src"
   },
   "author": "Pablo Carvalho",

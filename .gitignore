@@ -62,3 +62,6 @@ scratch/
 # Os arquivos finais gerados podem ser versionados quando prontos para submissão
 saida/*.tmp
 saida/*_temp.csv
+
+# Painel HTML gerado (npm run report)
+painel/

@@ -139,6 +139,13 @@ Para validar a integridade dos arquivos gerados contra o esquema oficial:
 npm run validate
 ```
 
+### Painel visual
+Para ver input, processamento e output do pipeline numa página só:
+```bash
+npm run report
+```
+Depois abra `painel/index.html` no navegador. O pipeline roda num diretório temporário (não grava em `saida/`) e `painel/` não é versionado.
+
 ### 5. Executar a Suíte de Testes Caixa-Preta (Imutável)
 Funciona de forma idêntica em **Linux**, **Arch Linux** e **Windows 11**:
 ```bash

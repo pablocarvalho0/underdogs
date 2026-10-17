@@ -4,7 +4,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from src.config import DATA_PACK_DIR, OUTPUT_DIR
+from src.config import DATA_PACK_DIR, OUTPUT_DIR, ROOT_DIR
 from src.core.pipeline import run_pipeline
 from src.loaders import (
     load_extrato_aurora,
@@ -14,6 +14,7 @@ from src.loaders import (
     load_ponte_cambio_report,
     load_taxas_contratadas,
 )
+from src.painel import gerar_painel
 from src.validators import validate_all_outputs
 
 app = typer.Typer(help="Pipeline de Conciliação e Fechamento Tarvo - Underdogs")
@@ -102,6 +103,14 @@ def run():
         for nome, dif in inv.items():
             cor = "green" if dif == 0 else "red"
             console.print(f"  [{cor}]{trilha}.{nome}: {dif}[/{cor}]")
+
+
+@app.command()
+def report():
+    """Gera o painel HTML (input, processamento, output) em painel/index.html."""
+    console.print("\n[bold cyan]Gerando painel visual...[/bold cyan]")
+    caminho = gerar_painel(ROOT_DIR / "painel" / "index.html")
+    console.print(f"[bold green]Painel gerado:[/bold green] {caminho}")
 
 
 if __name__ == "__main__":
