@@ -33,8 +33,8 @@ Se dois documentos discordarem, vale o da coluna "fonte de verdade".
 | :--- | :--- | :--- |
 | O que o desafio pede, prazos, critérios de nota | `docs/01_instrucoes_participantes.docx.md` | Oficial, não editar |
 | Regras de negócio, premissas, perguntas, números esperados | `HIPOTESES.md` | Vigente |
-| Plano de construção: frentes, portões G1–G3, cortes | `docs/plano-construcao.md` | ⚠️ **Só na branch `docs/plano-construcao`, sem PR** |
-| Tarefa de cada dev | `docs/tasks/dev1-checkout.md`, `dev2-remessa-extratos.md` | ⚠️ **Só na branch `docs/tasks-trilhas`, sem PR**, e em conflito com o plano (§3) |
+| Plano de construção: frentes, portões G1–G3, cortes | `docs/plano-construcao.md` | Vigente (PR #15) |
+| Tarefa de cada dev | `docs/tasks/dev1-checkout.md`, `dev2-remessa-extratos.md` | Na `main` (PR #13), mas em conflito com o plano (§3) |
 | Regras para agentes de IA | `CLAUDE.md` (o `GEMINI.md` só aponta para ele) | Vigente |
 | Princípios e onde a IA atua (base do pitch) | `docs/visao-geral.md` §3, §4 e §6 | Vigente só nessas seções. As §8 e §10 foram superadas pelo `HIPOTESES.md` |
 | Arquitetura e contrato do código | `docs/plano-engenharia.md` §2 | Só a §2 vale. Cronograma, perguntas F-xx e decisões D-xx foram superados |
@@ -52,12 +52,11 @@ Cada item é uma decisão do Pablo. Até ela ser tomada, ninguém deve construir
 
 1. **Quem faz a remessa.** O plano de construção dá a trilha B ao Pablo. A task do dev 2 dá a
    B e a C ao dev 2. É preciso escolher uma das duas versões antes de distribuir.
-2. **Merge do plano e das tasks.** Os dois estão em branches sem PR. Enquanto não entrarem na
-   `main`, quem faz `git pull` não os vê.
+2. ~~**Merge do plano e das tasks.**~~ Resolvido: entraram na `main` pelos PRs #13 e #15.
 3. **D-01..D-06** (`HIPOTESES.md` §4.1): continuam como recomendação. A D-01 (entrada pelo
    cabeçalho) bloqueia o `06_`, e o `06_` muda R$ 3.304,39 no checkout.
-4. **Áudio no repositório público.** A branch `docs/tasks-trilhas` versiona
-   `docs/audios/briefing.ogg`, com a voz de quem gravou. Este PR versiona só a transcrição.
+4. **Áudio no repositório público.** O `docs/audios/briefing.ogg`, com a voz de quem gravou,
+   entrou na `main` pelo PR #13. Decidir se fica ou sai.
 
 ---
 
