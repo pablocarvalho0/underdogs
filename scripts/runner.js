@@ -14,4 +14,17 @@ const pythonBin = fs.existsSync(venvPython) ? venvPython : (isWin ? 'python' : '
 const args = process.argv.slice(2);
 
 const res = spawnSync(pythonBin, args, { stdio: 'inherit', cwd: rootDir });
-process.exit(res.status ?? 0);
+
+// Falha ao iniciar o processo (ex: python ausente) nao pode virar sucesso
+if (res.error) {
+  console.error(`Falha ao executar ${pythonBin}: ${res.error.message}`);
+  process.exit(1);
+}
+
+// Processo morto por sinal (ex: OOM kill) tem status null
+if (res.signal) {
+  console.error(`${pythonBin} encerrado pelo sinal ${res.signal}`);
+  process.exit(1);
+}
+
+process.exit(res.status ?? 1);
