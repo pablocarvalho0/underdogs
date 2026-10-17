@@ -210,7 +210,20 @@ def rodar(dados: DadosEntrada, cadastro: Cadastro, premissas: Premissas) -> Resu
         )
         todas.extend(comps)
 
-    if todas:
+    total_ponte = sum((c.valor for c in todas), Decimal(0))
+    if todas and total_ponte <= 0:
+        # R-26 aplicada à remessa: ajustes da Ponte (P-19) podem zerar ou negativar o mês.
+        # Nota com valor zero ou negativo não se emite; vira pendência, como no checkout.
+        res.linhas.append(
+            pendencia(
+                "REM", f"SEMNOTA-{cnpj_ponte}", "NOTA_NAO_EMITIDA", todas,
+                f"Participação no spread da {nome_ponte} de {comp} ficou em "
+                f"{_brl_txt(total_ponte)} (zero ou negativa, por ajustes da Ponte), então não há "
+                "nota a emitir. Não passa sozinha para o mês seguinte (R-26).",
+                "Helena",
+            )
+        )  # fmt: skip
+    elif todas:
         # R-27: uma nota só, tomadora a Ponte.
         nota = LinhaSaida.somando(
             "notas_a_emitir.csv",
