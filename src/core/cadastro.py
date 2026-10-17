@@ -106,15 +106,27 @@ class CadastroPlanilha:
     def __init__(self, taxas: pd.DataFrame, premissas: Premissas):
         self._premissas = premissas
         self._linhas: dict[str, list[_LinhaTaxa]] = {}
+        # Linha marcada INATIVO na planilha (Globo Trotter, tachada): não vale taxa nenhuma.
+        self.inativos_por_ec: dict[str, Lojista] = {}
         for _, r in taxas.iterrows():
             cnpj = r["cnpj_limpo"]
             ec = str(r["EC Orbe"]).strip() if pd.notna(r.get("EC Orbe")) else None
             loj = Lojista(cnpj=cnpj, nome=str(r["Lojista"]).strip(), ec_orbe=ec)
+            if "INATIVO" in str(r.get("Obs") or "").upper():
+                if ec:
+                    self.inativos_por_ec[ec] = loj
+                continue
             ini, fim = vigencia(r.get("Vigência"))
             self._linhas.setdefault(cnpj, []).append(_LinhaTaxa(loj, ini, fim, {str(k): v for k, v in r.items()}))
 
-        self._por_cnpj = {c: ls[-1].lojista for c, ls in self._linhas.items()}
-        self._por_ec = {l.ec_orbe: l for l in self._por_cnpj.values() if l.ec_orbe}
+        # Nome da primeira linha (a razão social; a renegociação vem embaixo como "(NOVA)").
+        self._por_cnpj = {c: ls[0].lojista for c, ls in self._linhas.items()}
+        self._por_ec = {
+            ln.lojista.ec_orbe: self._por_cnpj[c]
+            for c, ls in self._linhas.items()
+            for ln in ls
+            if ln.lojista.ec_orbe
+        }
 
     def lojistas(self) -> list[Lojista]:
         return list(self._por_cnpj.values())

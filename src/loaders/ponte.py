@@ -22,8 +22,11 @@ def load_ponte_cambio_report(file_path: Path = PONTE_EML) -> pd.DataFrame:
         msg = email.message_from_binary_file(f, policy=policy.default)
 
     xlsx_bytes: bytes | None = None
+    corpo = ""
     for part in msg.walk():
         filename = part.get_filename()
+        if part.get_content_type() == "text/plain" and not filename and not corpo:
+            corpo = str(part.get_content())
         if filename and filename.lower().endswith(".xlsx"):
             payload = part.get_payload(decode=True)
             if isinstance(payload, bytes):
@@ -70,5 +73,7 @@ def load_ponte_cambio_report(file_path: Path = PONTE_EML) -> pd.DataFrame:
     if "CNPJ Cliente" in df.columns:
         df["cnpj_limpo"] = df["CNPJ Cliente"].apply(clean_cnpj)
     df.attrs["rodape"] = rodape
+    # Corpo do e-mail: assinatura (nome e CNPJ da Ponte) e data prevista do repasse.
+    df.attrs["corpo_email"] = corpo
 
     return df

@@ -19,6 +19,10 @@ class RastroNaoFecha(Exception):
     pass
 
 
+class ColunasForaDoTemplate(Exception):
+    pass
+
+
 def _fmt(v: Any) -> str:
     if v is None:
         return ""
@@ -45,7 +49,29 @@ def conferir_rastro(linhas: list[LinhaSaida]) -> None:
         raise RastroNaoFecha("\n".join(erros[:20]))
 
 
+def conferir_colunas(linhas: list[LinhaSaida]) -> None:
+    """Cada linha traz exatamente as colunas do template: nem a mais, nem a menos.
+
+    Coluna sem valor vem explícita como None (sai vazia); a coluna do número rastreado
+    e `id_saida` não vão em `campos`.
+    """
+    erros = []
+    for ln in linhas:
+        coluna_valor = COLUNA_VALOR[ln.arquivo]
+        esperadas = set(OUTPUT_FILES[ln.arquivo]) - {"id_saida", coluna_valor}
+        recebidas = set(ln.campos)
+        extras = recebidas - esperadas
+        faltando = esperadas - recebidas
+        if extras:
+            erros.append(f"{ln.id_saida} ({ln.arquivo}): colunas fora do template {sorted(extras)}")
+        if faltando:
+            erros.append(f"{ln.id_saida} ({ln.arquivo}): colunas ausentes {sorted(faltando)}")
+    if erros:
+        raise ColunasForaDoTemplate("\n".join(erros[:20]))
+
+
 def escrever(linhas: list[LinhaSaida], output_dir: Path) -> dict[str, int]:
+    conferir_colunas(linhas)
     conferir_rastro(linhas)
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -68,10 +94,10 @@ def escrever(linhas: list[LinhaSaida], output_dir: Path) -> dict[str, int]:
 
     contagem = {}
     for nome, rows in por_arquivo.items():
-        obrigatorias = OUTPUT_FILES[nome]
-        extras = sorted({k for r in rows for k in r} - set(obrigatorias))
         with open(output_dir / nome, "w", encoding="utf-8", newline="") as f:
-            w = csv.DictWriter(f, fieldnames=obrigatorias + extras, delimiter=";", restval="")
+            w = csv.DictWriter(
+                f, fieldnames=OUTPUT_FILES[nome], delimiter=";", restval="", lineterminator="\n"
+            )
             w.writeheader()
             w.writerows(rows)
         contagem[nome] = len(rows)

@@ -1,7 +1,6 @@
 """Configurações, caminhos e esquemas oficiais dos relatórios."""
 
 from pathlib import Path
-from typing import Dict, List
 
 # Diretórios base
 ROOT_DIR = Path(__file__).resolve().parent.parent
@@ -18,7 +17,7 @@ AURORA_CSV = DATA_PACK_DIR / "05a_extrato_banco_aurora_cc4471_set2026.csv"
 MERIDIANO_OFX = DATA_PACK_DIR / "05b_extrato_banco_meridiano_cc90233_set2026.ofx"
 
 # Arquivos obrigatórios de saída em saida/
-OUTPUT_FILES: Dict[str, List[str]] = {
+OUTPUT_FILES: dict[str, list[str]] = {
     "comissoes_por_lojista.csv": [
         "id_saida",
         "cnpj",

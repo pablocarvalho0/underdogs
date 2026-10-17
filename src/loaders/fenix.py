@@ -1,7 +1,9 @@
 """Parser do plano de contas exportado do ERP Fênix."""
 
 from pathlib import Path
+
 import pandas as pd
+
 from src.config import FENIX_ERP_CSV
 
 

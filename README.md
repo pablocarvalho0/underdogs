@@ -130,6 +130,20 @@ Para rodar a conciliação completa e gerar todos os arquivos em `saida/`:
 npm run run
 ```
 
+Para rodar outro mês, aponte a pasta do data pack (os nomes dos arquivos não importam: o papel de
+cada um é reconhecido pelo conteúdo, e **todos** os arquivos da Orbe da pasta entram, inclusive
+ajustes tardios):
+```bash
+npm run run -- --input caminho/da/pasta_do_mes --output saida
+```
+Se faltar uma fonte ou aparecer um arquivo com layout desconhecido, a execução não para: o terminal
+mostra o aviso, ele vira uma linha em `saida/pendencias.csv` e o restante fecha normalmente.
+
+Para conferir os números de setembro contra o controle independente (HIPOTESES.md §5):
+```bash
+.venv/bin/python -m pytest tests/test_controle_setembro.py -q
+```
+
 Para validar a integridade dos arquivos gerados contra o esquema oficial:
 ```bash
 npm run validate

@@ -1,5 +1,7 @@
 """Ponto de entrada CLI para execução e validação da conciliação Tarvo."""
 
+from pathlib import Path
+
 import typer
 from rich.console import Console
 from rich.table import Table
@@ -76,10 +78,12 @@ def status():
 
 
 @app.command()
-def validate():
+def validate(
+    output: Path = typer.Option(OUTPUT_DIR, "--output", "-o", help="Pasta com os 6 CSVs."),  # noqa: B008
+):
     """Valida se os arquivos em saida/ cumprem os requisitos obrigatórios."""
-    console.print(f"\n[bold cyan]Validando arquivos de saída em {OUTPUT_DIR}...[/bold cyan]\n")
-    is_valid, errors = validate_all_outputs(OUTPUT_DIR)
+    console.print(f"\n[bold cyan]Validando arquivos de saída em {output}...[/bold cyan]\n")
+    is_valid, errors = validate_all_outputs(output)
     if is_valid:
         console.print("[bold green]✓ Todos os arquivos de saída estão válidos e conformes![/bold green]\n")
     else:
@@ -90,10 +94,19 @@ def validate():
 
 
 @app.command()
-def run():
+def run(
+    input: Path = typer.Option(DATA_PACK_DIR, "--input", "-i", help="Pasta do data pack do mês."),  # noqa: B008
+    output: Path = typer.Option(OUTPUT_DIR, "--output", "-o", help="Pasta onde gravar os 6 CSVs."),  # noqa: B008
+):
     """Executa o pipeline completo de conciliação financeira e gera os CSVs em saida/."""
-    console.print("\n[bold yellow]Executando pipeline de conciliação Tarvo...[/bold yellow]")
-    resultado = run_pipeline(DATA_PACK_DIR, OUTPUT_DIR)
+    console.print(f"\n[bold yellow]Executando pipeline de conciliação Tarvo em {input}...[/bold yellow]")
+    resultado = run_pipeline(input, output)
+    console.print("\n[bold cyan]Arquivos reconhecidos:[/bold cyan]")
+    for papel, nome in resultado["arquivos_lidos"].items():
+        console.print(f"  {papel}: {nome}")
+    for aviso in resultado["avisos"]:
+        console.print(f"  [yellow]AVISO {aviso.tipo} ({aviso.ref}): {aviso.motivo}[/yellow]")
+    console.print(f"\n[bold cyan]Saída em {output}:[/bold cyan]")
     for nome, n in resultado["arquivos"].items():
         console.print(f"  {nome}: {n} linhas")
     console.print("\n[bold cyan]Invariantes de conservação (diferença deve ser 0):[/bold cyan]")

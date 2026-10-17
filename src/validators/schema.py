@@ -2,30 +2,29 @@
 
 import re
 from pathlib import Path
-from typing import Dict, List, Tuple
+
 import pandas as pd
+
 from src.config import OUTPUT_DIR, OUTPUT_FILES
 
 
-def validate_file_columns(file_path: Path, expected_cols: List[str]) -> List[str]:
-    """Verifica se o arquivo contém exatamente as colunas obrigatórias."""
-    errors: List[str] = []
+def validate_file_columns(file_path: Path, expected_cols: list[str]) -> list[str]:
+    """Verifica se o cabeçalho é exatamente o do template: mesmas colunas, mesma ordem."""
     if not file_path.exists():
         return [f"Arquivo ausente: {file_path.name}"]
 
     with open(file_path, "r", encoding="utf-8") as f:
-        first_line = f.readline().strip()
+        first_line = f.readline().rstrip("\r\n")
 
-    actual_cols = [c.strip() for c in first_line.split(";")]
-    missing = [c for c in expected_cols if c not in actual_cols]
-    if missing:
-        errors.append(f"{file_path.name}: colunas ausentes: {missing}")
-    return errors
+    actual_cols = first_line.split(";")
+    if actual_cols != expected_cols:
+        return [f"{file_path.name}: cabeçalho {actual_cols} difere do template {expected_cols}"]
+    return []
 
 
-def validate_cnpj_format(df: pd.DataFrame, file_name: str, col_name: str) -> List[str]:
+def validate_cnpj_format(df: pd.DataFrame, file_name: str, col_name: str) -> list[str]:
     """Valida se os CNPJs contêm apenas dígitos (14 números)."""
-    errors: List[str] = []
+    errors: list[str] = []
     if col_name not in df.columns:
         return errors
     invalid_rows = []
@@ -40,9 +39,9 @@ def validate_cnpj_format(df: pd.DataFrame, file_name: str, col_name: str) -> Lis
     return errors
 
 
-def validate_date_format(df: pd.DataFrame, file_name: str, col_name: str) -> List[str]:
+def validate_date_format(df: pd.DataFrame, file_name: str, col_name: str) -> list[str]:
     """Valida formato de data AAAA-MM-DD."""
-    errors: List[str] = []
+    errors: list[str] = []
     if col_name not in df.columns:
         return errors
     invalid_dates = []
@@ -57,12 +56,12 @@ def validate_date_format(df: pd.DataFrame, file_name: str, col_name: str) -> Lis
     return errors
 
 
-def validate_rastro_integrity(output_dir: Path = OUTPUT_DIR) -> List[str]:
+def validate_rastro_integrity(output_dir: Path = OUTPUT_DIR) -> list[str]:
     """
     Verifica se a soma dos valores em rastro.csv bate com os números reportados
     nos arquivos de saída.
     """
-    errors: List[str] = []
+    errors: list[str] = []
     rastro_path = output_dir / "rastro.csv"
     if not rastro_path.exists():
         return ["rastro.csv não encontrado para conferência."]
@@ -90,9 +89,9 @@ def validate_rastro_integrity(output_dir: Path = OUTPUT_DIR) -> List[str]:
     return errors
 
 
-def validate_all_outputs(output_dir: Path = OUTPUT_DIR) -> Tuple[bool, List[str]]:
+def validate_all_outputs(output_dir: Path = OUTPUT_DIR) -> tuple[bool, list[str]]:
     """Executa a bateria de validações nos arquivos gerados em saida/."""
-    all_errors: List[str] = []
+    all_errors: list[str] = []
 
     for file_name, expected_cols in OUTPUT_FILES.items():
         file_path = output_dir / file_name
