@@ -1,2 +1,3 @@
 id_saida;cnpj;linha_negocio;ref_origem;taxa_contratada_pct;taxa_aplicada_pct;diferenca_brl
 DIV-001;22222222000122;CHECKOUT;TX-BB-003;2.19;2.69;10.00
+DIV-002;11111111000111;REMESSA;PC-BB-001;1.50;2.00;49.00

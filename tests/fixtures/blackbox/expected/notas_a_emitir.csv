@@ -1,4 +1,4 @@
 id_saida;tomador_cnpj;tomador;linha_negocio;valor_brl;discriminacao
 NF-001;11111111000111;ALPHA INTERCAMBIO;CHECKOUT;29.45;Intermediação de pagamentos - Checkout 09/2026
-NF-002;22222222000122;BETA IDIOMAS;CHECKOUT;53.80;Intermediação de pagamentos - Checkout 09/2026
+NF-002;22222222000122;BETA IDIOMAS;CHECKOUT;43.80;Intermediação de pagamentos - Checkout 09/2026
 NF-003;75374179000146;PONTE CÂMBIO S.A.;REMESSA;100.00;Participação no spread de remessas internacionais 09/2026

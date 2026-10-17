@@ -121,8 +121,10 @@ def test_blackbox_contract_execution(tmp_path):
     for _, row_exp in df_pen_exp.iterrows():
         match = df_pen_gen[df_pen_gen["ref_origem"] == row_exp["ref_origem"]]
         assert not match.empty, f"Pendência crítica {row_exp['ref_origem']} não foi reportada em pendencias.csv"
-        pen_row = match.iloc[0]
-        assert str(pen_row["tipo"]).strip() == str(row_exp["tipo"]).strip(), f"Tipo de pendência incorreto para {row_exp['ref_origem']}"
+        # Uma mesma ref_origem pode ter pendências de tipos diferentes (ex.: contestação e repasse da mesma operação).
+        do_tipo = match[match["tipo"].astype(str).str.strip() == str(row_exp["tipo"]).strip()]
+        assert not do_tipo.empty, f"Tipo de pendência incorreto para {row_exp['ref_origem']}"
+        pen_row = do_tipo.iloc[0]
         assert str(pen_row["quem_decide"]).strip() == str(row_exp["quem_decide"]).strip(), f"Decisor incorreto para {row_exp['ref_origem']}"
 
     # F) Integridade Matemática Estrita do Rastro

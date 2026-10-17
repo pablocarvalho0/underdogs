@@ -2,7 +2,8 @@ id_saida;arquivo_origem;ref_origem;valor
 COM-CHK-11111111000111;01_orbe_relatorio_comissoes_set2026.csv;TX-BB-001;25.00
 COM-CHK-11111111000111;01_orbe_relatorio_comissoes_set2026.csv;TX-BB-002;4.45
 COM-REM-11111111000111;03_email_ponte_cambio_relatorio_set2026.eml;PC-BB-001;100.00
-COM-CHK-22222222000122;01_orbe_relatorio_comissoes_set2026.csv;TX-BB-003;53.80
+COM-CHK-22222222000122;01_orbe_relatorio_comissoes_set2026.csv;TX-BB-003;43.80
 COM-CHK-22222222000122;01_orbe_relatorio_comissoes_set2026.csv;TX-BB-004;21.90
 COM-CHK-22222222000122;01_orbe_relatorio_comissoes_set2026.csv;TX-BB-005;-21.90
 DIV-001;01_orbe_relatorio_comissoes_set2026.csv;TX-BB-003;10.00
+DIV-002;03_email_ponte_cambio_relatorio_set2026.eml;PC-BB-001;49.00
