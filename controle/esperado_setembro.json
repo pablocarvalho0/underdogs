@@ -1,0 +1,57 @@
+{
+  "_sobre": "Prévia independente de setembro (01 + 06), calculada fora do src/. Fonte: HIPOTESES.md §5 e plano-construcao.md §7 e §8. Usada por tests/test_controle_setembro.py e pela página de conferência. Diferença aqui se investiga; não se ajusta o número no código.",
+  "data_pack": "docs/Tarvo_Data_Pack_set2026",
+  "totais": [
+    {"grupo": "Comissões", "item": "Comissão CHECKOUT, soma dos lojistas", "arquivo": "comissoes_por_lojista.csv", "filtro": {"linha_negocio": "CHECKOUT"}, "metrica": "soma", "coluna": "comissao_brl", "esperado": "203735.34", "fonte": "HIPOTESES §5"},
+    {"grupo": "Comissões", "item": "Comissão CHECKOUT, nº de lojistas (sem Atlas)", "arquivo": "comissoes_por_lojista.csv", "filtro": {"linha_negocio": "CHECKOUT"}, "metrica": "linhas", "esperado": "21", "fonte": "HIPOTESES §5, D-03"},
+    {"grupo": "Comissões", "item": "Casa do Estudante: comissão do mês (só o estorno TX88445133)", "arquivo": "comissoes_por_lojista.csv", "filtro": {"linha_negocio": "CHECKOUT", "cnpj": "00520815000100"}, "metrica": "soma", "coluna": "comissao_brl", "esperado": "-5.50", "fonte": "R-08, R-26"},
+    {"grupo": "Comissões", "item": "Oxford Prep (com o 06)", "arquivo": "comissoes_por_lojista.csv", "filtro": {"linha_negocio": "CHECKOUT", "cnpj": "23109187000161"}, "metrica": "soma", "coluna": "comissao_brl", "esperado": "13845.71", "fonte": "HIPOTESES §5, efeito do 06"},
+    {"grupo": "Comissões", "item": "Maple Study (com o 06)", "arquivo": "comissoes_por_lojista.csv", "filtro": {"linha_negocio": "CHECKOUT", "cnpj": "34671260000100"}, "metrica": "soma", "coluna": "comissao_brl", "esperado": "14165.77", "fonte": "HIPOTESES §5, efeito do 06"},
+    {"grupo": "Comissões", "item": "EduAbroad (com o 06)", "arquivo": "comissoes_por_lojista.csv", "filtro": {"linha_negocio": "CHECKOUT", "cnpj": "16181276000153"}, "metrica": "soma", "coluna": "comissao_brl", "esperado": "11858.16", "fonte": "HIPOTESES §5, efeito do 06"},
+    {"grupo": "Comissões", "item": "Bridge (com o 06)", "arquivo": "comissoes_por_lojista.csv", "filtro": {"linha_negocio": "CHECKOUT", "cnpj": "22224579000109"}, "metrica": "soma", "coluna": "comissao_brl", "esperado": "11769.74", "fonte": "HIPOTESES §5, efeito do 06"},
+    {"grupo": "Comissões", "item": "Dublin Hub (com o 06)", "arquivo": "comissoes_por_lojista.csv", "filtro": {"linha_negocio": "CHECKOUT", "cnpj": "68567965000102"}, "metrica": "soma", "coluna": "comissao_brl", "esperado": "11876.37", "fonte": "HIPOTESES §5, efeito do 06"},
+    {"grupo": "Comissões", "item": "Mundo Aberto, checkout (com o 06)", "arquivo": "comissoes_por_lojista.csv", "filtro": {"linha_negocio": "CHECKOUT", "cnpj": "17217888000111"}, "metrica": "soma", "coluna": "comissao_brl", "esperado": "18508.09", "fonte": "HIPOTESES §5, efeito do 06"},
+    {"grupo": "Comissões", "item": "Kiwi (com o 06)", "arquivo": "comissoes_por_lojista.csv", "filtro": {"linha_negocio": "CHECKOUT", "cnpj": "07752116000126"}, "metrica": "soma", "coluna": "comissao_brl", "esperado": "10886.22", "fonte": "HIPOTESES §5, efeito do 06"},
+    {"grupo": "Comissões", "item": "Comissão REMESSA, soma (228 operações)", "arquivo": "comissoes_por_lojista.csv", "filtro": {"linha_negocio": "REMESSA"}, "metrica": "soma", "coluna": "comissao_brl", "esperado": "39543.45", "fonte": "HIPOTESES §5, R-11..R-17"},
+
+    {"grupo": "Notas", "item": "Notas CHECKOUT, nº (comissão > 0)", "arquivo": "notas_a_emitir.csv", "filtro": {"linha_negocio": "CHECKOUT"}, "metrica": "linhas", "esperado": "20", "fonte": "plano §7, R-26"},
+    {"grupo": "Notas", "item": "Notas CHECKOUT, soma", "arquivo": "notas_a_emitir.csv", "filtro": {"linha_negocio": "CHECKOUT"}, "metrica": "soma", "coluna": "valor_brl", "esperado": "203740.84", "fonte": "plano §7"},
+    {"grupo": "Notas", "item": "Nota REMESSA única, tomadora Ponte Câmbio", "arquivo": "notas_a_emitir.csv", "filtro": {"linha_negocio": "REMESSA", "tomador_cnpj": "75374179000146"}, "metrica": "soma", "coluna": "valor_brl", "esperado": "39543.45", "fonte": "R-27"},
+
+    {"grupo": "Divergências", "item": "Divergências CHECKOUT, nº de linhas", "arquivo": "divergencias_taxa.csv", "filtro": {"linha_negocio": "CHECKOUT"}, "metrica": "linhas", "esperado": "92", "fonte": "HIPOTESES §5"},
+    {"grupo": "Divergências", "item": "Divergências CHECKOUT, soma", "arquivo": "divergencias_taxa.csv", "filtro": {"linha_negocio": "CHECKOUT"}, "metrica": "soma", "coluna": "diferenca_brl", "esperado": "1576.23", "fonte": "HIPOTESES §5"},
+    {"grupo": "Divergências", "item": "Rota, crédito à vista 2,49% → 2,99%", "arquivo": "divergencias_taxa.csv", "filtro": {"cnpj": "95927868000148", "taxa_contratada_pct": "2.49"}, "metrica": "soma", "coluna": "diferenca_brl", "esperado": "299.62", "fonte": "HIPOTESES §5"},
+    {"grupo": "Divergências", "item": "Rota, 2–6x 2,99% → 3,49%", "arquivo": "divergencias_taxa.csv", "filtro": {"cnpj": "95927868000148", "taxa_contratada_pct": "2.99"}, "metrica": "soma", "coluna": "diferenca_brl", "esperado": "539.26", "fonte": "HIPOTESES §5"},
+    {"grupo": "Divergências", "item": "Rota, 7–12x 3,59% → 4,09%", "arquivo": "divergencias_taxa.csv", "filtro": {"cnpj": "95927868000148", "taxa_contratada_pct": "3.59"}, "metrica": "soma", "coluna": "diferenca_brl", "esperado": "707.40", "fonte": "HIPOTESES §5"},
+    {"grupo": "Divergências", "item": "Bridge, à vista 2,19% → 2,59% (5 vendas)", "arquivo": "divergencias_taxa.csv", "filtro": {"cnpj": "22224579000109"}, "metrica": "soma", "coluna": "diferenca_brl", "esperado": "29.95", "fonte": "HIPOTESES §5"},
+    {"grupo": "Divergências", "item": "Divergência REMESSA Mundo Aberto, nº de operações", "arquivo": "divergencias_taxa.csv", "filtro": {"linha_negocio": "REMESSA"}, "metrica": "linhas", "esperado": "23", "fonte": "HIPOTESES §5"},
+    {"grupo": "Divergências", "item": "Divergência REMESSA Mundo Aberto, valor cheio", "arquivo": "divergencias_taxa.csv", "filtro": {"linha_negocio": "REMESSA"}, "metrica": "soma", "coluna": "diferenca_brl", "esperado": "1418.85", "fonte": "P-05"},
+
+    {"grupo": "Lançamentos", "item": "Lançamentos Aurora", "arquivo": "lancamentos_classificados.csv", "filtro": {"banco": "AURORA"}, "metrica": "linhas", "esperado": "84", "fonte": "plano §7"},
+    {"grupo": "Lançamentos", "item": "Lançamentos Meridiano", "arquivo": "lancamentos_classificados.csv", "filtro": {"banco": "MERIDIANO"}, "metrica": "linhas", "esperado": "100", "fonte": "plano §7"},
+
+    {"grupo": "Pendências", "item": "Spreads negativos, pelo relatório (4 operações)", "arquivo": "pendencias.csv", "filtro": {"tipo": "SPREAD_NEGATIVO"}, "metrica": "soma", "coluna": "valor_brl", "esperado": "-1834.05", "fonte": "R-14"}
+  ],
+  "pendencias": [
+    {"id_saida": "PEN-CHK-SEMCONTRATO-1076801732", "caso": "Atlas sem contrato, 57 linhas (não faturar)", "esperado": "7876.05", "quem_decide": "Comercial"},
+    {"id_saida": "PEN-CHK-DEVOLUCAO-00520815000100", "caso": "Casa: devolução ao lojista, 118 linhas", "esperado": "15396.77", "quem_decide": "Helena + Comercial"},
+    {"id_saida": "PEN-CHK-SEMNOTA-00520815000100", "caso": "Casa: nota não emitida (comissão negativa)", "esperado": "-5.50", "quem_decide": "Helena"},
+    {"id_saida": "PEN-CHK-CONTESTACAO-95927868000148", "caso": "Rota: contestar com a Orbe, 87 linhas", "esperado": "1546.28", "quem_decide": "Helena"},
+    {"id_saida": "PEN-CHK-CONTESTACAO-22224579000109", "caso": "Bridge: contestar com a Orbe, 5 linhas", "esperado": "29.95", "quem_decide": "Helena"},
+    {"id_saida": "PEN-CHK-ALERTA-ANTECIPACAO-1076801732", "caso": "Atlas: antecipação acima das vendas (pico 15/09)", "esperado": "124235.32", "quem_decide": "Helena + Comercial"},
+    {"id_saida": "PEN-REM-CONTESTACAO-17217888000111", "caso": "Mundo Aberto: spread acima do contrato, 23 operações", "esperado": "1418.85", "quem_decide": "Helena → Ponte"},
+    {"id_saida": "PEN-REM-DUPLICATA", "caso": "PC-0926-0162 duplicada no relatório", "esperado": null, "quem_decide": "Ponte"},
+    {"id_saida": "PEN-REM-REPASSE-75374179000146", "caso": "Acompanhar o repasse da Ponte em outubro", "esperado": "39543.45", "quem_decide": "Helena"},
+    {"id_saida": "PEN-EXT-NAOIDENT-L50", "caso": "Aurora L50: crédito sem identificação", "esperado": "7350.00", "quem_decide": "Helena"},
+    {"id_saida": "PEN-EXT-DEVOLUCAO-L65", "caso": "Aurora L65: devolução de Pix, motivo desconhecido", "esperado": "12400.00", "quem_decide": "Helena"},
+    {"id_saida": "PEN-EXT-TRANSF-L92", "caso": "Aurora L92: R$ 300 mil cai no Meridiano em 01/10", "esperado": "-300000.00", "quem_decide": "Helena"}
+  ],
+  "tipos_cobertos_pelos_totais": ["SPREAD_NEGATIVO"],
+  "nao_e_pendencia": [
+    "Bandeira divergente nos estornos (D-04)",
+    "Pix de R$ 18.240 da Ponte Aérea, MRD2026090425 (R-34)",
+    "Aliases de EC confirmados (R-05)",
+    "Estornos de vendas de agosto (R-03)",
+    "Ressalvas de compliance da Ponte (R-15)"
+  ]
+}

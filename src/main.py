@@ -119,6 +119,17 @@ def run(
 
 
 @app.command()
+def conferencia(
+    input: Path = typer.Option(DATA_PACK_DIR, "--input", "-i", help="Pasta do data pack do mês."),  # noqa: B008
+):
+    """Gera conferencia/index.html: entradas, resultado esperado e saídas geradas."""
+    from src.conferencia import gerar
+
+    caminho = gerar(input)
+    console.print(f"[bold green]Página de conferência gerada:[/bold green] {caminho}")
+
+
+@app.command()
 def report():
     """Gera o painel HTML (input, processamento, output) em painel/index.html."""
     console.print("\n[bold cyan]Gerando painel visual...[/bold cyan]")

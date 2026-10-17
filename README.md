@@ -139,6 +139,16 @@ npm run run -- --input caminho/da/pasta_do_mes --output saida
 Se faltar uma fonte ou aparecer um arquivo com layout desconhecido, a execução não para: o terminal
 mostra o aviso, ele vira uma linha em `saida/pendencias.csv` e o restante fecha normalmente.
 
+Para ver numa página só as entradas, o resultado esperado e o que o pipeline gerou, abra
+[`conferencia/index.html`](conferencia/index.html) no navegador. Ela já vem gerada; para regerar:
+```bash
+npm run conferencia
+```
+A página roda o pipeline do zero, compara cada total e cada pendência com
+`controle/esperado_setembro.json` (a prévia independente do HIPOTESES.md §5), mostra os
+invariantes e diz se o `saida/` versionado é idêntico à execução. Clicando num `id_saida`, ela
+mostra as linhas de origem que somam aquele número.
+
 Para conferir os números de setembro contra o controle independente (HIPOTESES.md §5):
 ```bash
 .venv/bin/python -m pytest tests/test_controle_setembro.py -q
