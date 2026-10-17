@@ -22,6 +22,8 @@ dev = [
     "pytest>=8.0.0",
     "ruff>=0.4.0",
     "mypy>=1.10.0",
+    "pandas-stubs",
+    "types-openpyxl",
 ]
 
 [build-system]

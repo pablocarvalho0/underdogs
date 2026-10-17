@@ -1,11 +1,12 @@
 """Parser do relatório de comissões da adquirente Orbe."""
 
 from pathlib import Path
+from typing import Any
 import pandas as pd
 from src.config import ORBE_CSV
 
 
-def parse_brazilian_float(val: any) -> float:
+def parse_brazilian_float(val: Any) -> float:
     """Converte strings com vírgula decimal para float."""
     if pd.isna(val) or val is None or val == "":
         return 0.0

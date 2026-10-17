@@ -55,7 +55,7 @@ com a soma). O loader atual devolve 235 porque **lê as 2 linhas de rodapé como
   operações. É uma divergência de REMESSA.
 - Demais lojistas: spread aplicado bate com o contratado; os sem valor rodam a ~1,5%.
 
-**Aurora (80 lançamentos reais):** o loader inclui `SALDO ANTERIOR` (L8) e 3 linhas de
+**Aurora (84 lançamentos reais, L9–L92):** o loader incluía `SALDO ANTERIOR` (L8) e 3 linhas de
 rodapé (L93–L95) com valor 0 — precisam sair. Padrões claros: TED Orbe, PIX ENVIADO
 lojista (repasse), transferência p/ Meridiano, folha, impostos, tarifas. Ambíguos:
 `L50 PIX RECEBIDO ... SEM IDENTIFICACAO` (R$ 7.350) e `L65 DEVOLUCAO PIX - MUNDO
@@ -173,7 +173,7 @@ nada sumiu: tudo o que entrou ou está numa saída, ou está numa pendência.
 - Resíduo → D-02 (IA ou HUMANO). Os dois ambíguos já conhecidos (L50, L65) viram
   pendência de qualquer forma.
 - Armadilha Ponte Aérea × Ponte Câmbio: a regra mais específica vem primeiro.
-- **Invariante:** 80 + 100 lançamentos de entrada = lançamentos classificados; saldo
+- **Invariante:** 84 + 100 lançamentos de entrada = lançamentos classificados; saldo
   inicial + Σ = saldo final no Aurora.
 
 ## 5. Fase 2 — integração (serial)
@@ -207,9 +207,27 @@ Formato: "[Underdogs] …", sempre com um caso concreto do arquivo.
 - **F-10 Competência:** operação contratada em 30/09 e liquidada em 01/10 (ex.
   PC-0926-0002) entra em setembro?
 
-## 7. Decisões de engenharia em aberto
+## 7. Organização do time (D-01, decidido)
 
-- **D-01** Divisão das trilhas entre Pablo e os 2 devs.
+| Quem | Durante a Fase 0 (Pablo no serial) | Fase 1 |
+| :--- | :--- | :--- |
+| **Pablo** | Fase 0a + 0b; dispara F-01..F-10 | Trilha B (remessa) + respostas do financeiro |
+| **Dev 1** | Estuda a trilha A: hipóteses, 3 casos calculados na mão, invariante | Trilha A (checkout), branch `feat/trilha-checkout` |
+| **Dev 2** | Estuda a trilha C: rascunho da tabela de regras, invariante | Trilha C (extratos), branch `feat/trilha-extratos` |
+
+O estudo de cada dev precisa sair com três coisas escritas, para virar código direto
+quando o contrato cair na `main`:
+1. As hipóteses da trilha que ainda não estão em §6 — viram pergunta ou flag.
+2. **Condições de controle:** o invariante de conservação da trilha (§4) e 3 casos
+   reais calculados na mão, com o valor esperado — viram a verificação da trilha.
+3. **Dev 1:** tabela EC → lojista → taxa vigente para os 22 ECs, marcando onde não há
+   taxa ou EC. **Dev 2:** lista dos padrões de descrição dos dois extratos → conta
+   analítica, marcando os que não têm regra óbvia.
+
+Quando 0a estiver na `main`, cada dev faz `git pull` e rebase da própria branch. Merge
+final na Fase 2, um PR por trilha, aprovado pelo Pablo.
+
+## 8. Decisões de engenharia em aberto
 - **D-02** IA em runtime na classificação dos extratos: sim (resíduo, com cache) ou não.
 - **D-03** Default enquanto o financeiro não responde F-01 (comissão pela aplicada ou
   pela contratada).

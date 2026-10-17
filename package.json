@@ -8,7 +8,8 @@
     "test:real": "node scripts/runner.js -m pytest tests/test_real_dataset_integrity.py tests/test_loaders.py -v",
     "run": "node scripts/runner.js -m src.main run",
     "validate": "node scripts/runner.js -m src.main validate",
-    "status": "node scripts/runner.js -m src.main status"
+    "status": "node scripts/runner.js -m src.main status",
+    "typecheck": "node scripts/runner.js -m mypy src"
   },
   "author": "Pablo Carvalho",
   "license": "MIT"

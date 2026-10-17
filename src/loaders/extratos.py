@@ -1,9 +1,13 @@
 """Parsers dos extratos bancários: Banco Aurora (CSV) e Banco Meridiano (OFX)."""
 
+import re
+from datetime import datetime
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import Any
+
+import ofxparse  # type: ignore[import-untyped]
 import pandas as pd
-import ofxparse
+
 from src.config import AURORA_CSV, MERIDIANO_OFX
 from src.loaders.orbe import parse_brazilian_float
 
@@ -26,33 +30,34 @@ def load_extrato_aurora(file_path: Path = AURORA_CSV) -> pd.DataFrame:
     if header_idx is None:
         raise ValueError("Cabeçalho do extrato Banco Aurora não encontrado.")
 
-    data: List[Dict[str, Any]] = []
+    # Só linhas com data e sem ser SALDO ANTERIOR/FINAL são lançamentos. Os saldos
+    # ficam em df.attrs para o invariante saldo_anterior + Σ valor = saldo_final.
+    data: list[dict[str, Any]] = []
+    saldos: dict[str, float] = {}
     for line_num, line in enumerate(lines[header_idx:], start=header_idx + 1):
-        line_clean = line.strip()
-        if not line_clean:
+        parts = [p.strip() for p in line.strip().split(";")]
+        if len(parts) < 5:
             continue
-        parts = [p.strip() for p in line_clean.split(";")]
-        if len(parts) < 4:
+        dt_str, desc, doc, valor_str, saldo_str = parts[:5]
+        if desc.upper().startswith("SALDO"):
+            saldos[desc.upper()] = parse_brazilian_float(saldo_str)
             continue
-        # Descartar saldo anterior ou linhas puramente informativas
-        dt_str = parts[0]
-        desc = parts[1]
-        doc = parts[2] if len(parts) > 2 else ""
-        valor_str = parts[3] if len(parts) > 3 else "0"
-        saldo_str = parts[4] if len(parts) > 4 else ""
-
-        val = parse_brazilian_float(valor_str)
+        if not re.fullmatch(r"\d{2}/\d{2}/\d{4}", dt_str):
+            continue
 
         data.append({
             "linha_fisica": f"L{line_num}",
-            "data": dt_str,
+            "data": datetime.strptime(dt_str, "%d/%m/%Y").strftime("%Y-%m-%d"),
             "descricao": desc,
             "documento": doc,
-            "valor": val,
+            "valor": parse_brazilian_float(valor_str),
             "saldo": parse_brazilian_float(saldo_str),
         })
 
-    return pd.DataFrame(data)
+    df = pd.DataFrame(data)
+    df.attrs["saldo_anterior"] = saldos.get("SALDO ANTERIOR")
+    df.attrs["saldo_final"] = saldos.get("SALDO FINAL")
+    return df
 
 
 def load_extrato_meridiano(file_path: Path = MERIDIANO_OFX) -> pd.DataFrame:
@@ -63,7 +68,7 @@ def load_extrato_meridiano(file_path: Path = MERIDIANO_OFX) -> pd.DataFrame:
     with open(file_path, "rb") as f:
         ofx = ofxparse.OfxParser.parse(f)
 
-    data: List[Dict[str, Any]] = []
+    data: list[dict[str, Any]] = []
     for tx in ofx.account.statement.transactions:
         data.append({
             "fitid": tx.id,
