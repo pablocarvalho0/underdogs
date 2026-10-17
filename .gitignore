@@ -65,3 +65,6 @@ saida/*_temp.csv
 
 # Painel HTML gerado (npm run report)
 painel/
+
+# Worktrees de agentes/sessões paralelas
+.claude/worktrees/

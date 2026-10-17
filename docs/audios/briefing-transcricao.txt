@@ -1,0 +1,7 @@
+[  0.0-  6.5] Irmão, você tem que criar um sistema que você vai enviar os dados que estão no template dado, na pasta do Hackathon
+[  6.5- 12.6] e com esses dados vai sair num output padronizado de saída
+[ 12.6- 16.4] todos os arquivos que ele pede ali que estão no requisito também.
+[ 17.2- 21.1] Isso inclui a nota fiscal, isso inclui as comissões por lojista
+[ 21.1- 26.9] e além disso, você tem que ser capaz de, ao jogar esses dados também,
+[ 26.9- 30.7] conseguir processar se tem divergências e pendências.
+[ 32.0- 36.0] Depois disso, o resto do time vai pensar o que fazer com essas pendências e divergências.
