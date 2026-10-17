@@ -41,7 +41,7 @@ Todos os arquivos gerados em `saida/` seguem o padrão obrigatório do desafio:
 | `notas_a_emitir.csv` | Relação de NFs a faturar por tomador e linha | `id_saida; tomador_cnpj; tomador; linha_negocio; valor_brl; discriminacao` |
 | `lancamentos_classificados.csv` | Lançamentos dos extratos categorizados no plano de contas | `id_saida; banco; ref_origem; data; descricao; valor; conta_codigo; metodo; confianca` |
 | `pendencias.csv` | Casos de exceção que exigem decisão humana | `id_saida; tipo; ref_origem; valor_brl; motivo; quem_decide` |
-| `rastro.csv` | Rastreabilidade 100% auditável ligando saídas às origens | `id_saida; arquivo_origem; ref_origem; valor` |
+| `rastro.csv` | Rastro por `id_saida`, com a soma conferida contra o número reportado | `id_saida; arquivo_origem; ref_origem; valor` |
 
 ---
 
@@ -61,6 +61,9 @@ Todos os arquivos gerados em `saida/` seguem o padrão obrigatório do desafio:
 │   ├── config.py                          # Constantes e caminhos
 │   └── main.py                            # Ponto de entrada CLI
 ├── tests/                                 # Testes automatizados e validações de integridade
+├── controle/                              # Prévia independente (previa_independente.py) e esperado_setembro.json
+├── conferencia/                           # Página de conferência (index.html), gerada por `npm run conferencia`
+├── scripts/                               # runner.js: atalho multiplataforma dos `npm run`
 ├── saida/                                 # Arquivos de saída gerados (CSVs normatizados)
 ├── PROMPTS/                               # Histórico de sessões de IA
 │   └── MOMENTOS.md                        # Momentos chave de direção da IA
@@ -78,6 +81,8 @@ Todos os arquivos gerados em `saida/` seguem o padrão obrigatório do desafio:
 ### Pré-requisitos
 - **Python 3.11+** (recomendado Python 3.12)
 - [uv](https://github.com/astral-sh/uv) (gerenciador rápido de pacotes Python) ou `pip` padrão.
+- **Node.js 18+ e npm**, só para os atalhos `npm run ...`, que chamam `.venv/bin/python -m src.main ...`. Sem Node: `python -m src.main run` (com a `.venv` ativa).
+- No Windows, troque `.venv/bin/python` por `.venv\Scripts\python` em todos os comandos.
 
 ### 1. Clonar o repositório
 ```bash
@@ -121,6 +126,8 @@ assim, o mesmo data pack sempre gera os mesmos números, e cada número aponta p
 O `.env.example` não é lido pelo código hoje; pastas de entrada e saída vão por `--input`/`--output`.
 
 ### 4. Executar o Fechamento
+Cada execução regrava `saida/registro_execucao.json` (o campo `executado_em` muda), então o `git status` fica sujo depois de rodar: é esperado.
+
 Para rodar a conciliação completa e gerar todos os arquivos em `saida/`:
 ```bash
 npm run run
@@ -266,6 +273,6 @@ Pronto: sua `main` está igual à do GitHub. Volte ao passo 1 para a próxima ta
 - **Identificação de lojista no checkout e na remessa:** nunca por nome. Orbe pelo EC, Ponte pelo CNPJ, ambos resolvidos pela planilha de taxas e pelos aliases confirmados pelo financeiro (R-05). O que não casa vira pendência.
 - **Exceção, nos extratos:** o banco não traz CNPJ no Pix enviado, só o nome truncado do destinatário. O Pix enviado é tratado como repasse ao lojista quando esse nome truncado é o **começo** do nome de um lojista (planilha, Orbe ou Ponte), depois de tirar acentos e pontuação. Não há similaridade aproximada, mas um nome curto pode casar com o lojista errado. Isso muda só a conta contábil (2.1.01.001), nunca uma comissão.
 - **Saldo inicial do Meridiano:** o OFX só traz o saldo final; o inicial (R$ 204.118,03) é derivado dele e não tem conferência independente.
-- **O que não aparece em nenhum arquivo:** o custo da Orbe para a Tarvo e os juros e o IOF da conta garantida. A comissão é a taxa contratada inteira (R-01); esses custos ficam fora do fechamento.
+- **Fora do fechamento de setembro:** o custo da Orbe para a Tarvo não aparece em nenhum arquivo (a comissão é a taxa contratada inteira, R-01). Os juros da conta garantida vêm no extrato do mês seguinte (R-53): em setembro não há nada a lançar.
 - **Suíte caixa-preta (`npm test`):** falha em um valor (CNPJ 22222222000122: gerado 43,80, esperado 53,80). Duas implementações independentes chegam a 43,80 seguindo as respostas da Helena; a suíte foi escrita antes delas. Não foi lida nem alterada (`CLAUDE.md` §0).
 - Veja detalhes completos em [`HIPOTESES.md`](./HIPOTESES.md).

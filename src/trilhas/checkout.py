@@ -260,7 +260,7 @@ def rodar(dados: DadosEntrada, cadastro: Cadastro, premissas: Premissas) -> Resu
                 f"EC {ec} ({nome_ec[ec]}) não tem contrato na aba vigente da planilha: "
                 f"{len(comps)} transações, {_brl_txt(total)} cobrados pela Orbe, não faturados. "
                 "Quando o comercial confirmar a taxa, o mês entra junto com o seguinte (R-06, R-07).",
-                "Comercial",
+                "Diego (Comercial)",  # R-55
             )
         )  # fmt: skip
     for ec, comps in sorted(inativo.items()):

@@ -12,7 +12,7 @@ Cinco momentos em que a direção humana mudou o resultado. Dois são erros da I
 ### Momento 2: o mapeamento dos ECs pela "impressão digital" das taxas ficou como hipótese até a resposta
 - **O que pedimos:** descobrir de quem são os 3 ECs da Orbe que não estão na planilha.
 - **O que a IA devolveu:** um mapeamento pelo conjunto de taxas cobradas em cada EC: Kiwi, Novo Horizonte e Horizonte Viagens.
-- **O que fizemos com isso:** não usamos como fato. Perguntamos no canal, a Helena confirmou os três (R-05), e o alias ficou como dado com fonte e aprovador. Assim, um EC novo em outubro vira pendência de cadastro em vez de ser adivinhado.
+- **O que fizemos com isso:** não usamos como fato. A pergunta já estava no canal compartilhado, feita por outro time (Fox AI, [T4] no `HIPOTESES.md`); esperamos a resposta, a Helena confirmou os três (R-05), e o alias ficou como dado com fonte e aprovador. Assim, um EC novo em outubro vira pendência de cadastro em vez de ser adivinhado.
 
 ### Momento 3: não confiar no que já estava escrito (direção humana)
 - **O que pedimos:** reler os dados e o canal inteiro sem confiar a priori no repositório, separando o que o financeiro disse do que um time propôs.
