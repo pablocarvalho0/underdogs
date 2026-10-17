@@ -16,6 +16,7 @@ from typing import Any
 
 import pandas as pd
 
+from src.conferencia import conferir
 from src.config import DATA_PACK_DIR, OUTPUT_FILES, ROOT_DIR
 from src.core.pipeline import run_pipeline
 from src.loaders import (
@@ -237,6 +238,40 @@ def _aba_output(tmp: Path) -> tuple[str, str]:
     return f"{total} linhas de saída · {resumo_t}", val + corpo_t + corpo
 
 
+def _aba_conferencia(tmp: Path) -> tuple[str, str]:
+    checagens = conferir(tmp)
+    cls = {"ok": "bg-ok", "falhou": "bg-err", "pendente": "bg-warn"}
+    resumos = []
+    corpo = (
+        "<p>Saída do pipeline contra a prévia independente do <code>HIPOTESES.md</code> §5. "
+        "Um nível só está entregue com todas as linhas dele em verde. "
+        "Amarelo: a saída ainda não tem essas linhas.</p>"
+    )
+    for nivel in ("Mínimo", "Alvo"):
+        do_nivel = [c for c in checagens if c.nivel == nivel]
+        ok = sum(c.status == "ok" for c in do_nivel)
+        falhou = sum(c.status == "falhou" for c in do_nivel)
+        veredito = (
+            '<span class="ok">ENTREGUE</span>'
+            if ok == len(do_nivel)
+            else f'<span class="err">{falhou} ERRADO(S)</span>'
+            if falhou
+            else '<span class="warn">INCOMPLETO</span>'
+        )
+        resumos.append(f"{nivel}: {ok}/{len(do_nivel)}")
+        rows = "".join(
+            f'<tr class="{cls[c.status]}"><td>{_e(c.item)}</td><td>{_e(c.esperado)}</td>'
+            f"<td>{_e(c.obtido)}</td><td>{c.status}</td></tr>"
+            for c in do_nivel
+        )
+        corpo += (
+            f'<div class="card"><h3>{nivel} — {veredito} ({ok}/{len(do_nivel)})</h3>'
+            "<table><tr><th>Item (§5)</th><th>Esperado</th><th>Obtido</th><th>Status</th></tr>"
+            f"{rows}</table></div>"
+        )
+    return " · ".join(resumos), corpo
+
+
 def gerar_painel(output_html: Path) -> Path:
     """Gera o painel em `output_html` e devolve o caminho."""
     output_html = Path(output_html)
@@ -245,13 +280,19 @@ def gerar_painel(output_html: Path) -> Path:
         tmp = Path(d)
         r_in, c_in = _aba_input()
         r_proc, c_proc = _aba_processamento(tmp)
+        r_conf, c_conf = _aba_conferencia(tmp)
         r_out, c_out = _aba_output(tmp)
 
     agora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     branch = _git("rev-parse", "--abbrev-ref", "HEAD")
     commit = _git("rev-parse", "--short", "HEAD")
-    resumo = f"{r_in} · {r_out}"
-    abas = [("Input", r_in, c_in), ("Processamento", r_proc, c_proc), ("Output", r_out, c_out)]
+    resumo = f"{r_conf} · {r_in} · {r_out}"
+    abas = [
+        ("Conferência", r_conf, c_conf),
+        ("Input", r_in, c_in),
+        ("Processamento", r_proc, c_proc),
+        ("Output", r_out, c_out),
+    ]
     nav = "".join(
         f'<button class="{"on" if i == 0 else ""}" onclick="aba({i})">{n}</button>'
         for i, (n, _, _) in enumerate(abas)
