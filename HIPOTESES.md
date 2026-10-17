@@ -1,8 +1,9 @@
 # Hipóteses, premissas e respostas do financeiro
 
-> **Versão de 17/10, 13h45.** Reescrita a partir de todas as respostas do financeiro da Tarvo
+> **Versão de 17/10, 13h40.** Reescrita a partir de todas as respostas do financeiro da Tarvo
 > (assinadas "Helena, financeiro da Tarvo") no canal
-> [#duvidas-hackathon-ai](https://bartehackathonai.slack.com/archives/C0CA0S5D37B) até 12h50.
+> [#duvidas-hackathon-ai](https://bartehackathonai.slack.com/archives/C0CA0S5D37B) até 13h35.
+> Inclui o arquivo `06_orbe_ajustes_tardios_set2026.csv`, que chegou às 13h10.
 > O canal é compartilhado entre os times ("queremos que todos tenham o mesmo contexto"), então as
 > respostas valem para todos. A versão anterior (H-01..H-07) está mapeada na §6.
 
@@ -24,6 +25,15 @@
 - 22 ECs e 31 grafias de nome. A Mundo Aberto aparece de 3 jeitos. **Não traz CNPJ.**
 - `valor_taxa` é `valor_bruto × taxa_aplicada_pct` **truncado** no centavo, em 100% das linhas.
 - Estornos: 50 apontam (`id_referencia`) para vendas do próprio arquivo, todos integrais, com a mesma taxa e o mesmo EC; 9 apontam para vendas de agosto. As 6 reversões apontam para antecipações do mês, pelo valor integral.
+- A bandeira do estorno é diferente da bandeira da venda em 39 dos 50 casos. Não importa, porque nenhuma taxa depende da bandeira.
+
+**Orbe, ajustes tardios (`06_orbe_ajustes_tardios_set2026.csv`, chegou às 13h10 de 17/10 [T43])**
+- O cabeçalho é **idêntico** ao do 01, com a mesma codificação, separador e formato de data. São 14 linhas, todas com `data_movimento` = 30/09/2026: 10 `ESTORNO`, 3 `REVERSAO ANTECIPACAO` e 1 `VENDA`.
+- Nenhum `id_transacao` repete o 01. Os ids continuam a sequência do 01 (o maior TX do 01 é 88446959; o menor do 06 é 88446992).
+- Os 10 estornos apontam para vendas de setembro do 01. Todos são integrais, com mesmo EC, modalidade, parcelas, taxa e data da venda. Nenhuma dessas vendas já tinha estorno no 01.
+- As 3 reversões anulam por inteiro antecipações do 01: Oxford em 22/09 e 29/09, e Maple em 24/09.
+- A venda é da Kiwi (`TX88447225`): R$ 5.480,00, 3x, 3,19%, a mesma taxa das outras 24 vendas parceladas da Kiwi no mês.
+- `valor_taxa` também vem truncado, e `valor_liquido` = bruto − taxa em todas as linhas.
 
 **Planilha de taxas (`02_...xlsx`)**
 - Aba "Taxas vigentes": 25 linhas, 24 CNPJs. A Bridge tem 2 linhas: crédito à vista 2,59% até 14/09 e 2,19% a partir de 15/09.
@@ -73,6 +83,8 @@
 | R-08 | **Casa do Estudante** (`1018325654`) tem **tarifa zerada no checkout de set a dez/2026**, em MDR e antecipação, por concessão do comercial. Vale para venda a partir de 01/09. Estorno de venda anterior segue a taxa da venda (ex.: `TX88445133`, venda de 21/08, 1,49%). A remessa segue normal. | [T7] [T35] [T17] |
 | R-09 | O que a Orbe cobrou da Casa durante a isenção é **devolução ao lojista**, paga pela Tarvo. Não é divergência de contrato e não entra na cobrança da Orbe. O valor é o descontado de fato (`valor_taxa`). Vira pendência para Helena e comercial, com o total e o detalhe por transação. | [T17] [T26] [T36] [T39] |
 | R-10 | A Tarvo não vende acima de 12x. Se aparecer, é pendência. | [T28] |
+| R-43 | **Ajuste tardio da Orbe** chega num arquivo à parte, no mesmo formato do 01, e só quando a Orbe tem ajuste (não é todo mês). Se chegar **antes** da aprovação do fechamento, entra no mês do movimento: é o caso do 06, que entra em setembro. Se chegar **depois** da aprovação, entra no mês seguinte. Consequência: a entrada tem que ler **todos** os arquivos da Orbe da pasta do mês, e não um nome fixo. | [T40] [T43] |
+| R-44 | Isenção da Casa na **antecipação**: vale a data da antecipação, não a das vendas antecipadas. Antecipação feita em setembro é isenta, e não é preciso procurar as vendas de origem. | [T41] |
 
 ### 2.2 Comissão de remessa
 | ID | Regra | Fonte |
@@ -112,7 +124,7 @@
 | R-31 | A provisão de folha e impostos de setembro fica **fora** do nosso fechamento (é da contabilidade). Classificamos só o que passou nos extratos. | [T36] |
 | R-32 | Pix de R$ 7.350 sem identificação (L50): **não é receita** até alguém identificar. A devolução de Pix da Mundo Aberto, R$ 12.400 (L65), é um repasse que voltou, motivo ainda desconhecido; servem a 2.1.01.001 ou a 2.1.01.002 (P-04). | [T7] [T21] |
 | R-33 | A transferência de R$ 300 mil de 30/09 (L92) cai no Meridiano em 01/10. | [T7] |
-| R-34 | O Pix de R$ 18.240 da Ponte Aérea (`MRD2026090425`) é dinheiro de uma remessa que sai em outubro. A Ponte Aérea Estudantil é lojista, não tem relação com a Ponte Câmbio. | [T17] [T18] |
+| R-34 | O Pix de R$ 18.240 da Ponte Aérea (`MRD2026090425`) é dinheiro de uma remessa que sai em outubro. A Ponte Aérea Estudantil é lojista, não tem relação com a Ponte Câmbio. Fica em recursos para remessas. | [T17] [T18] [T42] |
 | R-35 | O saldo negativo do Aurora é a **conta garantida**, usada para pagar lojistas antes de a Orbe liquidar. A Orbe deposita tudo no Aurora: débito e Pix em D+1, crédito e parcelado ao longo dos meses. Conciliar Orbe × banco parcela por parcela fica fora deste fechamento. | [T14] |
 | R-36 | O repasse ao lojista é 2× no mês (~10 e ~24), do que a Orbe já liquidou. Às vezes a Bia antecipa pela conta garantida, sem regra nem limite. O repasse à Atlas continua. | [T25] [T27] [T29] |
 
@@ -130,7 +142,7 @@
 | ID | Regra | Fonte |
 | :--- | :--- | :--- |
 | L-01 | Canal único `#duvidas-hackathon-ai`: começar com `[Financeiro]` ou `[Logística]` e o nome do time, uma pergunta por thread. | [T24] |
-| L-02 | **A solução tem que rodar**: recebe a pasta (ou upload) do mês, não tem nada fixo para setembro, roda com um comando e gera os 6 CSVs. O README diz como rodar e onde configurar a chave de API. A banca roda com os arquivos do case, **inclusive os que chegarem durante o dia**, e compara com o `saida/` entregue. | [T19] [T30] |
+| L-02 | **A solução tem que rodar**: recebe a pasta (ou upload) do mês, não tem nada fixo para setembro, roda com um comando e gera os 6 CSVs. O README diz como rodar e onde configurar a chave de API. A banca roda com os arquivos do case, **inclusive os que chegarem durante o dia**, e compara com o `saida/` entregue. **O fechamento das 18h30 tem que considerar o 06.** | [T19] [T30] [T43] |
 | L-03 | Não vai ter pacote de outubro. O `saida/` tem só setembro. | [T30] |
 | L-04 | `pendencias.csv`: vários `ref_origem` separados por `|` valem; `quem_decide` é texto livre, coerente com o canal. **Alarme falso é marcar divergência onde não existe.** | [T30] |
 | L-05 | Um repositório por time, com tudo dentro. | [T3] |
@@ -140,7 +152,7 @@
 
 ## 3. Premissas nossas (decisões delegadas ou sem resposta)
 
-Status: **proposta**, a confirmar pelo time no PR.
+Status: **proposta**, a confirmar pelo time no PR, menos onde está marcado **decidida**.
 
 | ID | Premissa | Por quê | Fonte da delegação |
 | :--- | :--- | :--- | :--- |
@@ -152,11 +164,12 @@ Status: **proposta**, a confirmar pelo time no PR.
 | P-06 | A isenção da Casa **não** entra em `divergencias_taxa.csv`; fica só na pendência, com detalhe por transação no rastro. | Evita misturar com divergência de contrato (R-09). Listar é opcional. | [T36] |
 | P-07 | Spreads negativos **não** entram em `divergencias_taxa.csv`; ficam só na pendência de contestação. | O lojista não pagou a mais (R-23). | [T16] |
 | P-08 | Alerta de antecipação: lojista **sem venda antes do mês** cuja antecipação acumulada supera as vendas acumuladas em algum dia do mês (o **pico**), citando as reversões. Em setembro acende só para a Atlas (pico em 15/09: R$ 179.592,82 antecipados contra R$ 55.357,50 vendidos). | Antecipação é sobre a agenda inteira, então comparar com as vendas do mês acende lojista demais. O que preocupa é lojista novo antecipando alto. | [T32] [T38] |
-| P-09 | `taxa_contratada_pct` e `taxa_aplicada_pct` em **pontos percentuais** (`2.69`), como a coluna `taxa_aplicada_pct` da própria Orbe. Fica parametrizado. | Não muda nenhum valor em R$, mas a correção automática pode comparar a coluna. Ver Q-01. | — |
+| P-09 | **Decidida pelo time (17/10 13h40).** `taxa_contratada_pct` e `taxa_aplicada_pct` em **pontos percentuais** (`2.69`). Internamente o cálculo usa fração; a conversão é feita só na gravação do CSV. | É a unidade da coluna `taxa_aplicada_pct` da Orbe, e a Orbe manda todo mês no mesmo modelo (o 06 confirma). Não muda nenhum valor em R$. | — |
 | P-10 | `arquivo_origem` no rastro é o nome do arquivo do data pack. Para a Ponte, o `.eml` (`03_email_ponte_cambio_relatorio_set2026.eml`), com `ref_origem` = Nº Operação. | É o arquivo que chega no pacote; o xlsx é extraído dele. Ver Q-02. | — |
 | P-11 | Transferência de R$ 300 mil (L92) → 1.1.09.001, com pendência de acompanhamento: confirmar o crédito no Meridiano em 01/10. | R-33 + R-39. | — |
 | P-12 | Pix de R$ 18.240 (`MRD2026090425`) → 2.1.02.001. Não é pendência de decisão, porque a R-34 explica; no máximo acompanhamento até a operação de outubro. | R-34. | — |
 | P-13 | Pendência é **uma por contraparte e por lojista**, com os `ref_origem` separados por `|`. | R-37 + L-04. | — |
+| P-14 | Ajuste da Orbe com `id_transacao` que **já existe** em outro arquivo da Orbe do mês: se a linha for idêntica, conta uma vez. Se for diferente, **vale a versão do ajuste**, e uma pendência para a Helena mostra as duas linhas e o efeito na comissão e na divergência. A linha substituída não entra no rastro. | É a informação mais recente da fonte, e a Helena vê a troca antes de liberar. A duplicata idêntica segue a lógica da R-13. Não aconteceu em setembro. | [T40] |
 
 ---
 
@@ -164,21 +177,20 @@ Status: **proposta**, a confirmar pelo time no PR.
 
 | ID | Para | Pergunta | O que destrava |
 | :--- | :--- | :--- | :--- |
-| Q-01 | `[Logística]` | `taxa_*_pct` deve vir em pontos percentuais (`2.69`) ou em fração (`0.0269`)? | A correção automática de `divergencias_taxa.csv` (P-09) |
 | Q-02 | `[Logística]` | No `rastro.csv`, qual `arquivo_origem` usar para valores da Ponte: o `.eml` do pacote ou o xlsx anexado? | A correção automática do `rastro.csv` (P-10) |
-| Q-03 | `[Financeiro]` | A Helena citou que a Orbe às vezes manda ajuste depois do relatório [T37]. Como ele chega: linhas novas no relatório do mês seguinte (com qual `tipo_lancamento`?) ou arquivo separado? | O agente reconhecer o ajuste em outubro em vez de quebrar |
 
-As 3 perguntas da versão anterior deste arquivo **não chegaram a ser enviadas**. Todas foram respondidas no canal por perguntas de outros times (ver §6).
+As 3 perguntas da versão anterior deste arquivo **não chegaram a ser enviadas**. Todas foram respondidas no canal por perguntas de outros times (ver §6). Duas perguntas da versão de 13h25 também saíram da lista: a Q-01 (unidade da taxa) foi decidida pelo time (P-09), e a Q-03 (ajuste da Orbe) foi respondida pela R-43.
 
 ---
 
 ## 5. Prévia independente dos números de setembro (para controle)
 
-Calculada por um script de exploração, fora do `src/`, aplicando as regras acima. **A implementação das trilhas tem que chegar aos mesmos valores.** Se não chegar, alguém errou, e vale investigar antes de entregar.
+Calculada por um script de exploração, fora do `src/`, aplicando as regras acima aos arquivos **01 + 06** da Orbe. **A implementação das trilhas tem que chegar aos mesmos valores.** Se não chegar, alguém errou, e vale investigar antes de entregar.
 
 | Item | Valor | Regras |
 | :--- | ---: | :--- |
-| Comissão de checkout, 21 lojistas (sem Atlas) | **R$ 207.039,73** | R-01..R-08 |
+| Comissão de checkout, 21 lojistas (sem Atlas), com o 06 | **R$ 203.735,34** | R-01..R-08, R-43 |
+| · sem o 06, só para comparar | R$ 207.039,73 | |
 | Casa do Estudante: comissão do mês (só o estorno `TX88445133`) | −R$ 5,50 → sem nota, pendência | R-08, R-26 |
 | Casa do Estudante: devolução ao lojista (118 linhas isentas) | R$ 15.396,77 | R-09 |
 | Atlas: o que a Orbe cobrou e não será faturado (57 linhas) | R$ 7.876,05 | R-06 |
@@ -192,6 +204,20 @@ Calculada por um script de exploração, fora do `src/`, aplicando as regras aci
 | Spreads negativos: pelo relatório / pela diferença até o contrato | −R$ 1.834,05 / −R$ 3.565,98 | R-14 |
 
 Na Rota, o débito (1,49%) e o Pix (0,89%) foram cobrados certo o mês inteiro. A diferença é só no crédito, a partir de 12/09.
+
+**O que o 06 muda (−R$ 3.304,39 no checkout).** Muda só a comissão de 7 lojistas. Divergências, Casa, Atlas e remessa ficam iguais: nenhuma linha do 06 é de Rota, Bridge à vista, Casa ou Atlas, e as taxas aplicadas batem com o contrato.
+
+| Lojista | Linhas do 06 | Comissão sem o 06 | Com o 06 | Diferença |
+| :--- | :--- | ---: | ---: | ---: |
+| Oxford Prep | 2 estornos e 2 reversões de antecipação | 16.077,90 | 13.845,71 | −2.232,19 |
+| Maple Study | 2 estornos e 1 reversão | 15.010,78 | 14.165,77 | −845,01 |
+| EduAbroad | 2 estornos | 12.070,17 | 11.858,16 | −212,01 |
+| Bridge | 2 estornos | 11.916,02 | 11.769,74 | −146,28 |
+| Dublin Hub | 1 estorno | 11.906,08 | 11.876,37 | −29,71 |
+| Mundo Aberto | 1 estorno | 18.522,09 | 18.508,09 | −14,00 |
+| Kiwi | 1 venda | 10.711,41 | 10.886,22 | +174,81 |
+
+Todas as 7 notas de checkout mudam de valor, e nenhuma fica zerada ou negativa.
 
 ---
 
@@ -214,7 +240,8 @@ Na Rota, o débito (1,49%) e o Pix (0,89%) foram cobrados certo o mês inteiro. 
 
 - **17/10 08:30** — Repositório criado com proteção de branch e aprovação por PR.
 - **17/10 08:35** — Arquitetura com `rastro.csv` nativo.
-- **17/10 13:45** — Reescrita a partir das respostas do financeiro no canal (R-01..R-42), com premissas propostas (P-01..P-13), perguntas abertas (Q-01..Q-03) e prévia de controle (§5).
+- **17/10 13:25** — Reescrita a partir das respostas do financeiro no canal (R-01..R-42), com premissas propostas (P-01..P-13), perguntas abertas (Q-01..Q-03) e prévia de controle (§5).
+- **17/10 13:40** — Entrou o `06_orbe_ajustes_tardios_set2026.csv` (fatos na §1, R-43, R-44, P-14, §5 recalculada). P-09 decidida: 2.69. Q-01 e Q-03 saíram da lista.
 
 ---
 
@@ -259,3 +286,7 @@ Na Rota, o débito (1,49%) e o Pix (0,89%) foram cobrados certo o mês inteiro. 
 [T37]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792250828101959 "Turma do Barulho: mudanças de mês a mês (17/10 12h27)"
 [T38]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792251374757469 "Fox AI: alerta da Atlas pelo pico (17/10 12h36)"
 [T39]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792251861625499 "Participante: devolução pelo valor descontado (17/10 12h44)"
+[T40]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792253999043339 "Participante: ajustes tardios da Orbe (17/10 13h20)"
+[T41]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792253993517819 "Participante: isenção da Casa na antecipação (17/10 13h20)"
+[T42]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792253934475539 "Dogshow: Pix de R$ 18.240 (17/10 13h19)"
+[T43]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792253401618969 "Organização: chegou o arquivo 06 (17/10 13h10)"
