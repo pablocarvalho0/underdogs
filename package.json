@@ -5,10 +5,13 @@
   "scripts": {
     "test": ".venv/bin/pytest tests/test_blackbox_immutable.py -v",
     "test:all": ".venv/bin/pytest -v",
+    "test:real": ".venv/bin/pytest tests/test_real_dataset_integrity.py tests/test_loaders.py -v",
     "test:watch": ".venv/bin/pytest -f",
+    "run": ".venv/bin/python -m src.main run",
     "validate": ".venv/bin/python -m src.main validate",
     "status": ".venv/bin/python -m src.main status"
   },
   "author": "Pablo Carvalho",
-  "license": "Private"
+  "license": "MIT"
+
 }

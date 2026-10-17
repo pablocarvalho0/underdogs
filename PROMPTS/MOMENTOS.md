@@ -18,10 +18,11 @@ Este documento registra os momentos críticos na interação com a IA durante o 
 
 ---
 
-### Momento 3: [A preencher durante a execução do pipeline de reconciliação]
-- **O que foi pedido:** *(Registrar próximo momento crítico de refatoração ou conciliação)*
-- **O que a IA devolveu:** *(Registrar retorno da IA)*
-- **O que foi feito com isso:** *(Registrar decisão e ajuste adotado)*
+### Momento 3: Auditoria Crítica de Governança, Regras do Hackathon e Blindagem de Testes
+- **O que foi pedido:** Validação da confiabilidade dos testes como gabarito, verificação de aderência às condições de contorno da Barte AI e blindagem para impedir que IAs adulterassem os testes para obter falsos positivos.
+- **O que a IA devolveu:** A análise revelou que o `README.md` e `CLAUDE.md` estavam incorretamente configurados como "repositório privado" (o que violava o regulamento eliminatório da Barte que exige repositório público para correção automática), que o teste sintético inicial ignorava validação contábil do ERP Fênix e que apenas avisos em texto não impediam fisicamente que IAs alterassem os testes.
+- **O que foi feito com isso:** A documentação foi corrigida imediatamente para repositório público; as asserções de teste foram estendidas para validar classificações contábeis, notas fiscais individuais e rastreabilidade estendida; foi criada uma suíte de integridade para o dataset real (`npm run test:real`); e os arquivos foram blindados via permissões de sistema (`chmod 444`) e hook de pré-commit do Git.
+
 
 ---
 
