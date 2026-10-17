@@ -1,11 +1,13 @@
 """Motor de execução da conciliação financeira Tarvo."""
 
 import json
+from dataclasses import replace
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 from src.core.cadastro import montar_cadastro
+from src.core import entrada
 from src.core.entrada import carregar
 from src.core.writer import escrever
 from src.premissas import PREMISSAS, Premissas
@@ -22,6 +24,7 @@ def run_pipeline(
     inicio = datetime.now()
     resultados = [t.rodar(dados, cadastro, premissas) for t in (checkout, remessa, extratos)]
     linhas = [ln for r in resultados for ln in r.linhas]
+    _nomes_reais(linhas, dados.arquivos)
     contagem = escrever(linhas, Path(output_dir))
 
     resultado = {
@@ -30,6 +33,24 @@ def run_pipeline(
     }
     _registrar_execucao(Path(input_dir), Path(output_dir), dados, inicio, resultado)
     return resultado
+
+
+def _nomes_reais(linhas: list[Any], arquivos: dict[str, str]) -> None:
+    """P-19: se a fonte veio com outro nome, o rastro aponta para o arquivo que de fato foi lido."""
+    padrao = {
+        entrada.ARQ_TAXAS: "taxas",
+        entrada.ARQ_PONTE: "ponte",
+        entrada.ARQ_FENIX: "plano_contas",
+        entrada.ARQ_AURORA: "aurora",
+        entrada.ARQ_MERIDIANO: "meridiano",
+    }
+    troca = {nome: arquivos[papel] for nome, papel in padrao.items() if arquivos.get(papel, nome) != nome}
+    if not troca:
+        return
+    for ln in linhas:
+        ln.componentes = [
+            replace(c, arquivo_origem=troca.get(c.arquivo_origem, c.arquivo_origem)) for c in ln.componentes
+        ]
 
 
 def _registrar_execucao(input_dir: Path, output_dir: Path, dados: Any, inicio: datetime, resultado: dict) -> None:
