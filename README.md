@@ -160,6 +160,53 @@ Este repositório é **PÚBLICO** (requisito mandatório para avaliação da ban
 - Rastreamento obrigatório de premissas em `HIPOTESES.md` para qualquer ajuste em regras de negócio.
 - **Suíte de Testes e Gabaritos:** Travados como somente leitura (`chmod 444`) e protegidos contra modificações inadvertidas ou adulterações por agentes de IA.
 
+---
+
+## 🤝 Como Contribuir (Fluxo de Trabalho)
+
+Todo trabalho segue o mesmo ciclo: **branch nova → código → PR → revisão do `@pablocarvalho0` → merge → atualizar a `main` local → próxima tarefa.**
+
+### 1. Planeje antes de abrir a branch
+Cada branch resolve **uma tarefa planejada e delimitada** (ex.: "parser do OFX do Meridiano", "cálculo de comissão do Checkout"). Se a tarefa não cabe em uma frase, quebre em mais de uma branch. PR pequeno é revisado e mergeado rápido; PR grande trava o time.
+
+### 2. Parta da `main` atualizada e crie a branch
+```bash
+git switch main
+git pull
+git switch -c feat/nome-da-tarefa
+```
+Prefixos: `feat/` (funcionalidade), `fix/` (correção), `docs/` (documentação), `chore/` (ferramental).
+
+### 3. Code na sua branch
+- Commits pequenos e com mensagem que diga **o que** e **por quê**.
+- Rode `npm test` antes de subir. Teste falhando que você não consegue explicar vai na descrição do PR, não é escondido.
+- Premissa nova de regra de negócio vai em [`HIPOTESES.md`](./HIPOTESES.md); decisão relevante tomada com IA vai em [`PROMPTS/MOMENTOS.md`](./PROMPTS/MOMENTOS.md).
+
+### 4. Suba e abra o Pull Request
+```bash
+git push -u origin feat/nome-da-tarefa
+```
+Abra o PR contra a `main` no GitHub (ou `gh pr create --base main`). Na descrição: o que muda, por quê, e como você verificou (resultado do `npm test`).
+
+### 5. Revisão e merge
+O `@pablocarvalho0` revisa o PR. Se pedir ajuste, faça novos commits na **mesma branch** e dê `git push` — o PR atualiza sozinho. Depois de aprovado, **o próprio mantenedor faz o merge** na `main`; você não precisa fazer nada nessa etapa.
+
+### 6. Depois do merge: atualize sua `main` local
+```bash
+git switch main
+git pull
+git branch -d feat/nome-da-tarefa
+```
+Pronto: sua `main` está igual à do GitHub. Volte ao passo 1 para a próxima tarefa.
+
+> **Branch em andamento enquanto outro PR foi mergeado?** Traga as novidades da `main` para a sua branch antes de continuar:
+> ```bash
+> git switch feat/minha-tarefa
+> git fetch origin
+> git rebase origin/main
+> ```
+> Se houver conflito, resolva, `git add` nos arquivos e `git rebase --continue`. Depois do rebase, o push precisa de `git push --force-with-lease`.
+
 
 ---
 
