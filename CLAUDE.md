@@ -47,7 +47,7 @@ A **Tarvo Pagamentos** é uma subadquirente de nicho focada no mercado de educa�
 
 4. **Separação Rígida entre Fato e Premissa:**
    - Qualquer suposição não explícita na documentação oficial deve ser documentada em `HIPOTESES.md`.
-   - Se uma regra puder ser esclarecida com o financeiro no canal `#tarvo-financeiro`, a pergunta deve ser formulada primeiro.
+   - Se uma regra puder ser esclarecida com o financeiro no canal `#duvidas-hackathon-ai` (o `#tarvo-financeiro` do desafio não existe), a pergunta deve ser formulada primeiro.
 
 5. **Formato Obrigatório de Saída em `saida/`:**
    - Separador de colunas: `;`
@@ -67,6 +67,7 @@ A **Tarvo Pagamentos** é uma subadquirente de nicho focada no mercado de educa�
 | `04_plano_de_contas_fenix_erp.csv` | ERP Fênix | `COD_CONTA`, `DESCRICAO`, `TIPO`, `NATUREZA`, `ACEITA_LANCTO`, `COD_SUPERIOR` |
 | `05a_extrato_banco_aurora_cc4471_set2026.csv` | Internet Banking | Conta corrente principal de movimentação e repasses |
 | `05b_extrato_banco_meridiano_cc90233_set2026.ofx` | Internet Banking | Conta corrente usada nas operações de remessas internacionais |
+| `06_orbe_ajustes_tardios_set2026.csv` | Orbe Adquirente | Ajustes tardios, mesmo layout do 01 (chegou às 13h10 de 17/10). **A entrada lê todos os arquivos da Orbe da pasta**, nunca um nome fixo (R-43 do `HIPOTESES.md`) |
 
 ---
 

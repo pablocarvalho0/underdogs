@@ -1,9 +1,10 @@
 # Hipóteses, premissas e respostas do financeiro
 
-> **Versão de 17/10, 13h40.** Reescrita a partir de todas as respostas do financeiro da Tarvo
+> **Versão de 17/10, 13h50.** Reescrita a partir de todas as respostas do financeiro da Tarvo
 > (assinadas "Helena, financeiro da Tarvo") no canal
-> [#duvidas-hackathon-ai](https://bartehackathonai.slack.com/archives/C0CA0S5D37B) até 13h35.
-> Inclui o arquivo `06_orbe_ajustes_tardios_set2026.csv`, que chegou às 13h10.
+> [#duvidas-hackathon-ai](https://bartehackathonai.slack.com/archives/C0CA0S5D37B) até 13h50.
+> Inclui o arquivo `06_orbe_ajustes_tardios_set2026.csv`, que chegou às 13h10. Consolida os PRs
+> #7 (respostas do financeiro e arquivo 06) e #8 (releitura do canal inteiro).
 > O canal é compartilhado entre os times ("queremos que todos tenham o mesmo contexto"), então as
 > respostas valem para todos. A versão anterior (H-01..H-07) está mapeada na §6.
 
@@ -34,6 +35,7 @@
 - As 3 reversões anulam por inteiro antecipações do 01: Oxford em 22/09 e 29/09, e Maple em 24/09.
 - A venda é da Kiwi (`TX88447225`): R$ 5.480,00, 3x, 3,19%, a mesma taxa das outras 24 vendas parceladas da Kiwi no mês.
 - `valor_taxa` também vem truncado, e `valor_liquido` = bruto − taxa em todas as linhas.
+- A bandeira do estorno difere da bandeira da venda em 7 dos 10 estornos. Mesmo caso do 01: não muda nenhuma taxa (ver Q-05).
 
 **Planilha de taxas (`02_...xlsx`)**
 - Aba "Taxas vigentes": 25 linhas, 24 CNPJs. A Bridge tem 2 linhas: crédito à vista 2,59% até 14/09 e 2,19% a partir de 15/09.
@@ -80,7 +82,7 @@
 | R-05 | EC→lojista: `1043300981` = Novo Horizonte Intercâmbio; `1043396662` = Horizonte Viagens (são empresas diferentes); `1038867654` = Kiwi Experience. CNPJ e taxas estão nas linhas delas na aba vigente. | [T4] |
 | R-06 | **Atlas Idiomas** (`1076801732`) não tem contrato na aba vigente e começou em 10/09: **não fatura** até o comercial confirmar a taxa. O CNPJ da aba 2025 pode ser usado só para identificar; a taxa daquela aba não vale. O repasse continua normal. | [T4] [T34] [T29] |
 | R-07 | Quando o comercial confirmar a taxa da Atlas, ela vale desde 10/09, e **setembro é faturado junto com o mês seguinte**. O fechamento seguinte precisa puxar as linhas pendentes. | [T20] |
-| R-08 | **Casa do Estudante** (`1018325654`) tem **tarifa zerada no checkout de set a dez/2026**, em MDR e antecipação, por concessão do comercial. Vale para venda a partir de 01/09. Estorno de venda anterior segue a taxa da venda (ex.: `TX88445133`, venda de 21/08, 1,49%). A remessa segue normal. | [T7] [T35] [T17] |
+| R-08 | **Casa do Estudante** (`1018325654`) tem **tarifa zerada no checkout de set a dez/2026**, em MDR e antecipação, por concessão do comercial. Vale para venda a partir de 01/09. Estorno de venda anterior segue a taxa da venda (ex.: `TX88445133`, venda de 21/08, 1,49%). Para a antecipação, vale a data da antecipação (R-44). A remessa segue normal. | [T7] [T35] [T17] |
 | R-09 | O que a Orbe cobrou da Casa durante a isenção é **devolução ao lojista**, paga pela Tarvo. Não é divergência de contrato e não entra na cobrança da Orbe. O valor é o descontado de fato (`valor_taxa`). Vira pendência para Helena e comercial, com o total e o detalhe por transação. | [T17] [T26] [T36] [T39] |
 | R-10 | A Tarvo não vende acima de 12x. Se aparecer, é pendência. | [T28] |
 | R-43 | **Ajuste tardio da Orbe** chega num arquivo à parte, no mesmo formato do 01, e só quando a Orbe tem ajuste (não é todo mês). Se chegar **antes** da aprovação do fechamento, entra no mês do movimento: é o caso do 06, que entra em setembro. Se chegar **depois** da aprovação, entra no mês seguinte. Consequência: a entrada tem que ler **todos** os arquivos da Orbe da pasta do mês, e não um nome fixo. | [T40] [T43] |
@@ -92,12 +94,12 @@
 | R-11 | Comissão = **50% do `Spread R$` realizado**, e não do contratado. É calculada por operação, com o arredondamento da R-02 (50% de 262,01 = 131,01). | [T6] [T9] |
 | R-12 | Spread em branco ou "padrão" é **1,5% sobre a PTAX de referência**. | [T6] |
 | R-13 | O Nº de operação é único: operação repetida **conta uma vez**, e a repetição entra na lista para a Ponte corrigir o relatório. | [T6] [T13] |
-| R-14 | Spread negativo ("taxa travada D-1") **não é aceito**: a trava vale 2 horas e já tinha vencido. Fica fora da comissão e da nota. Vira pendência de contestação com **dois valores**: o spread do relatório e a diferença até o spread do contrato (ex.: `PC-0926-0210`: −R$ 687,52 e −R$ 1.351,87). | [T6] [T32] |
+| R-14 | Spread negativo ("taxa travada D-1") **não é aceito**: a trava vale 2 horas e já tinha vencido. Fica fora da comissão e da nota. Vira pendência de contestação com **dois valores**: o spread do relatório e a diferença até o spread do contrato (ex.: `PC-0926-0210`: −R$ 687,52 e −R$ 1.351,87). Os dois números do exemplo são cálculo do time que perguntou; a Helena confirmou a regra, não os valores (R-48). | [T6] [T32] |
 | R-15 | "APROVADO C/ RESSALVA" não muda nada. | [T6] |
 | R-16 | A competência é a **data de contratação**. | [T6] |
 | R-17 | Mundo Aberto: a comissão e a nota saem **pelo realizado**, com o excesso sobre 1,20% incluído. A contestação é um processo à parte. Se a Ponte devolver, a nossa metade sai no mês do ajuste. Não presumir que a Ponte vai descontar algo do repasse. | [T11] [T12] |
-| R-18 | Ajuste de contestação (de outubro em diante) chega como **linha nova**, com Nº próprio, `Spread R$` negativo e Observação "AJUSTE REF PC-…". Entra no mês em que aparece e abate a participação dentro da nota única. O rastro aponta para a operação original. Não há nenhum em setembro. | [T31] |
-| R-19 | Operação de CNPJ fora da planilha: calcular a nossa metade mesmo assim e abrir pendência de cadastro para o comercial. Não aconteceu em setembro. | [T18] |
+| R-18 | Ajuste de contestação (de outubro em diante) chega como **linha nova**, com Nº próprio, `Spread R$` negativo e Observação "AJUSTE REF PC-…". Entra no mês em que aparece e abate a participação dentro da nota única. O rastro aponta para a operação original. Não há nenhum em setembro. Se o `Spread R$` do ajuste é o spread inteiro ou já a nossa parte está em aberto (Q-04). | [T31] |
+| R-19 | Operação de CNPJ fora da planilha: calcular a nossa metade mesmo assim e abrir pendência de cadastro para o comercial. Não aconteceu em setembro. **A rigor é premissa**: a proposta foi de um time e a Helena respondeu "o tratamento que vocês propuseram é razoável. Registrem como premissa." Mantida aqui com o mesmo ID porque as tasks já a citam. | [T18] |
 
 ### 2.3 Divergências de taxa
 | ID | Regra | Fonte |
@@ -108,6 +110,7 @@
 | R-23 | Na remessa, divergência é o **lojista** pagar spread diferente do contratado. O valor é **cheio**, não a nossa metade. A tolerância é decisão nossa (P-01). Spread negativo não é divergência (R-14); pode ser listado, desde que marcado como outra natureza. | [T8] [T17] [T16] |
 | R-24 | Orbe cobrando abaixo do contrato também é divergência, decidida caso a caso. Não ocorreu em setembro. | [T17] |
 | R-25 | Divergência não vai automática para cobrança: a Helena decide caso a caso, com transação e valor. | [T1] |
+| R-49 | Ninguém avisa a Orbe nem a Ponte de condição nova: "O comercial fecha e, quando lembra, manda um e-mail para a Orbe ou a Ponte. A Bridge foi avisada alguns dias depois de 15/09, e a Casa do Estudante e a Mundo Aberto não foram avisadas." Contexto da R-22: o aviso não muda quem deve. | [T22] |
 
 ### 2.4 Notas fiscais
 | ID | Regra | Fonte |
@@ -115,6 +118,7 @@
 | R-26 | Checkout: **uma nota por lojista por mês**, no valor da comissão pela taxa contratada (com a antecipação). Comissão **zero ou negativa não emite**: vira pendência para a Helena e não passa automaticamente para o mês seguinte. | [T5] |
 | R-27 | Remessa: **uma nota só, com a Ponte Câmbio como tomadora** (75.374.179/0001-46), pelo total da participação no mês. Não há nota por lojista. | [T5] |
 | R-28 | Discriminação sem texto padrão: algo simples com o serviço e a competência. | [T5] |
+| R-45 | A nota de checkout **não gera cobrança nova**: "A Orbe já liquida o líquido: a taxa é descontada na hora em que ela paga [...]. A nota só documenta a taxa que já foi descontada e não gera cobrança nova. Por isso, quando a Orbe cobra a mais, o lojista já recebeu a menos e eu preciso devolver." | [T25] |
 
 ### 2.5 Extratos e plano de contas
 | ID | Regra | Fonte |
@@ -137,6 +141,18 @@
 | R-40 | Quem decide: **taxa, cadastro e contrato, o comercial** (a Bia mantém a planilha, mas não decide taxa). **Regra de fechamento e liberação, a Helena.** Registrar quem aprovou cada regra e quando. | [T23] [T28] [T37] |
 | R-41 | Antecipação acima das vendas vira **alerta** para Helena e comercial e não muda nenhum número. O critério é nosso (P-08). | [T17] [T32] [T36] [T38] |
 | R-42 | Todo mês a estrutura é a mesma, mas arquivo pode atrasar, a Orbe pode mandar ajuste depois do relatório e parceiro já mudou layout sem avisar. **A solução deve avisar, não quebrar em silêncio.** Se faltar uma fonte, fecha o que não depende dela, marca o provisório e explica o bloqueio. Quem libera é a Helena (taxa e cadastro passam antes pelo comercial). | [T37] |
+| R-46 | Retorno da contestação: "A Ponte responde por e-mail e manda o ajuste no relatório do mês seguinte, como crédito ou débito. Eu confiro e registro no fechamento do mês em que o ajuste aparece." Complementa a R-18. | [T25] |
+| R-47 | Caso que nenhuma regra cobre: "Para o que aparecer fora disso, me digam como vocês tratariam e por quê." O agente propõe o tratamento com o motivo e gera pendência; não decide sozinho. | [T6] |
+| R-48 | **A Helena não valida número nem conta contábil.** "Número eu não valido. Quem fecha é você, e a banca vai olhar o rastro." [T12]; "Conta por conta eu não valido." [T28] [T29]; "Os números eu não confiro." [T35]. Tabela de contas proposta por time no canal (TED da Orbe → 1.1.03.001, Pix ao lojista → 2.1.01.001 etc.) é **proposta**, não regra: confirmado é só o critério da contrapartida (R-29). Os lançamentos propostos na thread [T7] depois da resposta dela também ficaram sem resposta. | [T7] [T12] [T28] [T29] [T35] |
+
+**Contexto do processo atual** [T25], útil para o pitch e não para o código: a Bia cuida do
+checkout e da planilha de taxas, o Caio cuida dos bancos e das remessas, e a Helena confere,
+decide as exceções e fala com comercial, Orbe e Ponte. O fechamento leva uns 3 dias de comissão
+de checkout (metade manual, metade retrabalho por planilha desatualizada), uns 2 de remessa
+(a maior parte espera), uns 2 de classificação de extrato (quase tudo manual), e o último dia é
+das notas e da revisão. A conclusão de cada etapa é marcada com "ok" e data numa aba de controle
+da planilha. Nas palavras dela: "Quase tudo que vocês já descobriram aqui no canal estava só na
+minha cabeça".
 
 ### 2.7 Logística do hackathon
 | ID | Regra | Fonte |
@@ -146,7 +162,10 @@
 | L-03 | Não vai ter pacote de outubro. O `saida/` tem só setembro. | [T30] |
 | L-04 | `pendencias.csv`: vários `ref_origem` separados por `|` valem; `quem_decide` é texto livre, coerente com o canal. **Alarme falso é marcar divergência onde não existe.** | [T30] |
 | L-05 | Um repositório por time, com tudo dentro. | [T3] |
-| L-06 | Checkpoint 2 às 16h (opcional, por mensagem privada ao organizador indicado no [T24]). O financeiro atende até 17h45. Repositório às 18h30 e pitch às 19h, por e-mail. | [T24] |
+| L-06 | Agenda: 11h45 checkpoint 1 (opcional, passou), **16h00 checkpoint 2** (opcional), **17h45 fim do atendimento do financeiro**, **18h30 link do repositório por e-mail**, **19h00 link do pitch por e-mail**, 19h30 finalistas, 20h30 premiação. O checkpoint 2 pede: o que roda de ponta a ponta, o que mudou no plano, o que vai ser cortado, o maior risco e em que a banca pode ajudar. Uma pessoa do time manda por mensagem privada ao organizador, começando com o nome do time. | [T24] |
+| L-07 | Chave de API: "quem quiser enviar sua chave de API junto do desenvolvimento para testarmos, ok. lembrem-se de limitar o uso dela". Opcional; o README diz onde configurá-la (L-02). | [T45] |
+| L-08 | O repositório entregue tem "código, `saida/`, `PROMPTS/`, `HIPOTESES.md` e um `README.md` que rode a solução do zero". Parte em plataforma online vai como link no README, com instruções de teste. "A regra das 18h30 vale para tudo: o que mudar depois não conta." Detalha a L-05. | [T3] |
+| L-09 | O canal `#tarvo-financeiro` do documento do desafio **não existe**. "podem enviar aqui. explicitem na thread de duvida se é tarvo ou hackaton." | [T1] |
 
 ---
 
@@ -177,9 +196,13 @@ Status: **proposta**, a confirmar pelo time no PR, menos onde está marcado **de
 
 | ID | Para | Pergunta | O que destrava |
 | :--- | :--- | :--- | :--- |
-| Q-02 | `[Logística]` | No `rastro.csv`, qual `arquivo_origem` usar para valores da Ponte: o `.eml` do pacote ou o xlsx anexado? | A correção automática do `rastro.csv` (P-10) |
+| Q-02 | `[Logística]` | No `rastro.csv`, qual `arquivo_origem` usar para valores da Ponte: o `.eml` do pacote ou o xlsx anexado? **Não enviada.** | A correção automática do `rastro.csv` (P-10) |
+| Q-04 | Desbravadores, 12h04 [T44] | No ajuste da Ponte ("AJUSTE REF PC-…"), o `Spread R$` negativo é o spread inteiro (a nossa parte cai 50% dele) ou já a nossa parte (cai 100%)? Ex.: devolução de R$ 235,74 da `PC-0926-0434`. | A R-18 de outubro em diante. Não afeta setembro |
+| Q-05 | Turma do Barulho, 13h35 [T46] | 7 estornos do 06 têm bandeira diferente da venda referenciada. Mantém o vínculo, abate pela taxa da venda e registra a divergência de bandeira para a Orbe corrigir? | Se a bandeira divergente vira pendência para a Orbe. Não muda nenhum valor (nenhuma taxa depende da bandeira) |
+| Q-06 | Desbravadores, 13h36 [T47] | (1) Mesmo `id_transacao` no relatório e no ajuste, com valores iguais ou diferentes. (2) Estorno ou reversão no ajuste que aponta para transação do mês que **não está** em nenhum arquivo da Orbe. | (1) já coberto pela P-14. (2) Hoje não há regra: não acontece em setembro |
+| Q-07 | Turma do Barulho, 13h48 [T48] | Estrutura de rastro desejada e padrão para ser auditável pela Tarvo e pela Barte. | Pode mudar o formato do `rastro.csv`, se a resposta for além do §4 do `CLAUDE.md` |
 
-As 3 perguntas da versão anterior deste arquivo **não chegaram a ser enviadas**. Todas foram respondidas no canal por perguntas de outros times (ver §6). Duas perguntas da versão de 13h25 também saíram da lista: a Q-01 (unidade da taxa) foi decidida pelo time (P-09), e a Q-03 (ajuste da Orbe) foi respondida pela R-43.
+As 3 perguntas da versão anterior deste arquivo **não chegaram a ser enviadas**. Todas foram respondidas no canal por perguntas de outros times (ver §6). Duas perguntas da versão de 13h25 também saíram da lista: a Q-01 (unidade da taxa) foi decidida pelo time (P-09), e a Q-03 (ajuste da Orbe) foi respondida pela R-43. Das perguntas do PR #8, a de ajuste da Orbe e a de isenção da Casa na antecipação foram respondidas antes das 13h40 (R-43 e R-44); só a do ajuste da Ponte segue aberta (Q-04). As Q-04..Q-07 são de outros times; acompanhamos as respostas.
 
 ---
 
@@ -242,6 +265,7 @@ Todas as 7 notas de checkout mudam de valor, e nenhuma fica zerada ou negativa.
 - **17/10 08:35** — Arquitetura com `rastro.csv` nativo.
 - **17/10 13:25** — Reescrita a partir das respostas do financeiro no canal (R-01..R-42), com premissas propostas (P-01..P-13), perguntas abertas (Q-01..Q-03) e prévia de controle (§5).
 - **17/10 13:40** — Entrou o `06_orbe_ajustes_tardios_set2026.csv` (fatos na §1, R-43, R-44, P-14, §5 recalculada). P-09 decidida: 2.69. Q-01 e Q-03 saíram da lista.
+- **17/10 13:50** — Consolidação dos PRs #7 e #8. Do #8 entraram, renumerados para não colidir com o #7: R-45..R-49 (no #8 eram R-43..R-47), a agenda completa na L-06, L-07..L-09 (no #8, L-08, L-11, L-10), Q-04 (no #8, Q-06), o contexto do processo e as ressalvas na R-14 e na R-19. Saíram do #8 a L-07 (o 06 já está no data pack) e as Q-04/Q-05 dele (respondidas: R-43, R-44). Entraram as Q-05..Q-07, de threads posteriores. Links [T40]..[T43] seguem a numeração do #7; [T44]..[T48] são novos.
 
 ---
 
@@ -290,3 +314,8 @@ Todas as 7 notas de checkout mudam de valor, e nenhuma fica zerada ou negativa.
 [T41]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792253993517819 "Participante: isenção da Casa na antecipação (17/10 13h20)"
 [T42]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792253934475539 "Dogshow: Pix de R$ 18.240 (17/10 13h19)"
 [T43]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792253401618969 "Organização: chegou o arquivo 06 (17/10 13h10)"
+[T44]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792249449403979 "Desbravadores: valor do ajuste da Ponte (17/10 12h04, sem resposta)"
+[T45]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792250704054669 "Organização: chave de API (17/10 12h25)"
+[T46]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792254957589749 "Turma do Barulho: bandeira divergente nos estornos do 06 (17/10 13h35, sem resposta)"
+[T47]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792254985999379 "Desbravadores: id repetido e estorno órfão no ajuste da Orbe (17/10 13h36, sem resposta)"
+[T48]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792255687788519 "Turma do Barulho: estrutura do rastro (17/10 13h48, sem resposta)"
