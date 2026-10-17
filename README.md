@@ -241,5 +241,9 @@ Pronto: sua `main` está igual à do GitHub. Volte ao passo 1 para a próxima ta
 
 - **Transações da Ponte Câmbio:** O anexo `.xlsx` dentro do arquivo `.eml` é extraído programaticamente pelo parser sem necessidade de manipulação manual.
 - **Transações com status "APROVADO C/ RESSALVA":** seguem para liquidação e não mudam nenhum cálculo (R-15 do `HIPOTESES.md`).
-- **Identificação de lojista:** nunca por nome. Orbe pelo EC, Ponte pelo CNPJ, ambos resolvidos pela planilha de taxas e pelos aliases confirmados pelo financeiro (R-05). O que não casa vira pendência.
+- **Identificação de lojista no checkout e na remessa:** nunca por nome. Orbe pelo EC, Ponte pelo CNPJ, ambos resolvidos pela planilha de taxas e pelos aliases confirmados pelo financeiro (R-05). O que não casa vira pendência.
+- **Exceção, nos extratos:** o banco não traz CNPJ no Pix enviado, só o nome truncado do destinatário. O Pix enviado é tratado como repasse ao lojista quando esse nome truncado é o **começo** do nome de um lojista (planilha, Orbe ou Ponte), depois de tirar acentos e pontuação. Não há similaridade aproximada, mas um nome curto pode casar com o lojista errado. Isso muda só a conta contábil (2.1.01.001), nunca uma comissão.
+- **Saldo inicial do Meridiano:** o OFX só traz o saldo final; o inicial (R$ 204.118,03) é derivado dele e não tem conferência independente.
+- **O que não aparece em nenhum arquivo:** o custo da Orbe para a Tarvo e os juros e o IOF da conta garantida. A comissão é a taxa contratada inteira (R-01); esses custos ficam fora do fechamento.
+- **Suíte caixa-preta (`npm test`):** falha em um valor (CNPJ 22222222000122: gerado 43,80, esperado 53,80). Duas implementações independentes chegam a 43,80 seguindo as respostas da Helena; a suíte foi escrita antes delas. Não foi lida nem alterada (`CLAUDE.md` §0).
 - Veja detalhes completos em [`HIPOTESES.md`](./HIPOTESES.md).
