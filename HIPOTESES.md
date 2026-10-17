@@ -87,6 +87,8 @@
 | R-10 | A Tarvo não vende acima de 12x. Se aparecer, é pendência. | [T28] |
 | R-43 | **Ajuste tardio da Orbe** chega num arquivo à parte, no mesmo formato do 01, e só quando a Orbe tem ajuste (não é todo mês). Se chegar **antes** da aprovação do fechamento, entra no mês do movimento: é o caso do 06, que entra em setembro. Se chegar **depois** da aprovação, entra no mês seguinte. Consequência: a entrada tem que ler **todos** os arquivos da Orbe da pasta do mês, e não um nome fixo. | [T40] [T43] |
 | R-44 | Isenção da Casa na **antecipação**: vale a data da antecipação, não a das vendas antecipadas. Antecipação feita em setembro é isenta, e não é preciso procurar as vendas de origem. | [T41] |
+| R-50 | **Bandeira** não muda a taxa. A Orbe às vezes troca a bandeira no estorno: não precisa contestar nem abrir pendência. O estorno se liga à venda pela referência (`id_referencia`). | [T46] |
+| R-51 | Estorno ou reversão num ajuste da Orbe que aponta para transação **ausente** de todos os arquivos da Orbe: entra pelo valor que veio e vira pendência para a Helena pedir a original à Orbe. Não acontece em setembro: todas as referências do 06 estão no 01. | [T47] |
 
 ### 2.2 Comissão de remessa
 | ID | Regra | Fonte |
@@ -166,6 +168,7 @@ minha cabeça".
 | L-07 | Chave de API: "quem quiser enviar sua chave de API junto do desenvolvimento para testarmos, ok. lembrem-se de limitar o uso dela". Opcional; o README diz onde configurá-la (L-02). | [T45] |
 | L-08 | O repositório entregue tem "código, `saida/`, `PROMPTS/`, `HIPOTESES.md` e um `README.md` que rode a solução do zero". Parte em plataforma online vai como link no README, com instruções de teste. "A regra das 18h30 vale para tudo: o que mudar depois não conta." Detalha a L-05. | [T3] |
 | L-09 | O canal `#tarvo-financeiro` do documento do desafio **não existe**. "podem enviar aqui. explicitem na thread de duvida se é tarvo ou hackaton." | [T1] |
+| L-10 | **Rastro auditável** (Organização). O mínimo é o `rastro.csv` do formato, com toda comissão e toda nota tendo `id_saida` e a soma por `id_saida` batendo. Para ficar auditável de verdade: (1) rastro também das divergências e da nota da Ponte; (2) **registro de cada execução**, com os arquivos que entraram, quantas linhas de cada, data e hora; (3) **em cada linha, a regra aplicada** (taxa contratada usada, isenção, estorno pela venda original). "Quem abrir tem que conseguir refazer qualquer número sem perguntar para vocês." | [T48] |
 
 ---
 
@@ -200,11 +203,8 @@ Status: **proposta**, a confirmar pelo time no PR, menos onde está marcado **de
 | :--- | :--- | :--- | :--- |
 | Q-02 | `[Logística]` | No `rastro.csv`, qual `arquivo_origem` usar para valores da Ponte: o `.eml` do pacote ou o xlsx anexado? **Não enviada.** | A correção automática do `rastro.csv` (P-10) |
 | Q-04 | Desbravadores, 12h04 [T44] | No ajuste da Ponte ("AJUSTE REF PC-…"), o `Spread R$` negativo é o spread inteiro (a nossa parte cai 50% dele) ou já a nossa parte (cai 100%)? Ex.: devolução de R$ 235,74 da `PC-0926-0434`. | A R-18 de outubro em diante. Não afeta setembro |
-| Q-05 | Turma do Barulho, 13h35 [T46] | 7 estornos do 06 têm bandeira diferente da venda referenciada. Mantém o vínculo, abate pela taxa da venda e registra a divergência de bandeira para a Orbe corrigir? | Se a bandeira divergente vira pendência para a Orbe. Não muda nenhum valor (nenhuma taxa depende da bandeira) |
-| Q-06 | Desbravadores, 13h36 [T47] | (1) Mesmo `id_transacao` no relatório e no ajuste, com valores iguais ou diferentes. (2) Estorno ou reversão no ajuste que aponta para transação do mês que **não está** em nenhum arquivo da Orbe. | (1) já coberto pela P-14. (2) Hoje não há regra: não acontece em setembro |
-| Q-07 | Turma do Barulho, 13h48 [T48] | Estrutura de rastro desejada e padrão para ser auditável pela Tarvo e pela Barte. | Pode mudar o formato do `rastro.csv`, se a resposta for além do §4 do `CLAUDE.md` |
 
-As 3 perguntas da versão anterior deste arquivo **não chegaram a ser enviadas**. Todas foram respondidas no canal por perguntas de outros times (ver §6). Duas perguntas da versão de 13h25 também saíram da lista: a Q-01 (unidade da taxa) foi decidida pelo time (P-09), e a Q-03 (ajuste da Orbe) foi respondida pela R-43. Das perguntas do PR #8, a de ajuste da Orbe e a de isenção da Casa na antecipação foram respondidas antes das 13h40 (R-43 e R-44); só a do ajuste da Ponte segue aberta (Q-04). As Q-04..Q-07 são de outros times; acompanhamos as respostas.
+As 3 perguntas da versão anterior deste arquivo **não chegaram a ser enviadas**. Todas foram respondidas no canal por perguntas de outros times (ver §6). Duas perguntas da versão de 13h25 também saíram da lista: a Q-01 (unidade da taxa) foi decidida pelo time (P-09), e a Q-03 (ajuste da Orbe) foi respondida pela R-43. Das perguntas do PR #8, a de ajuste da Orbe e a de isenção da Casa na antecipação foram respondidas antes das 13h40 (R-43 e R-44); só a do ajuste da Ponte segue aberta (Q-04). As Q-04..Q-07 são de outros times; acompanhamos as respostas. **Q-05, Q-06 e Q-07 foram respondidas entre 14h08 e 14h11** (R-50, R-51 e L-10). Continua aberta a Q-04.
 
 
 ### 4.1 Decisões internas do time (antes das trilhas)
@@ -214,9 +214,9 @@ Não são perguntas para o canal: são escolhas nossas, levantadas na consolida�
 | ID | Decisão | Opções | Recomendação e por quê |
 | :--- | :--- | :--- | :--- |
 | D-01 | Como a entrada acha os arquivos do mês. Hoje `src/config.py` usa o nome fixo de setembro: o 06 é ignorado (checkout R$ 3.304,39 acima do certo) e outubro quebra (L-02). | (a) papel pelo **cabeçalho**, com o prefixo `01_`/`06_` como desempate; (b) só pelo prefixo numérico; (c) glob pelo nome do parceiro | **(a)**. A suíte caixa-preta roda com um data pack sintético, cujos nomes de arquivo não conhecemos. Todos os arquivos da Orbe são concatenados com `arquivo_origem` por linha. Papel faltando ou arquivo desconhecido gera pendência (R-42). |
-| D-02 | Estorno ou reversão no ajuste que aponta para transação do mês que **não está** em nenhum arquivo da Orbe (Q-06, parte 2). | (a) abate e gera pendência; (b) não abate, só gera pendência; (c) esperar a resposta da Helena | **(a)**. A linha do estorno já traz modalidade, parcelas e `data_venda_original`, que é tudo de que a R-03 precisa. É o mesmo mecanismo dos 9 estornos de agosto. A pendência diz "venda original não veio". |
+| D-02 | Estorno ou reversão no ajuste que aponta para transação do mês que **não está** em nenhum arquivo da Orbe (Q-06, parte 2). | (a) abate e gera pendência; (b) não abate, só gera pendência; (c) esperar a resposta da Helena | **(a)**. A linha do estorno já traz modalidade, parcelas e `data_venda_original`, que é tudo de que a R-03 precisa. É o mesmo mecanismo dos 9 estornos de agosto. A pendência diz "venda original não veio". **Confirmada pela Helena às 14h10 (R-51).** |
 | D-03 | Atlas na `comissoes_por_lojista.csv` (P-02). | (a) não aparece, fica só na pendência; (b) aparece com 0,00 | **(a)**. A Helena disse que a Atlas não fatura. Uma linha 0,00 com 57 componentes somando zero é artificial, e a L-04 diz que alarme falso conta contra. A pendência carrega o detalhe e os R$ 7.876,05. **Decidida: (a)**, registrada na P-02 (17/10, PR #16). |
-| D-04 | Bandeira do estorno diferente da venda (7 de 10 no 06, 39 de 50 no 01; Q-05). | (a) só registro aqui; (b) pendência informativa para a Orbe | **(a)**. Nenhuma taxa depende da bandeira, e a frequência indica ruído do dado. Pendência aqui seria alarme falso (L-04). |
+| D-04 | Bandeira do estorno diferente da venda (7 de 10 no 06, 39 de 50 no 01; Q-05). | (a) só registro aqui; (b) pendência informativa para a Orbe | **(a)**. Nenhuma taxa depende da bandeira, e a frequência indica ruído do dado. Pendência aqui seria alarme falso (L-04). **Confirmada pela Helena às 14h08 (R-50).** |
 | D-05 | Status das premissas P-01..P-08 e P-10..P-14, que ainda estão como **proposta**. | Confirmar em bloco ou contestar uma a uma | Confirmar em bloco, menos a P-02 (depende da D-03). As tasks das trilhas já foram escritas em cima delas. |
 | D-06 | Destino dos PRs #7 e #8. | Fechar os dois quando este for mergeado | Fechar. Todo o conteúdo deles está aqui, e o log da §7 registra o que mudou de ID. |
 
@@ -282,6 +282,7 @@ Todas as 7 notas de checkout mudam de valor, e nenhuma fica zerada ou negativa.
 - **17/10 13:25** — Reescrita a partir das respostas do financeiro no canal (R-01..R-42), com premissas propostas (P-01..P-13), perguntas abertas (Q-01..Q-03) e prévia de controle (§5).
 - **17/10 13:40** — Entrou o `06_orbe_ajustes_tardios_set2026.csv` (fatos na §1, R-43, R-44, P-14, §5 recalculada). P-09 decidida: 2.69. Q-01 e Q-03 saíram da lista.
 - **17/10 13:50** — Consolidação dos PRs #7 e #8. Do #8 entraram, renumerados para não colidir com o #7: R-45..R-49 (no #8 eram R-43..R-47), a agenda completa na L-06, L-07..L-09 (no #8, L-08, L-11, L-10), Q-04 (no #8, Q-06), o contexto do processo e as ressalvas na R-14 e na R-19. Saíram do #8 a L-07 (o 06 já está no data pack) e as Q-04/Q-05 dele (respondidas: R-43, R-44). Entraram as Q-05..Q-07, de threads posteriores. Links [T40]..[T43] seguem a numeração do #7; [T44]..[T48] são novos.
+- **17/10 14:40** — Respostas das 14h08–14h11: R-50 (bandeira), R-51 (estorno órfão no ajuste) e L-10 (rastro auditável). Q-05..Q-07 saem das abertas; D-02 e D-04 confirmadas. Lacunas, anomalias e conflitos ainda abertos estão em `docs/lacunas-e-conflitos.md`.
 
 - **17/10 14:15** — Briefing interno em áudio transcrito (faster-whisper large-v3, 36 s). Entraram a P-15 (entrada reprocessável com outro data pack, reforça a D-01 (a)) e a P-16 (o sistema registra pendências e divergências, mas não as resolve).
 - **17/10 14:55** — Nível Mínimo implementado (PR #16): comissão de checkout por lojista com rastro, conferida contra a §5 (R$ 203.735,34 em 21 lojistas). D-03 decidida como (a): a Atlas fica fora da comissão e a pendência dela entra no Alvo (P-02 reescrita).
@@ -335,6 +336,6 @@ Todas as 7 notas de checkout mudam de valor, e nenhuma fica zerada ou negativa.
 [T43]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792253401618969 "Organização: chegou o arquivo 06 (17/10 13h10)"
 [T44]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792249449403979 "Desbravadores: valor do ajuste da Ponte (17/10 12h04, sem resposta)"
 [T45]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792250704054669 "Organização: chave de API (17/10 12h25)"
-[T46]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792254957589749 "Turma do Barulho: bandeira divergente nos estornos do 06 (17/10 13h35, sem resposta)"
-[T47]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792254985999379 "Desbravadores: id repetido e estorno órfão no ajuste da Orbe (17/10 13h36, sem resposta)"
-[T48]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792255687788519 "Turma do Barulho: estrutura do rastro (17/10 13h48, sem resposta)"
+[T46]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792254957589749 "Turma do Barulho: bandeira divergente nos estornos do 06 (17/10 13h35, respondida 14h08)"
+[T47]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792254985999379 "Desbravadores: id repetido e estorno órfão no ajuste da Orbe (17/10 13h36, respondida 14h10)"
+[T48]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792255687788519 "Turma do Barulho: estrutura do rastro (17/10 13h48, respondida 14h11)"
