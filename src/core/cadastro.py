@@ -42,8 +42,9 @@ class Cadastro(Protocol):
         CREDITO A VISTA, CREDITO PARCELADO, PIX ou ANTECIPACAO. None = sem taxa."""
         ...
 
-    def spread_contratado_pct(self, cnpj: str) -> Decimal | None:
-        """Spread de remessa em pontos percentuais. None = não definido."""
+    def spread_contratado_pct(self, cnpj: str, data_ref: date | None = None) -> Decimal | None:
+        """Spread de remessa em pontos percentuais, na linha vigente em `data_ref`.
+        None = não definido."""
         ...
 
 
@@ -167,12 +168,17 @@ class CadastroPlanilha:
             return None
         return pct_planilha(linha.taxas.get(coluna))
 
-    def spread_contratado_pct(self, cnpj: str) -> Decimal | None:
+    def spread_contratado_pct(self, cnpj: str, data_ref: date | None = None) -> Decimal | None:
         linhas = self._linhas.get(cnpj)
         if not linhas:
             return None
+        # Linha vigente na data de contratação, como no checkout. Sem data, ou com a
+        # planilha ambígua (zero ou duas vigentes), fica a última linha (o aditivo).
+        linha = self._linha_vigente(cnpj, data_ref) if data_ref is not None else None
+        if linha is None:
+            linha = linhas[-1]
         # Rodapé da planilha: "spread em branco = padrão".
-        valor = pct_planilha(linhas[-1].taxas.get("Spread remessa"))
+        valor = pct_planilha(linha.taxas.get("Spread remessa"))
         return valor if valor is not None else self._premissas.spread_padrao_pct
 
 
