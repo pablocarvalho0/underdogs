@@ -1,8 +1,8 @@
 # Hipóteses, premissas e respostas do financeiro
 
-> **Versão de 17/10, 13h50.** Reescrita a partir de todas as respostas do financeiro da Tarvo
+> **Versão de 17/10, 18h05.** Reescrita a partir de todas as respostas do financeiro da Tarvo
 > (assinadas "Helena, financeiro da Tarvo") no canal
-> [#duvidas-hackathon-ai](https://bartehackathonai.slack.com/archives/C0CA0S5D37B) até 13h50.
+> [#duvidas-hackathon-ai](https://bartehackathonai.slack.com/archives/C0CA0S5D37B) até 17h45 (fim do atendimento do financeiro).
 > Inclui o arquivo `06_orbe_ajustes_tardios_set2026.csv`, que chegou às 13h10. Consolida os PRs
 > #7 (respostas do financeiro e arquivo 06) e #8 (releitura do canal inteiro).
 > O canal é compartilhado entre os times ("queremos que todos tenham o mesmo contexto"), então as
@@ -81,7 +81,7 @@
 | R-04 | Antecipação entra na comissão do lojista, na mesma nota. A reversão anula só a taxa da antecipação que ela reverte. | [T5] [T15] |
 | R-05 | EC→lojista: `1043300981` = Novo Horizonte Intercâmbio; `1043396662` = Horizonte Viagens (são empresas diferentes); `1038867654` = Kiwi Experience. CNPJ e taxas estão nas linhas delas na aba vigente. | [T4] |
 | R-06 | **Atlas Idiomas** (`1076801732`) não tem contrato na aba vigente e começou em 10/09: **não fatura** até o comercial confirmar a taxa. O CNPJ da aba 2025 pode ser usado só para identificar; a taxa daquela aba não vale. O repasse continua normal. | [T4] [T34] [T29] |
-| R-07 | Quando o comercial confirmar a taxa da Atlas, ela vale desde 10/09, e **setembro é faturado junto com o mês seguinte**. O fechamento seguinte precisa puxar as linhas pendentes. | [T20] |
+| R-07 | Quando o comercial confirmar a taxa da Atlas, ela vale desde 10/09, e **setembro é faturado junto com o mês seguinte**. O fechamento seguinte precisa puxar as linhas pendentes. **Não automatizado:** o pipeline não carrega pendência de um mês para o outro; as 57 transações ficam no rastro de `PEN-CHK-SEMCONTRATO-1076801732` e o README ("Como fechar outubro") manda a analista incluí-las à mão. | [T20] |
 | R-08 | **Casa do Estudante** (`1018325654`) tem **tarifa zerada no checkout de set a dez/2026**, em MDR e antecipação, por concessão do comercial. Vale para venda a partir de 01/09. Estorno de venda anterior segue a taxa da venda (ex.: `TX88445133`, venda de 21/08, 1,49%). Para a antecipação, vale a data da antecipação (R-44). A remessa segue normal. | [T7] [T35] [T17] |
 | R-09 | O que a Orbe cobrou da Casa durante a isenção é **devolução ao lojista**, paga pela Tarvo. Não é divergência de contrato e não entra na cobrança da Orbe. O valor é o descontado de fato (`valor_taxa`). Vira pendência para Helena e comercial, com o total e o detalhe por transação. | [T17] [T26] [T36] [T39] |
 | R-10 | A Tarvo não vende acima de 12x. Se aparecer, é pendência. | [T28] |
@@ -101,7 +101,7 @@
 | R-16 | A competência é a **data de contratação**. | [T6] |
 | R-17 | Mundo Aberto: a comissão e a nota saem **pelo realizado**, com o excesso sobre 1,20% incluído. A contestação é um processo à parte. Se a Ponte devolver, a nossa metade sai no mês do ajuste. Não presumir que a Ponte vai descontar algo do repasse. | [T11] [T12] |
 | R-18 | Ajuste de contestação (de outubro em diante) chega como **linha nova**, com Nº próprio, `Spread R$` negativo e Observação "AJUSTE REF PC-…". Entra no mês em que aparece e abate a participação dentro da nota única. O rastro aponta para a operação original. Não há nenhum em setembro. Se o `Spread R$` do ajuste é o spread inteiro ou já a nossa parte está em aberto (Q-04). | [T31] |
-| R-19 | Operação de CNPJ fora da planilha: calcular a nossa metade mesmo assim e abrir pendência de cadastro para o comercial. Não aconteceu em setembro. **A rigor é premissa**: a proposta foi de um time e a Helena respondeu "o tratamento que vocês propuseram é razoável. Registrem como premissa." Mantida aqui com o mesmo ID porque as tasks já a citam. | [T18] |
+| R-19 (premissa) | Operação de CNPJ fora da planilha: calcular a nossa metade mesmo assim e abrir pendência de cadastro para o comercial. Não aconteceu em setembro. **A rigor é premissa**: a proposta foi de um time e a Helena respondeu "o tratamento que vocês propuseram é razoável. Registrem como premissa." Mantida aqui com o mesmo ID porque as tasks já a citam. | [T18] |
 
 ### 2.3 Divergências de taxa
 | ID | Regra | Fonte |
@@ -172,9 +172,19 @@ minha cabeça".
 
 ---
 
+### 2.8 Respostas de 15h47 a 17h32 (releitura das 18h)
+
+| ID | Regra | Fonte |
+| :--- | :--- | :--- |
+| R-52 | A nota da Ponte sai **pela nossa regra** (negativo fora, repetida uma vez), nunca pelo número da Ponte. Se o crédito de 06/10 vier diferente da nota, a diferença vira pendência para a Helena, junto com a contestação. "Não contem com o desconto da Ponte no repasse." | [T52] |
+| R-53 | Juros da conta garantida **vêm no extrato do mês seguinte**: em setembro não há nada a lançar (fecha a N-11). O IOF de R$ 48,21 é de uma operação de crédito do Meridiano, não da garantida do Aurora; a conta é critério nosso. IOF das remessas é do cliente. A Ponte não retém nada; o ISS da nota vai no DAMSP do mês seguinte, fora deste fechamento. | [T53] |
+| R-54 | Razão social do tomador é a do contrato de adesão, que não está no pacote: nome da planilha com CNPJ serve, e a Bia confere na emissão. CNPJ tem sempre 14 dígitos. Pix da Fluente a 0,79% é condição negociada (sem pendência). Isenção da Casa de 01/09 a 31/12/2026. O prazo de contestação ainda está aberto. Em setembro, o único Pix enviado que não é repasse é o da contabilidade. Rendimento é receita do mês; seguro vai direto na despesa. | [T53] |
+| R-55 | Quem decide: o pagador do Pix sem identificação (L50) quem procura é o **Caio**, com o banco, até o fechamento de outubro; a taxa da Atlas é do **Diego**, do comercial, sem previsão; transferência sem entrada em outubro é da tesouraria (Helena). "Conta por conta e número por número eu não confiro: o que vale na entrega é o critério de vocês, registrado no `HIPOTESES.md`." Mundo Aberto R$ 1.418,85 × R$ 1.418,88: escolher e registrar (P-05). | [T51] |
+| R-56 | Confirmações: devolução da Casa = o que a Orbe tirou (R$ 15.396,77); estorno com divergência fica nas duas linhas, com o estorno negativo, e elas se anulam na cobrança da Orbe; Orbe abaixo do contrato é divergência decidida caso a caso; a folha de agosto baixa pelo valor cheio; colunas extras são aceitas [T54]. A Atlas é faturada junto com outubro, desde 10/09; os R$ 18.240 baixam pelo relatório de outubro da Ponte [T55]. A comissão é a taxa inteira, sem custo da Orbe [T56]. | [T54] [T55] [T56] |
+
 ## 3. Premissas nossas (decisões delegadas ou sem resposta)
 
-Status: **proposta**, a confirmar pelo time no PR, menos onde está marcado **decidida**.
+Status: P-01..P-14 implementadas no MVP da `main` como estão escritas; P-15..P-23 implementadas no PR #19 (nível Extra). Todas são **propostas do time**, menos onde está marcado **decidida**. A Helena: "o que vale na entrega é o critério de vocês, registrado no `HIPOTESES.md`" [T51].
 
 | ID | Premissa | Por quê | Fonte da delegação |
 | :--- | :--- | :--- | :--- |
@@ -197,7 +207,7 @@ Status: **proposta**, a confirmar pelo time no PR, menos onde está marcado **de
 | P-17 | Nome do lojista nas saídas = nome da **primeira** linha do CNPJ na aba vigente. | A linha do aditivo da Bridge traz a anotação "Bridge Idiomas (NOVA)", que não é razão social e iria para o tomador da nota. | — |
 | P-18 | `metodo` e `confianca` nos lançamentos: regra determinística = `REGRA` com confiança **1**; linha que nenhuma regra pega (ou cuja conta não aceita lançamento) = `HUMANO` com confiança **0**, conta vazia e pendência. **Não há IA no pipeline**: `usar_ia_extratos` e `confianca_minima_ia` em `premissas.py` não são lidos (não implementado). Em setembro, as 184 linhas saem como `REGRA`/1. | A confiança mede a origem da classificação, não a chance de acerto. Ressalva: o Pix enviado reconhecido pelo começo do nome do lojista também recebe 1, e pode errar o lojista com nome curto (README, Limitações); muda só a conta, nunca uma comissão. | — |
 | P-19 | Ajuste da Ponte ("AJUSTE REF PC-…", R-18): enquanto a Q-04 está aberta, o `Spread R$` é lido como **spread inteiro** e a participação cai **50%** (R-11), com o arredondamento da R-02. Entra na comissão do lojista e na nota única do mês em que aparece, **mesmo com data de contratação de outro mês**. No rastro, `ref_origem` é o Nº da operação original. Cada ajuste gera uma pendência para a Helena com o abatimento em 50% e em 100%. A comissão do lojista pode ficar negativa no mês. | R-18 + R-46. Leitura simétrica da R-11; a Helena vê os dois números antes de liberar. Não há ajuste em setembro. | [T31] [T44] |
-| P-20 | Nº de operação da Ponte repetido com **algum valor diferente** entre as cópias (a Observação não conta): **nenhuma cópia** entra na comissão nem na nota, e abre pendência para a Ponte com as versões. Cópia idêntica segue a R-13. | Não há como saber qual versão vale; contar uma das duas seria heurística arbitrária (CLAUDE.md §2.3). Em setembro a única repetida (PC-0926-0162) é idêntica. | — |
+| P-20 | Nº de operação da Ponte repetido com **algum valor diferente** entre as cópias (a Observação não conta): **nenhuma cópia** entra na comissão nem na nota, e abre pendência com as versões (quem decide: Helena, que pede à Ponte qual vale, R-40). Cópia idêntica segue a R-13. | Não há como saber qual versão vale; contar uma das duas seria heurística arbitrária (CLAUDE.md §2.3). Em setembro a única repetida (PC-0926-0162) é idêntica. | — |
 | P-21 | Competência da remessa = mês mais frequente da `Data Contratação` no relatório. Operação de outro mês, ou sem data, fica fora da comissão e vira pendência "operação de outro mês" para a Helena (R-16). | R-16. Não acontece em setembro. | [T6] |
 | P-22 | O spread contratado vem da linha da planilha **vigente na data de contratação**, como o MDR no checkout. Se a planilha não decide (nenhuma ou duas linhas vigentes), fica a última linha. | Mesma regra do MDR; setembro não muda. | — |
 | P-23 | Leitura robusta para outro mês (R-42): Orbe e Aurora são lidos em UTF-8 e, se falhar, em cp1252/latin-1. Linha do Aurora com conteúdo e menos campos que o layout vira aviso `LINHA_IGNORADA_AURORA` com o número da linha, em vez de sumir. Contestação com a Orbe de total negativo (cobrou abaixo do contrato) diz "caso a caso, nada a ressarcir ao lojista" (R-24). Alias de EC com `confirmado_financeiro=False` gera pendência `ALIAS_NAO_CONFIRMADO`. | R-42, R-24, R-05. Nenhum desses casos ocorre em setembro; cobertos por `tests/test_checkout_outubro.py`. | — |
@@ -205,6 +215,13 @@ Status: **proposta**, a confirmar pelo time no PR, menos onde está marcado **de
 ---
 
 ## 4. Perguntas abertas (ainda não respondidas no canal)
+
+**Perguntas feitas pelo time.** O time não abriu thread própria com o nome Underdogs. Houve uma
+pergunta de um integrante às 17h30 (se o `valor_taxa` vira inteiro receita da Tarvo), respondida
+remetendo à R-01 [T56]. As demais respostas deste arquivo vieram de perguntas de **outros times** no
+canal compartilhado, que o time acompanhou e conferiu thread a thread (§6 e `PROMPTS/MOMENTOS.md`).
+As perguntas que preparamos e não enviamos estão no `docs/plano-construcao.md` §11 e no
+`docs/lacunas-e-conflitos.md` §6. Pergunta presencial na mesa da banca, se houve, não está registrada aqui.
 
 | ID | Para | Pergunta | O que destrava |
 | :--- | :--- | :--- | :--- |
@@ -220,11 +237,11 @@ Não são perguntas para o canal: são escolhas nossas, levantadas na consolida�
 
 | ID | Decisão | Opções | Recomendação e por quê |
 | :--- | :--- | :--- | :--- |
-| D-01 | Como a entrada acha os arquivos do mês. Hoje `src/config.py` usa o nome fixo de setembro: o 06 é ignorado (checkout R$ 3.304,39 acima do certo) e outubro quebra (L-02). | (a) papel pelo **cabeçalho**, com o prefixo `01_`/`06_` como desempate; (b) só pelo prefixo numérico; (c) glob pelo nome do parceiro | **(a)**. A suíte caixa-preta roda com um data pack sintético, cujos nomes de arquivo não conhecemos. Todos os arquivos da Orbe são concatenados com `arquivo_origem` por linha. Papel faltando ou arquivo desconhecido gera pendência (R-42). **Implementada (a)** no MVP da `main` (b64734f): papel pelo conteúdo, o 06 entra, e outubro com nomes trocados gera a mesma saída. |
+| D-01 | Como a entrada acha os arquivos do mês. Até o PR #16, `src/config.py` usava o nome fixo de setembro: o 06 era ignorado (checkout R$ 3.304,39 acima do certo) e outubro quebrava (L-02). | (a) papel pelo **cabeçalho**, com o prefixo `01_`/`06_` como desempate; (b) só pelo prefixo numérico; (c) glob pelo nome do parceiro | **(a)**. A suíte caixa-preta roda com um data pack sintético, cujos nomes de arquivo não conhecemos. Todos os arquivos da Orbe são concatenados com `arquivo_origem` por linha. Papel faltando ou arquivo desconhecido gera pendência (R-42). **Implementada (a)** no MVP da `main` (b64734f): papel pelo conteúdo, o 06 entra, e outubro com nomes trocados gera a mesma saída. |
 | D-02 | Estorno ou reversão no ajuste que aponta para transação do mês que **não está** em nenhum arquivo da Orbe (Q-06, parte 2). | (a) abate e gera pendência; (b) não abate, só gera pendência; (c) esperar a resposta da Helena | **(a)**. A linha do estorno já traz modalidade, parcelas e `data_venda_original`, que é tudo de que a R-03 precisa. É o mesmo mecanismo dos 9 estornos de agosto. A pendência diz "venda original não veio". **Confirmada pela Helena às 14h10 (R-51).** |
 | D-03 | Atlas na `comissoes_por_lojista.csv` (P-02). | (a) não aparece, fica só na pendência; (b) aparece com 0,00 | **(a)**. A Helena disse que a Atlas não fatura. Uma linha 0,00 com 57 componentes somando zero é artificial, e a L-04 diz que alarme falso conta contra. A pendência carrega o detalhe e os R$ 7.876,05. **Decidida: (a)**, registrada na P-02 (17/10, PR #16). |
 | D-04 | Bandeira do estorno diferente da venda (7 de 10 no 06, 39 de 50 no 01; Q-05). | (a) só registro aqui; (b) pendência informativa para a Orbe | **(a)**. Nenhuma taxa depende da bandeira, e a frequência indica ruído do dado. Pendência aqui seria alarme falso (L-04). **Confirmada pela Helena às 14h08 (R-50).** |
-| D-05 | Status das premissas P-01..P-08 e P-10..P-14, que ainda estão como **proposta**. | Confirmar em bloco ou contestar uma a uma | Confirmar em bloco, menos a P-02 (depende da D-03). As tasks das trilhas já foram escritas em cima delas. **Situação em 17/10 17h50:** todas implementadas no MVP da `main` como estão escritas (a P-02 conforme a D-03 decidida). |
+| D-05 | Status das premissas P-01..P-08 e P-10..P-14, que ainda estão como **proposta**. | Confirmar em bloco ou contestar uma a uma | Confirmar em bloco, menos a P-02 (depende da D-03). As tasks das trilhas já foram escritas em cima delas. **Situação em 17/10 17h50:** todas implementadas no MVP da `main` como estão escritas (a P-02 conforme a D-03 decidida). P-15..P-23: implementadas no PR #19, propostas do time. |
 | D-06 | Destino dos PRs #7 e #8. | Fechar os dois quando este for mergeado | Fechar. Todo o conteúdo deles está aqui, e o log da §7 registra o que mudou de ID. |
 
 ---
@@ -267,6 +284,8 @@ Todas as 7 notas de checkout mudam de valor, e nenhuma fica zerada ou negativa.
 
 ---
 
+**Suíte caixa-preta (`npm test`).** Falha em um valor: CNPJ 22222222000122, gerado 43,80, esperado 53,80. A suíte foi escrita antes das respostas da Helena e do 06; duas implementações independentes chegam a 43,80 pelas regras acima. Não foi lida nem alterada (`CLAUDE.md` §0): triagem humana (README, Limitações).
+
 ## 6. O que aconteceu com as hipóteses e perguntas anteriores
 
 | Antes | Situação agora |
@@ -289,12 +308,13 @@ Todas as 7 notas de checkout mudam de valor, e nenhuma fica zerada ou negativa.
 - **17/10 13:25** — Reescrita a partir das respostas do financeiro no canal (R-01..R-42), com premissas propostas (P-01..P-13), perguntas abertas (Q-01..Q-03) e prévia de controle (§5).
 - **17/10 13:40** — Entrou o `06_orbe_ajustes_tardios_set2026.csv` (fatos na §1, R-43, R-44, P-14, §5 recalculada). P-09 decidida: 2.69. Q-01 e Q-03 saíram da lista.
 - **17/10 13:50** — Consolidação dos PRs #7 e #8. Do #8 entraram, renumerados para não colidir com o #7: R-45..R-49 (no #8 eram R-43..R-47), a agenda completa na L-06, L-07..L-09 (no #8, L-08, L-11, L-10), Q-04 (no #8, Q-06), o contexto do processo e as ressalvas na R-14 e na R-19. Saíram do #8 a L-07 (o 06 já está no data pack) e as Q-04/Q-05 dele (respondidas: R-43, R-44). Entraram as Q-05..Q-07, de threads posteriores. Links [T40]..[T43] seguem a numeração do #7; [T44]..[T48] são novos.
+- **17/10 14:15** — Briefing interno em áudio transcrito (faster-whisper large-v3, 36 s). Entraram a P-15 (entrada reprocessável com outro data pack, reforça a D-01 (a)) e a P-16 (o sistema registra pendências e divergências, mas não as resolve).
 - **17/10 14:40** — Respostas das 14h08–14h11: R-50 (bandeira), R-51 (estorno órfão no ajuste) e L-10 (rastro auditável). Q-05..Q-07 saem das abertas; D-02 e D-04 confirmadas. Lacunas, anomalias e conflitos ainda abertos estão em `docs/lacunas-e-conflitos.md`.
 
-- **17/10 14:15** — Briefing interno em áudio transcrito (faster-whisper large-v3, 36 s). Entraram a P-15 (entrada reprocessável com outro data pack, reforça a D-01 (a)) e a P-16 (o sistema registra pendências e divergências, mas não as resolve).
 - **17/10 14:55** — Nível Mínimo implementado (PR #16): comissão de checkout por lojista com rastro, conferida contra a §5 (R$ 203.735,34 em 21 lojistas). D-03 decidida como (a): a Atlas fica fora da comissão e a pendência dela entra no Alvo (P-02 reescrita).
 - **17/10 17:35** — Conferência cruzada: a branch `feat/alvo` (implementação independente das 3 trilhas, feita sobre o PR #16) e o MVP da `main` (b64734f) geram **os mesmos valores** em todas as saídas: comissões (R$ 243.278,79 nas duas linhas), divergências (R$ 2.995,08 em 115 linhas), notas (R$ 243.284,29 em 21), lançamentos (184, mesmas contas) e pendências (16, mesmo total). Os dois batem com a prévia da §5. Entrou a P-17 (nome do lojista nas saídas).
-- **17/10 17:55** — Nível Extra, "roda em outubro sem retrabalho" (`feat/extra`): R-51 implementada (`ORIGINAL_AUSENTE`), R-18 implementada com a Q-04 em aberto (P-19), duplicata divergente da Ponte (P-20), competência da remessa (P-21), spread pela vigência (P-22) e leitura robusta (P-23). Prévia independente agora reproduzível (`controle/previa_independente.py`). Setembro sem mudança de número: só a concordância de 5 motivos em `pendencias.csv`. Testes novos com dados sintéticos de outubro: `tests/test_remessa_outubro.py` e `tests/test_checkout_outubro.py`.
+- **17/10 17:55** — Nível Extra, testado com outubro sintético (`tests/test_*_outubro.py`) (`feat/extra`): R-51 implementada (`ORIGINAL_AUSENTE`), R-18 implementada com a Q-04 em aberto (P-19), duplicata divergente da Ponte (P-20), competência da remessa (P-21), spread pela vigência (P-22) e leitura robusta (P-23). Prévia independente agora reproduzível (`controle/previa_independente.py`). Setembro sem mudança de número: só a concordância de 5 motivos em `pendencias.csv`. Testes novos com dados sintéticos de outubro: `tests/test_remessa_outubro.py` e `tests/test_checkout_outubro.py`.
+- **17/10 18:05** — Releitura do canal de 14h11 a 17h52: R-52..R-56 (nada muda número de setembro); `quem_decide` da L50 (Caio) e da Atlas (Diego); N-11 fechada; Q-04 segue sem resposta; nenhum arquivo novo depois do 06.
 
 ---
 
@@ -348,3 +368,9 @@ Todas as 7 notas de checkout mudam de valor, e nenhuma fica zerada ou negativa.
 [T46]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792254957589749 "Turma do Barulho: bandeira divergente nos estornos do 06 (17/10 13h35, respondida 14h08)"
 [T47]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792254985999379 "Desbravadores: id repetido e estorno órfão no ajuste da Orbe (17/10 13h36, respondida 14h10)"
 [T48]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792255687788519 "Turma do Barulho: estrutura do rastro (17/10 13h48, respondida 14h11)"
+[T51]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792263612411219 "T-800: rodada de confirmação (17/10 16h00, respondida 16h08)"
+[T52]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792265651603359 "dogshow: valor da NF da Ponte (17/10 16h34, respondida 16h40)"
+[T53]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792262634073559 "T-800: rodada única (17/10 15h43, respondida 15h47)"
+[T54]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792262730955209 "Fox AI: Casa, estorno, folha, colunas extras (17/10 15h45, respondida 15h55)"
+[T55]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792266166685059 "Dogshow: estorno, Atlas, Ponte Aérea (17/10 16h42, respondida 16h50)"
+[T56]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792269002891909 "Underdogs (integrante): valor_taxa é receita da Tarvo? (17/10 17h30, respondida 17h32)"

@@ -104,6 +104,8 @@ O **rastro não é uma etapa final**: ele é carregado desde o passo 1. Reconstr
 
 ## 6. Onde a IA atua e onde não atua
 
+> **Plano inicial, superado na entrega.** Na versão entregue **não há IA no pipeline**: as 184 classificações saem por regra (`metodo=REGRA`), a extração do e-mail da Ponte é por código e os textos de nota e pendência são modelos fixos (P-18 do `HIPOTESES.md`, README §3). A IA atuou só no desenvolvimento e na conferência (`PROMPTS/`). A tabela abaixo fica como registro do plano.
+
 A maior parte do fechamento é **determinística** (leitura, cálculo, soma, comparação). A IA entra onde há texto livre ou onde o resultado é texto para humano.
 
 | Tarefa | Quem faz | Por quê |
@@ -149,7 +151,7 @@ A coluna `metodo` (REGRA / IA / HUMANO) e a `confianca` (0 a 1) nos lançamentos
 ### Hipóteses (prováveis, **não confirmadas**)
 - A Tarvo fica com 50% do spread nas remessas. *(informação de partida, a confirmar na planilha de taxas e com o financeiro)*
 - Estornos e reversões da Orbe devem reduzir a comissão do mês. *(a confirmar: no mês do estorno ou no mês da venda original?)*
-- O CNPJ é a chave para ligar lojista entre as fontes. *(a confirmar: se todas as fontes trazem CNPJ)*
+- O CNPJ é a chave para ligar lojista entre as fontes. *(confirmado: a Orbe não traz CNPJ; a ligação é EC → CNPJ pela planilha de taxas, R-05)*
 
 ### Perguntas para o financeiro (a refinar com os dados abertos)
 1. Como tratar estornos e reversões: abatem a comissão do mês do estorno ou da venda original?

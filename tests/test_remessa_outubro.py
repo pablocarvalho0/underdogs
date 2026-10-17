@@ -125,7 +125,7 @@ def test_duplicata_identica_conta_uma_vez(res: ResultadoTrilha) -> None:
 
 def test_duplicata_divergente_fica_fora_e_vai_para_a_ponte(res: ResultadoTrilha) -> None:
     pen = _linha(res, "PEN-REM-DUPLICATA-DIVERGENTE")
-    assert pen.campos["quem_decide"] == PREMISSAS.nome_ponte_cambio
+    assert pen.campos["quem_decide"] == f"Helena ({PREMISSAS.nome_ponte_cambio})"
     assert pen.campos["ref_origem"] == "PC-1026-0006"
     assert pen.valor == Decimal(170)
     assert "80.0" in pen.campos["motivo"] and "90.0" in pen.campos["motivo"]
@@ -149,3 +149,25 @@ def test_spread_contratado_pela_vigencia(cadastro: CadastroPlanilha, res: Result
     divs = [ln for ln in res.linhas if ln.arquivo == "divergencias_taxa.csv"]
     assert [d.campos["ref_origem"] for d in divs] == ["PC-1026-0002"]
     assert divs[0].valor == Decimal("-250.00")
+
+
+def test_mes_so_com_ajuste_nao_emite_nota_e_abre_pendencia(cadastro: CadastroPlanilha) -> None:
+    # R-26 na remessa: ajuste da Ponte (P-19) maior que o mês deixa a participação negativa.
+    df = pd.DataFrame(
+        [
+            _op("PC-1026-0001", "2026-10-05", 100.0),
+            _op("PC-1026-0002", "2026-10-07", -500.0, "AJUSTE REF PC-0926-0434"),
+        ]
+    )
+    df["linha_planilha"] = [5, 6]
+    df.attrs["corpo_email"] = ""
+    vazio = pd.DataFrame()
+    dados = DadosEntrada(
+        orbe=vazio, taxas=_taxas(), ponte=df, plano_contas=vazio,
+        aurora=vazio, meridiano=vazio, arquivos={PONTE: ARQ},
+    )  # fmt: skip
+    r = remessa.rodar(dados, cadastro, PREMISSAS)
+    assert not [ln for ln in r.linhas if ln.arquivo == "notas_a_emitir.csv"]
+    pen = next(ln for ln in r.linhas if ln.id_saida.startswith("PEN-REM-SEMNOTA-"))
+    assert pen.valor == Decimal("-200.00")
+    assert pen.campos["quem_decide"] == "Helena"
