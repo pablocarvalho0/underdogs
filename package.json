@@ -11,6 +11,7 @@
     "status": "node scripts/runner.js -m src.main status",
     "report": "node scripts/runner.js -m src.main report",
     "conferencia": "node scripts/runner.js -m src.main conferencia",
+    "page": "node scripts/runner.js -m src.main conferencia && node scripts/runner.js -m http.server 5500 --bind 127.0.0.1 --directory conferencia",
     "typecheck": "node scripts/runner.js -m mypy src"
   },
   "author": "Pablo Carvalho",
