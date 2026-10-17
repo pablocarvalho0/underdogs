@@ -6,8 +6,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from src.core.cadastro import montar_cadastro
 from src.core import entrada
+from src.core.cadastro import montar_cadastro
 from src.core.entrada import carregar
 from src.core.writer import escrever
 from src.premissas import PREMISSAS, Premissas
@@ -62,7 +62,7 @@ def _registrar_execucao(input_dir: Path, output_dir: Path, dados: Any, inicio: d
     for nome in ("taxas", "ponte", "plano_contas", "aurora", "meridiano"):
         df = getattr(dados, nome, None)
         if df is not None:
-            linhas_entrada[nome] = int(len(df))
+            linhas_entrada[nome] = len(df)
     registro = {
         "executado_em": inicio.isoformat(timespec="seconds"),
         "pasta_entrada": str(input_dir),
