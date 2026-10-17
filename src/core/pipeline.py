@@ -1,6 +1,7 @@
 """Motor de execução da conciliação financeira Tarvo."""
 
 import json
+import os
 from dataclasses import replace
 from datetime import datetime
 from pathlib import Path
@@ -65,7 +66,7 @@ def _registrar_execucao(input_dir: Path, output_dir: Path, dados: Any, inicio: d
             linhas_entrada[nome] = len(df)
     registro = {
         "executado_em": inicio.isoformat(timespec="seconds"),
-        "pasta_entrada": str(input_dir),
+        "pasta_entrada": os.path.relpath(input_dir) if input_dir.resolve().is_relative_to(Path.cwd()) else input_dir.name,
         "arquivos_na_pasta": sorted(p.name for p in input_dir.iterdir() if p.is_file()),
         "linhas_lidas": linhas_entrada,
         "linhas_por_saida": resultado["arquivos"],

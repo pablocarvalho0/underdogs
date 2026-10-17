@@ -1,1 +1,22 @@
-id_saida;tomador_cnpj;tomador;linha_negocio;valor_brl;discriminacao
+id_saida;tomador_cnpj;tomador;linha_negocio;valor_brl;discriminacao;regra
+NF-CHK-03229837000103;03229837000103;Fluente Idiomas Online Ltda;CHECKOUT;7316.07;Comissão de intermediação de pagamentos (checkout), competência 09/2026;R-26 R-28 R-45
+NF-CHK-07752116000126;07752116000126;Kiwi Experience;CHECKOUT;10886.22;Comissão de intermediação de pagamentos (checkout), competência 09/2026;R-26 R-28 R-45
+NF-CHK-08780784000120;08780784000120;Campus Global Ltda;CHECKOUT;9336.06;Comissão de intermediação de pagamentos (checkout), competência 09/2026;R-26 R-28 R-45
+NF-CHK-16181276000153;16181276000153;EduAbroad;CHECKOUT;11858.16;Comissão de intermediação de pagamentos (checkout), competência 09/2026;R-26 R-28 R-45
+NF-CHK-17217888000111;17217888000111;Mundo Aberto;CHECKOUT;18508.09;Comissão de intermediação de pagamentos (checkout), competência 09/2026;R-26 R-28 R-45
+NF-CHK-20987545000140;20987545000140;Vela;CHECKOUT;9315.31;Comissão de intermediação de pagamentos (checkout), competência 09/2026;R-26 R-28 R-45
+NF-CHK-21394880000106;21394880000106;Trilha Jovem Turismo Ltda;CHECKOUT;5628.57;Comissão de intermediação de pagamentos (checkout), competência 09/2026;R-26 R-28 R-45
+NF-CHK-22224579000109;22224579000109;Escola Bridge de Idiomas Ltda;CHECKOUT;11769.74;Comissão de intermediação de pagamentos (checkout), competência 09/2026;R-26 R-28 R-45
+NF-CHK-23109187000161;23109187000161;Oxford Prep Cursos Ltda;CHECKOUT;13845.71;Comissão de intermediação de pagamentos (checkout), competência 09/2026;R-26 R-28 R-45
+NF-CHK-34671260000100;34671260000100;Maple Study Assessoria Educacional Ltda;CHECKOUT;14165.77;Comissão de intermediação de pagamentos (checkout), competência 09/2026;R-26 R-28 R-45
+NF-CHK-50900987000179;50900987000179;Bagagem Livre Turismo Ltda;CHECKOUT;7703.98;Comissão de intermediação de pagamentos (checkout), competência 09/2026;R-26 R-28 R-45
+NF-CHK-53857560000123;53857560000123;Canguru;CHECKOUT;11679.43;Comissão de intermediação de pagamentos (checkout), competência 09/2026;R-26 R-28 R-45
+NF-CHK-61720397000180;61720397000180;Lisboa Cursos e Viagens Ltda;CHECKOUT;8470.78;Comissão de intermediação de pagamentos (checkout), competência 09/2026;R-26 R-28 R-45
+NF-CHK-66564512000199;66564512000199;Novo Horizonte Intercambio;CHECKOUT;7767.78;Comissão de intermediação de pagamentos (checkout), competência 09/2026;R-26 R-28 R-45
+NF-CHK-67869675000142;67869675000142;Bem-Vindo Exchange Ltda;CHECKOUT;9259.74;Comissão de intermediação de pagamentos (checkout), competência 09/2026;R-26 R-28 R-45
+NF-CHK-68567965000102;68567965000102;Dublin Hub Intercâmbio Ltda;CHECKOUT;11876.37;Comissão de intermediação de pagamentos (checkout), competência 09/2026;R-26 R-28 R-45
+NF-CHK-78576234000179;78576234000179;Horizonte Viagens;CHECKOUT;9014.42;Comissão de intermediação de pagamentos (checkout), competência 09/2026;R-26 R-28 R-45
+NF-CHK-85694108000184;85694108000184;Andes Expedições Ltda;CHECKOUT;3819.35;Comissão de intermediação de pagamentos (checkout), competência 09/2026;R-26 R-28 R-45
+NF-CHK-89779285000114;89779285000114;Sol Nascente Viagens Ltda;CHECKOUT;5898.02;Comissão de intermediação de pagamentos (checkout), competência 09/2026;R-26 R-28 R-45
+NF-CHK-95927868000148;95927868000148;Rota Global Intercâmbio Ltda;CHECKOUT;15621.27;Comissão de intermediação de pagamentos (checkout), competência 09/2026;R-26 R-28 R-45
+NF-REM-75374179000146;75374179000146;Ponte Câmbio;REMESSA;39543.45;Participação de 50% no spread realizado das operações de remessa internacional (câmbio) de clientes Tarvo. Competência 09/2026. 228 operações.;R-11 R-13 R-14 R-16 R-17 R-27 R-28
