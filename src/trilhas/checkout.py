@@ -47,7 +47,7 @@ def _pendencia(chave: str, tipo: str, comps: list[Componente], motivo: str, quem
 def rodar(dados: DadosEntrada, cadastro: Cadastro, premissas: Premissas) -> ResultadoTrilha:
     res = ResultadoTrilha(trilha="checkout")
     nomes = {l.cnpj: l.nome for l in cadastro.lojistas()}
-    registros = dados.orbe.to_dict("records")
+    registros: list[dict[str, Any]] = dados.orbe.to_dict("records")  # type: ignore[assignment]
     datas_mov = [d for d in (_data(r["data_movimento"]) for r in registros) if d]
     inicio_mes = min(datas_mov).replace(day=1) if datas_mov else None
     competencia = inicio_mes.strftime("%m/%Y") if inicio_mes else ""
@@ -96,6 +96,7 @@ def rodar(dados: DadosEntrada, cadastro: Cadastro, premissas: Premissas) -> Resu
             sem_contrato_info.setdefault(ec, (str(r["nome_estabelecimento"]).strip(), "" if loj is None else loj.cnpj))
             continue
 
+        assert data_ref is not None  # taxa só existe com data
         isento = any(i.cnpj == loj.cnpj and i.inicio <= data_ref <= i.fim for i in premissas.isencoes_checkout)  # R-08
         # R-01: taxa contratada sobre valor_bruto (já negativo em estorno/reversão); R-02: half-up por linha.
         valor = brl(0) if isento else brl(r["valor_bruto"] * taxa / 100)
@@ -112,7 +113,7 @@ def rodar(dados: DadosEntrada, cadastro: Cadastro, premissas: Premissas) -> Resu
 
     # comissoes_por_lojista.csv e notas_a_emitir.csv (R-26, R-28)
     for cnpj in sorted(comp):
-        campos = {"cnpj": cnpj, "lojista": nomes[cnpj], "linha_negocio": "CHECKOUT", "regra": "R-01 R-02 R-03 R-04 R-08 R-44"}
+        campos: dict[str, Any] = {"cnpj": cnpj, "lojista": nomes[cnpj], "linha_negocio": "CHECKOUT", "regra": "R-01 R-02 R-03 R-04 R-08 R-44"}
         linha = LinhaSaida.somando("comissoes_por_lojista.csv", f"COM-CHK-{cnpj}", campos, comp[cnpj])
         res.linhas.append(linha)
         assert linha.valor is not None
@@ -272,7 +273,7 @@ def _alertas_antecipacao(registros: list[dict[str, Any]], cadastro: Cadastro, in
         )
         ant = ven = Decimal(0)
         pico: tuple[Decimal, date | None, Decimal, Decimal] = (Decimal(0), None, Decimal(0), Decimal(0))
-        dias = sorted({_data(r["data_movimento"]) for r in linhas} - {None})
+        dias = sorted(d for d in {_data(r["data_movimento"]) for r in linhas} if d is not None)
         for dia in dias:
             for r in linhas:
                 if _data(r["data_movimento"]) != dia:
