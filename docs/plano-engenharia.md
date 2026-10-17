@@ -1,5 +1,7 @@
 # Plano de engenharia — fechamento set/2026 Tarvo
 
+> **Superado em parte (17/10 14h16).** Só a §2 (arquitetura e contrato) continua valendo. Ver `docs/00-COMECE-AQUI.md`.
+
 Rascunho v0 (17/10, 13h20). Decisões marcadas **[D-xx]** estão abertas; perguntas ao
 financeiro marcadas **[F-xx]**. Todo número citado aqui foi medido no data pack
 nesta sessão, não estimado.

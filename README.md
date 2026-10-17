@@ -49,20 +49,16 @@ Todos os arquivos gerados em `saida/` seguem o padrão obrigatório do desafio:
 
 ```text
 ├── docs/                                  # Documentação e Data Pack oficial
+│   ├── 00-COMECE-AQUI.md                  # Mapa: onde estamos e qual documento manda em quê
 │   ├── 01_instrucoes_participantes.docx.md
-│   └── Tarvo_Data_Pack_set2026/           # Arquivos brutos de entrada
-│       ├── 01_orbe_relatorio_comissoes_set2026.csv
-│       ├── 02_tabela_taxas_contratadas.xlsx
-│       ├── 03_email_ponte_cambio_relatorio_set2026.eml
-│       ├── 04_plano_de_contas_fenix_erp.csv
-│       ├── 05a_extrato_banco_aurora_cc4471_set2026.csv
-│       └── 05b_extrato_banco_meridiano_cc90233_set2026.ofx
+│   └── Tarvo_Data_Pack_set2026/           # Arquivos brutos de entrada (01 a 06)
 ├── src/                                   # Código fonte modular da solução
 │   ├── loaders/                           # Parsers dos formatos de entrada (CSV, XLSX, EML, OFX)
-│   ├── core/                              # Regras de conciliação, comissões e divergências
-│   ├── accounting/                        # Classificador contábil (Plano de Contas Fênix)
-│   ├── reporting/                         # Gerador dos CSVs de saída e rastro
-│   ├── config.py                          # Constantes, paths e validações
+│   ├── core/                              # Contrato (model), cadastro, entrada, writer, pipeline
+│   ├── trilhas/                           # checkout.py, remessa.py, extratos.py: regras de negócio
+│   ├── validators/                        # Conferência do esquema dos 6 CSVs
+│   ├── premissas.py                       # Regras e premissas como configuração
+│   ├── config.py                          # Constantes e caminhos
 │   └── main.py                            # Ponto de entrada CLI
 ├── tests/                                 # Testes automatizados e validações de integridade
 ├── saida/                                 # Arquivos de saída gerados (CSVs normatizados)
@@ -220,6 +216,6 @@ Pronto: sua `main` está igual à do GitHub. Volte ao passo 1 para a próxima ta
 ## ⚠️ Limitações Conhecidas e Premissas
 
 - **Transações da Ponte Câmbio:** O anexo `.xlsx` dentro do arquivo `.eml` é extraído programaticamente pelo parser sem necessidade de manipulação manual.
-- **Transações com status "APROVADO C/ RESSALVA":** Conforme instrução do parceiro Ponte Câmbio, seguem para liquidação, porém são flagadas para visibilidade em `pendencias.csv` se houver divergência de taxa.
-- **Variações de Nomes Fantasia:** Mapeamentos entre nomes nos extratos bancários, adquirente Orbe e planilha de taxas usam normalização com chave primária em CNPJ sempre que disponível, reportando divergências para o financeiro.
+- **Transações com status "APROVADO C/ RESSALVA":** seguem para liquidação e não mudam nenhum cálculo (R-15 do `HIPOTESES.md`).
+- **Identificação de lojista:** nunca por nome. Orbe pelo EC, Ponte pelo CNPJ, ambos resolvidos pela planilha de taxas e pelos aliases confirmados pelo financeiro (R-05). O que não casa vira pendência.
 - Veja detalhes completos em [`HIPOTESES.md`](./HIPOTESES.md).
