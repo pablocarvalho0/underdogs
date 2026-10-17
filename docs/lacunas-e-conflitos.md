@@ -53,6 +53,7 @@ Continua sem resposta: **Q-04** (ajuste da Ponte é o spread inteiro ou a nossa 
 | N-13 | **Que remessa o Pix de R$ 18.240 vai pagar** | É de uma remessa que sai em outubro (R-34) | OUT: casar com a operação quando ela aparecer | — | Acompanhamento em outubro, sem pendência em setembro (P-12) |
 | N-14 | **Crédito dos R$ 300 mil (L92) no Meridiano em 01/10** | As outras 3 transferências (350, 420 e 380 mil) chegaram no mesmo dia | OUT | — | Pendência de acompanhamento (P-11) |
 | N-15 | **O que a suíte caixa-preta espera** | Ninguém pode ler (diretiva 0). O `COMECE-AQUI` registra `1 failed`. Foi escrita **antes** das respostas do financeiro | NOTA: pode codificar regra antiga | Humano do time | Triagem humana quando falhar (plano §4.2). Vale a regra da Helena |
+| N-16 | **Quanto a Orbe fica (o custo de adquirência da Tarvo)** | A regra do fechamento é a comissão pela taxa contratada **inteira**, "sem desconto de custo da Orbe" (R-01). O custo da Orbe não aparece em nenhuma fonte: o relatório só traz a taxa cobrada do lojista, os extratos não têm nenhum pagamento de comissão da Orbe (ao contrário da Ponte, que paga por TED) e o plano de contas não tem conta de custo de adquirência. A Helena disse que "a Orbe já liquida o líquido" [T25], mas não disse quanto a Orbe retém | — nos números de setembro. PITCH: a margem real do checkout não aparece em nenhum arquivo | Helena | Não descontar nada. Dizer no pitch que a margem líquida depende de um custo que não está no data pack |
 
 ---
 
