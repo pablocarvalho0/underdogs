@@ -1,5 +1,6 @@
 """Parsers dos extratos bancários: Banco Aurora (CSV) e Banco Meridiano (OFX)."""
 
+import io
 import re
 from datetime import datetime
 from pathlib import Path
@@ -12,18 +13,33 @@ from src.config import AURORA_CSV, MERIDIANO_OFX
 from src.loaders.orbe import parse_brazilian_float
 
 
+def ler_texto(file_path: Path) -> str:
+    """R-42: utf-8 (com ou sem BOM); se não decodificar, cp1252 (Excel no Windows).
+    latin-1 só como último recurso, porque nunca falha. Quebras de linha universais."""
+    bruto = Path(file_path).read_bytes()
+    for enc in ("utf-8-sig", "cp1252"):
+        try:
+            texto = bruto.decode(enc)
+            break
+        except UnicodeDecodeError:
+            continue
+    else:
+        texto = bruto.decode("latin-1")
+    return io.StringIO(texto, newline=None).read()
+
+
 def load_extrato_aurora(file_path: Path = AURORA_CSV) -> pd.DataFrame:
     """
     Carrega o extrato do Banco Aurora (CSV), capturando a linha física (L8, L9...)
     como 'ref_origem', conforme exigido pelo regulamento.
     """
-    with open(file_path, "r", encoding="utf-8", errors="replace") as f:
-        lines = f.readlines()
+    lines = io.StringIO(ler_texto(file_path)).readlines()
 
     header_idx = None
     for idx, line in enumerate(lines, start=1):
         parts = [p.strip().lower() for p in line.split(";")]
-        if "data" in parts and any("lançamento" in p or "lancamento" in p for p in parts):
+        # Mesmo critério da descoberta em core/entrada.py: coluna começando por "lan".
+        if "data" in parts and any(p.startswith("lan") for p in parts):
             header_idx = idx
             break
 
@@ -34,9 +50,12 @@ def load_extrato_aurora(file_path: Path = AURORA_CSV) -> pd.DataFrame:
     # ficam em df.attrs para o invariante saldo_anterior + Σ valor = saldo_final.
     data: list[dict[str, Any]] = []
     saldos: dict[str, float] = {}
+    puladas: list[str] = []  # linha com conteúdo e menos de 5 campos: vira aviso (R-42)
     for line_num, line in enumerate(lines[header_idx:], start=header_idx + 1):
         parts = [p.strip() for p in line.strip().split(";")]
         if len(parts) < 5:
+            if line.strip():
+                puladas.append(f"L{line_num}")
             continue
         dt_str, desc, doc, valor_str, saldo_str = parts[:5]
         if desc.upper().startswith("SALDO"):
@@ -57,6 +76,7 @@ def load_extrato_aurora(file_path: Path = AURORA_CSV) -> pd.DataFrame:
     df = pd.DataFrame(data)
     df.attrs["saldo_anterior"] = saldos.get("SALDO ANTERIOR")
     df.attrs["saldo_final"] = saldos.get("SALDO FINAL")
+    df.attrs["linhas_puladas"] = puladas
     return df
 
 
