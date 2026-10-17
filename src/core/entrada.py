@@ -49,14 +49,18 @@ def carregar_orbe(input_dir: Path) -> pd.DataFrame:
         df["arquivo_origem"] = p.name
         partes.append(df)
     orbe = pd.concat(partes, ignore_index=True)
-    dup = orbe[orbe.duplicated("id_transacao", keep=False)]
-    if not dup.empty:
-        cols = [c for c in orbe.columns if c != "arquivo_origem"]
-        # Idêntica entre arquivos: mantém uma. Diferente: erro (P-14 trata depois).
-        if dup.drop_duplicates(cols).duplicated("id_transacao", keep=False).any():
-            ids = sorted(dup.drop_duplicates(cols).loc[lambda d: d.duplicated("id_transacao", keep=False), "id_transacao"].unique())
-            raise ValueError(f"Orbe: id_transacao repetido com conteúdo diferente entre arquivos: {ids[:5]}")
-        orbe = orbe.drop_duplicates(cols, keep="first").reset_index(drop=True)
+    cols = [c for c in orbe.columns if c != "arquivo_origem"]
+    # P-14: linha idêntica entre arquivos conta uma vez.
+    orbe = orbe.drop_duplicates(cols, keep="first").reset_index(drop=True)
+    substituidas: list[tuple[dict, dict]] = []
+    antigas = orbe.duplicated("id_transacao", keep="last")
+    if antigas.any():
+        # P-14: versão diferente vale a do arquivo mais recente (o ajuste, que vem depois na ordem
+        # dos nomes); a substituída sai do cálculo e do rastro e vai para a pendência.
+        novas = {r["id_transacao"]: r for r in orbe[~antigas].to_dict("records")}
+        substituidas = [(r, novas[r["id_transacao"]]) for r in orbe[antigas].to_dict("records")]
+        orbe = orbe[~antigas].reset_index(drop=True)
+    orbe.attrs["substituidas"] = substituidas
     return orbe
 
 

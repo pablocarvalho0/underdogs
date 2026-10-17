@@ -215,6 +215,23 @@ def rodar(dados: DadosEntrada, cadastro: Cadastro, premissas: Premissas) -> Resu
             )
         )
 
+    # P-14: id_transacao repetido com conteúdo diferente entre arquivos da Orbe
+    for antiga, nova in dados.orbe.attrs.get("substituidas", []):
+        ref = str(nova["id_transacao"])
+        res.linhas.append(
+            _pendencia(
+                f"SUBSTITUIDA-{ref}",
+                "AJUSTE_SUBSTITUIU_LINHA",
+                [Componente(nova["arquivo_origem"], ref, nova["valor_bruto"])],
+                f"Transação {ref} veio em {antiga['arquivo_origem']} e de novo, diferente, em {nova['arquivo_origem']}. "
+                f"Valeu a versão do ajuste ({nova['tipo_lancamento']}, bruto {_brl_txt(nova['valor_bruto'])}, taxa "
+                f"{nova['taxa_aplicada_pct']}%) no lugar de ({antiga['tipo_lancamento']}, bruto "
+                f"{_brl_txt(antiga['valor_bruto'])}, taxa {antiga['taxa_aplicada_pct']}%). Valor = bruto da versão adotada.",
+                HELENA,
+                "P-14",
+            )
+        )
+
     # P-08: alerta de antecipação para lojista sem venda antes do mês
     if inicio_mes:
         for linha in _alertas_antecipacao(registros, cadastro, inicio_mes):
