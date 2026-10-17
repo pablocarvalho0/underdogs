@@ -153,6 +153,12 @@ Para conferir os números de setembro contra o controle independente (HIPOTESES.
 ```bash
 .venv/bin/python -m pytest tests/test_controle_setembro.py -q
 ```
+O valor esperado não foi digitado à mão: `controle/previa_independente.py` recalcula cada total e cada
+pendência direto dos arquivos brutos, sem importar nada do `src/`, e compara com
+`controle/esperado_setembro.json` (sai com erro se algum número não bater):
+```bash
+.venv/bin/python controle/previa_independente.py
+```
 
 Para validar a integridade dos arquivos gerados contra o esquema oficial:
 ```bash

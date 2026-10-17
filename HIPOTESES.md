@@ -225,7 +225,7 @@ Não são perguntas para o canal: são escolhas nossas, levantadas na consolida�
 
 ## 5. Prévia independente dos números de setembro (para controle)
 
-Calculada por um script de exploração, fora do `src/`, aplicando as regras acima aos arquivos **01 + 06** da Orbe. **A implementação das trilhas tem que chegar aos mesmos valores.** Se não chegar, alguém errou, e vale investigar antes de entregar.
+Calculada por `controle/previa_independente.py`, que não importa nada do `src/` e aplica as regras acima aos arquivos **01 + 06** da Orbe. **A implementação das trilhas tem que chegar aos mesmos valores.** Se não chegar, alguém errou, e vale investigar antes de entregar.
 
 | Item | Valor | Regras |
 | :--- | ---: | :--- |
