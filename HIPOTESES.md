@@ -204,6 +204,20 @@ Status: **proposta**, a confirmar pelo time no PR, menos onde está marcado **de
 
 As 3 perguntas da versão anterior deste arquivo **não chegaram a ser enviadas**. Todas foram respondidas no canal por perguntas de outros times (ver §6). Duas perguntas da versão de 13h25 também saíram da lista: a Q-01 (unidade da taxa) foi decidida pelo time (P-09), e a Q-03 (ajuste da Orbe) foi respondida pela R-43. Das perguntas do PR #8, a de ajuste da Orbe e a de isenção da Casa na antecipação foram respondidas antes das 13h40 (R-43 e R-44); só a do ajuste da Ponte segue aberta (Q-04). As Q-04..Q-07 são de outros times; acompanhamos as respostas.
 
+
+### 4.1 Decisões internas do time (antes das trilhas)
+
+Não são perguntas para o canal: são escolhas nossas, levantadas na consolidação dos PRs #7 e #8. Cada uma traz uma recomendação; quando o time decidir, ela vira P-xx (ou ajuste de uma P existente) e sai daqui.
+
+| ID | Decisão | Opções | Recomendação e por quê |
+| :--- | :--- | :--- | :--- |
+| D-01 | Como a entrada acha os arquivos do mês. Hoje `src/config.py` usa o nome fixo de setembro: o 06 é ignorado (checkout R$ 3.304,39 acima do certo) e outubro quebra (L-02). | (a) papel pelo **cabeçalho**, com o prefixo `01_`/`06_` como desempate; (b) só pelo prefixo numérico; (c) glob pelo nome do parceiro | **(a)**. A suíte caixa-preta roda com um data pack sintético, cujos nomes de arquivo não conhecemos. Todos os arquivos da Orbe são concatenados com `arquivo_origem` por linha. Papel faltando ou arquivo desconhecido gera pendência (R-42). |
+| D-02 | Estorno ou reversão no ajuste que aponta para transação do mês que **não está** em nenhum arquivo da Orbe (Q-06, parte 2). | (a) abate e gera pendência; (b) não abate, só gera pendência; (c) esperar a resposta da Helena | **(a)**. A linha do estorno já traz modalidade, parcelas e `data_venda_original`, que é tudo de que a R-03 precisa. É o mesmo mecanismo dos 9 estornos de agosto. A pendência diz "venda original não veio". |
+| D-03 | Atlas na `comissoes_por_lojista.csv` (P-02). | (a) não aparece, fica só na pendência; (b) aparece com 0,00 | **(a)**. A Helena disse que a Atlas não fatura. Uma linha 0,00 com 57 componentes somando zero é artificial, e a L-04 diz que alarme falso conta contra. A pendência carrega o detalhe e os R$ 7.876,05. Se o time escolher (a), a P-02 muda. |
+| D-04 | Bandeira do estorno diferente da venda (7 de 10 no 06, 39 de 50 no 01; Q-05). | (a) só registro aqui; (b) pendência informativa para a Orbe | **(a)**. Nenhuma taxa depende da bandeira, e a frequência indica ruído do dado. Pendência aqui seria alarme falso (L-04). |
+| D-05 | Status das premissas P-01..P-08 e P-10..P-14, que ainda estão como **proposta**. | Confirmar em bloco ou contestar uma a uma | Confirmar em bloco, menos a P-02 (depende da D-03). As tasks das trilhas já foram escritas em cima delas. |
+| D-06 | Destino dos PRs #7 e #8. | Fechar os dois quando este for mergeado | Fechar. Todo o conteúdo deles está aqui, e o log da §7 registra o que mudou de ID. |
+
 ---
 
 ## 5. Prévia independente dos números de setembro (para controle)
