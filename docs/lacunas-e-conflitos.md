@@ -141,3 +141,67 @@ Para revisão, junto com o §11 do plano. **Nenhuma foi enviada.**
 | T-3 | `[Financeiro]` | "Underdogs: a Atlas começou a vender em 10/09 e vendeu R$ 135,4 mil brutos no mês, mas recebeu R$ 249,3 mil em repasses (Pix de 10/09 e de 22/09). O segundo saiu depois da reversão de antecipação de 17/09. Isso foi uma antecipação da Bia pela conta garantida? Vocês querem que o alerta de antecipação traga também o total repassado contra o vendido?" | Muda o conteúdo do alerta e dá ao pitch o "dinheiro em risco" mais concreto do mês. Pergunta sobre fato, com números, sem pedir validação de número |
 | T-4 | `[Financeiro]` | "Underdogs: o contrato da Mundo Aberto é de 1,20% de spread desde julho, e em setembro a Ponte cobrou ~1,50% nas 23 operações. Se aconteceu o mesmo em julho e agosto, a contestação com a Ponte deve pedir esses meses também, ou só setembro?" | Pode aumentar o valor a contestar e entra no rascunho de e-mail. A resposta pode ser "só setembro", mas a pergunta mostra a causa raiz |
 | T-5 | `[Financeiro]` | "Underdogs: o e-mail da Ponte diz que o repasse é 50% do spread realizado, e o total do relatório (R$ 78.073,59) inclui a duplicata e os spreads negativos, dando R$ 39.036,80. A nossa nota sai em R$ 39.543,45. A nota vai pelo nosso valor e a diferença de R$ 506,65 entra na contestação, certo?" | Fecha a C-03 e define o texto da pendência de acompanhamento. Risco baixo: a R-14 e a R-27 já indicam a resposta |
+
+---
+
+## 7. Destino de cada item: construção, `pendencias.csv` ou só documento
+
+Uma lacuna nossa **não** vira pendência automaticamente. O `pendencias.csv` é para a Helena e o
+comercial decidirem algo sobre um número ou documento de setembro (P-16: o sistema detecta e
+registra, não resolve). O resto ou muda o código, ou é argumento de pitch e README. Pendência
+que ninguém precisa decidir é alarme falso (L-04).
+
+### 7.1 Necessário para construir (decide ou ajusta antes ou durante o código)
+
+| Quando | Itens | O que o código precisa |
+| :--- | :--- | :--- |
+| **Antes das trilhas** | C-01, X-04 | Controle de 01 + 06 (R$ 203.735,34) nas tasks e no `test_controle_setembro.py` |
+| **Antes das trilhas** | C-05, X-05 | Testes de loader sem `float64` e sem 1.943 fixo (ou concatenação na entrada) |
+| **Antes das trilhas** | C-02, H-02 | Decidir a D-03: Atlas com 0,00 em `comissoes_por_lojista` ou só na pendência |
+| **Antes das trilhas** | H-12, H-08 | Entrada por cabeçalho (D-01), 01 + 06 concatenados e a P-14 para id repetido |
+| Na trilha A | H-05, H-06 | Casa e Atlas fora de `divergencias_taxa`; regra do alerta (P-08) |
+| Na trilha B | H-01, H-04, H-05, E-03, C-11 | Tolerância de 0,01 p.p.; fórmula P-05; negativos fora das divergências; invariante "Σ das 233 linhas = incluídas + negativas + duplicata"; diferença até o contrato **calculada por nós** |
+| Na trilha B | N-04, C-03, H-10 | A pendência de acompanhamento da Ponte traz a nota (R$ 39.543,45) **e** os 50% do total do relatório (R$ 39.036,80), com a diferença |
+| Na trilha C | N-10, H-03 | DARFs sem mês no histórico → baixa de passivo de agosto (regra; `confianca` pode ser < 1) |
+| Na trilha C | N-09 | O invariante de saldo do Meridiano usa o saldo inicial derivado do `LEDGERBAL` |
+| Na trilha C | N-02, E-09 | A regra de "Pix sem identificação" extrai o CNPJ do histórico para o motivo |
+| Formato | H-07, H-11, C-09 | `arquivo_origem` da Ponte (P-10), padrão de `id_saida` e nomes de `quem_decide` padronizados |
+| Extra (L-10) | X-03 | Registro de cada execução (arquivos, linhas, data e hora) e colunas com a regra aplicada em cada linha |
+| **O que o código não pode emitir** | E-08, N-12, N-13, H-09 | Nenhuma pendência para bandeira trocada (R-50), IOF do Meridiano, Pix de R$ 18.240 (P-12) ou alias confirmado |
+| Outubro (Extra) | N-01, N-05 | Guardar as linhas da Atlas para recalcular (R-07); flag para o ajuste da Ponte (Q-04) |
+| Processo | N-15 | Triagem humana da caixa-preta quando falhar |
+
+### 7.2 Vira linha em `pendencias.csv` (saída de setembro)
+
+| Pendência | Itens de origem | Valor | Quem decide |
+| :--- | :--- | ---: | :--- |
+| Atlas sem contrato: não faturar (motivo cita as taxas aplicadas pela Orbe) | N-01, E-02 | 7.876,05 | Comercial |
+| Alerta de antecipação acima das vendas, Atlas (pico em 15/09, com as reversões) | E-01, H-06 | 124.235,32 | Helena + Comercial |
+| Casa: devolução do que a Orbe cobrou durante a isenção | E-04 | 15.396,77 | Helena + Comercial |
+| Casa: nota não emitida (comissão negativa) | — (R-26) | −5,50 | Helena |
+| Rota: contestar com a Orbe e ressarcir o lojista (motivo: +0,50 p.p. no crédito desde 12/09) | E-05, N-06 | 1.546,28 | Helena |
+| Bridge: contestar com a Orbe e ressarcir (taxa antiga de 15 a 18/09) | E-05 | 29,95 | Helena |
+| Mundo Aberto: spread acima do contrato, contestar com a Ponte | E-06 | 1.418,85 | Helena |
+| Spreads negativos: contestar com a Ponte (relatório e até o contrato) | E-07, C-11 | −1.834,05 | Helena |
+| Operação repetida no relatório da Ponte | E-03 | spread da cópia | Ponte |
+| Acompanhamento: repasse da Ponte (nota × 50% do total do relatório) | N-04, C-03 | 39.543,45 | Helena |
+| Pix sem identificação, com o CNPJ do pagador | N-02, E-09 | 7.350,00 | Helena |
+| Devolução de Pix da Mundo Aberto, motivo desconhecido | N-03 | 12.400,00 | Helena |
+| Acompanhamento: crédito dos R$ 300 mil no Meridiano em 01/10 | N-14 | 300.000,00 | Helena |
+
+As divergências da Rota, da Bridge e da Mundo Aberto também saem, linha a linha, em
+`divergencias_taxa.csv`. A pendência é o pedido de decisão agregado por lojista (P-13).
+
+### 7.3 Nem código nem pendência: documento, pitch ou pergunta
+
+| Destino | Itens |
+| :--- | :--- |
+| Pitch (dinheiro em jogo e causa raiz) | E-01 (repasses à Atlas: R$ 249.301,77 contra R$ 135.428,90 vendidos), N-06, N-08 (cobrança errada se repete em outubro), N-16 (custo da Orbe fora dos dados) |
+| README, em "limitações conhecidas" | N-11 (custo da conta garantida não aparece no mês), N-16, N-09 |
+| Pergunta candidata (decisão do time) | T-3 (E-01), T-4 (N-07), T-5 (C-03), mais O-1..O-3 e T-1, T-2 do plano |
+| Já decidido; só não repetir errado | C-04 (prazo: vale a Helena), C-06 e C-07 (afirmações da v0), C-10 (R-19 é premissa) |
+| Decisão de processo | C-08 (quem faz a remessa), C-12 (áudio público), X-01, X-02, X-07, X-08, X-09 |
+
+**Fora do código por escolha:** casar o nome do extrato com o lojista. Só serviria para
+enriquecer o alerta da Atlas com os repasses, e o case avisa contra casamento por nome. Esse
+número fica no pitch e no `HIPOTESES.md`, como investigação manual.
