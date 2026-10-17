@@ -137,7 +137,31 @@ npm run status
 
 ---
 
-## 🔐 6. Governança e Git
+## 🤖 6. Orquestração: líder + subagents
+
+A sessão principal (Opus) é o **líder**: lê a spec, quebra a tarefa grande em
+fatias independentes e delega. Subagents de projeto em `.claude/agents/`:
+
+- `implementador` (sonnet): implementa uma fatia em `src/`.
+- `varredor` (haiku): localiza coisas em `src/` e `docs/`, read-only.
+
+Protocolo do líder:
+
+1. Decidir arquitetura e regras ambíguas **antes** de delegar; premissa nova vai para `HIPOTESES.md`.
+2. Fatias sem arquivo em comum rodam em paralelo; com arquivo em comum, em sequência.
+3. Cada prompt de subagent é autocontido: arquivos a criar/editar, contrato de
+   entrada/saída (colunas, tipos), regra de negócio exata e critério de pronto.
+   Subagent não vê esta conversa.
+4. O líder revisa o diff de cada fatia e roda `npm test` no final. Subagent nunca
+   lê os testes caixa-preta (diretiva 0).
+5. Tarefa pequena ou de um arquivo só: o líder faz direto, sem delegar.
+
+Skills do gstack (instaladas em `~/.claude/skills`): úteis aqui são `/investigate`
+(teste falhando), `/review` (antes do PR) e `/ship`.
+
+---
+
+## 🔐 7. Governança e Git
 
 - **O repositório no GitHub deve ser PÚBLICO** (exigência mandatória do regulamento oficial da Barte AI para envio e correção automática até 18h30 de 17/10).
 - **Apenas mudanças aprovadas pelo usuário (`@pablocarvalho0`) podem entrar na branch `main`.**
