@@ -1,5 +1,8 @@
 # Plano de engenharia — fechamento set/2026 Tarvo
 
+> **Atualização (17/10 14h20):** cronograma, frentes, portões e perguntas restantes estão em
+> [`docs/plano-construcao.md`](plano-construcao.md). A arquitetura e o contrato abaixo continuam valendo.
+
 Rascunho v0 (17/10, 13h20). Decisões marcadas **[D-xx]** estão abertas; perguntas ao
 financeiro marcadas **[F-xx]**. Todo número citado aqui foi medido no data pack
 nesta sessão, não estimado.
