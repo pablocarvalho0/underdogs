@@ -132,13 +132,15 @@ pytest tests/test_blackbox_immutable.py -v
 
 ---
 
-## 🔒 Governança do Repositório (Branch Protection)
+## 🔒 Governança do Repositório (Público & Branch Protection)
 
-Este repositório possui proteção ativada na branch `main`:
+Este repositório é **PÚBLICO** (requisito mandatório para avaliação da banca do Hackathon Barte AI) e possui proteção ativada na branch `main`:
 - **Nenhum commit direto na `main` é permitido.**
 - Qualquer alteração de código ou premissa deve ser submetida via **Pull Request (PR)**.
 - O PR requer **aprovação explícita e obrigatória** do mantenedor (`@pablocarvalho0`) antes do merge.
 - Rastreamento obrigatório de premissas em `HIPOTESES.md` para qualquer ajuste em regras de negócio.
+- **Suíte de Testes e Gabaritos:** Travados como somente leitura (`chmod 444`) e protegidos contra modificações inadvertidas ou adulterações por agentes de IA.
+
 
 ---
 

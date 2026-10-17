@@ -122,7 +122,8 @@ mypy src
 
 ## 🔐 6. Governança e Git
 
-- O repositório no GitHub é privado.
+- **O repositório no GitHub deve ser PÚBLICO** (exigência mandatória do regulamento oficial da Barte AI para envio e correção automática até 18h30 de 17/10).
 - **Apenas mudanças aprovadas pelo usuário (`@pablocarvalho0`) podem entrar na branch `main`.**
 - Trabalhe sempre em branches de funcionalidade (ex: `feat/orbe-loader`, `feat/reconciliation-engine`, `feat/export-csv`) e abra Pull Requests para aprovação do usuário.
 - Mantenha `PROMPTS/MOMENTOS.md` atualizado com as decisões e interações críticas de IA.
+
