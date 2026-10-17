@@ -131,26 +131,21 @@ Copy-Item .env.example .env
 ### 4. Executar o Fechamento
 Para rodar a conciliação completa e gerar todos os arquivos em `saida/`:
 ```bash
-python -m src.main run
+npm run run
 ```
 
 Para validar a integridade dos arquivos gerados contra o esquema oficial:
 ```bash
-python -m src.main validate
+npm run validate
 ```
 
 ### 5. Executar a Suíte de Testes Caixa-Preta (Imutável)
 Funciona de forma idêntica em **Linux**, **Arch Linux** e **Windows 11**:
 ```bash
-# Comando padrão via npm (agnóstico de SO):
 npm test
-
-# Ou diretamente via pytest, sempre pelo python da .venv
-# (Windows: .venv\Scripts\python.exe):
-.venv/bin/python -m pytest tests/test_blackbox_immutable.py -v
 ```
 
-> `npm test` não usa jest: o `package.json` é só um atalho que chama o pytest da `.venv`. O projeto é Python puro, sem `node_modules`.
+> `npm test` não usa jest: o `package.json` é só um atalho que chama o pytest da `.venv`. Detalhes e o que não fazer em [`CLAUDE.md` §5](./CLAUDE.md).
 
 > ⚠️ **Regra Imutável:** A suíte em `tests/test_blackbox_immutable.py` e os gabaritos em `tests/fixtures/blackbox/` são **imutáveis**. Nenhuma IA está autorizada a inspecioná-los ou alterá-los para sobreajustar código. Apenas o comando de teste deve ser disparado para aferir o progresso.
 

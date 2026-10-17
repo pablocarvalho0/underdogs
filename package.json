@@ -6,12 +6,10 @@
     "test": "node scripts/runner.js -m pytest tests/test_blackbox_immutable.py -v",
     "test:all": "node scripts/runner.js -m pytest -v",
     "test:real": "node scripts/runner.js -m pytest tests/test_real_dataset_integrity.py tests/test_loaders.py -v",
-    "test:watch": "node scripts/runner.js -m pytest -f",
     "run": "node scripts/runner.js -m src.main run",
     "validate": "node scripts/runner.js -m src.main validate",
     "status": "node scripts/runner.js -m src.main status"
   },
   "author": "Pablo Carvalho",
   "license": "MIT"
-
 }

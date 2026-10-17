@@ -111,8 +111,6 @@ Não há jest, vitest, `node_modules` nem dependência npm.
   use o binário da venv: `.venv/bin/python -m ...`.
 - `npm test` saindo com código 1 e `FAILED` é **teste falhando de verdade**,
   não erro de ambiente. Leia a mensagem do pytest em vez de trocar de runner.
-- `./test.sh` roda **todos** os testes (equivale a `npm run test:all`), não só a
-  caixa-preta. Não use como substituto de `npm test`.
 
 ### Comandos
 

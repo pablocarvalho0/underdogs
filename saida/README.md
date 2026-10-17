@@ -1,6 +1,6 @@
 # Arquivos de Saída da Conciliação de Setembro/2026
 
-Os arquivos nesta pasta são gerados pela execução do pipeline (`python -m src.main run`) e devem respeitar os requisitos estritos do regulamento:
+Os arquivos nesta pasta são gerados pela execução do pipeline (`npm run run`) e devem respeitar os requisitos estritos do regulamento:
 
 1. **Separador de colunas:** `;`
 2. **Separador decimal:** `.` (ponto)
