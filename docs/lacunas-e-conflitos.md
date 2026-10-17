@@ -1,4 +1,4 @@
-# Lacunas, hipóteses e conflitos (17/10, 14h45)
+# Lacunas, hipóteses e conflitos (17/10, 14h40)
 
 O que **ainda não sabemos**, o que é **hipótese nossa**, o que **parece errado** nos dados e o que
 **conflita** entre fontes e documentos. Complementa o `HIPOTESES.md`: lá fica a regra, aqui fica a
