@@ -1,0 +1,14 @@
+{
+  "name": "underdogs-tarvo",
+  "version": "0.1.0",
+  "description": "Fechamento financeiro automatizado Tarvo - Desafio Barte AI",
+  "scripts": {
+    "test": ".venv/bin/pytest tests/test_blackbox_immutable.py -v",
+    "test:all": ".venv/bin/pytest -v",
+    "test:watch": ".venv/bin/pytest -f",
+    "validate": ".venv/bin/python -m src.main validate",
+    "status": ".venv/bin/python -m src.main status"
+  },
+  "author": "Pablo Carvalho",
+  "license": "Private"
+}

@@ -4,6 +4,17 @@ Este documento orienta assistentes de IA (Claude Code, Cursor, Copilot, Antigrav
 
 ---
 
+## 🚫 0. DIRETIVA MANDATÓRIA E INEGOCIÁVEL PARA QUALQUER IA: SUÍTE DE TESTES IMUTÁVEL
+
+> **ATENÇÃO MÁXIMA PARA QUALQUER AGENTE DE IA (CLAUDE, CURSOR, COPILOT, GEMINI, ANTIGRAVITY):**
+>
+> 1. **NÃO LEIA NEM INSPECIONE O ARQUIVO DE TESTE:** É terminantemente proibido ler `tests/test_blackbox_immutable.py` ou os gabaritos em `tests/fixtures/blackbox/` para "adaptar", "sobreajustar" (overfit) ou contornar as regras do código para fazê-lo passar nos testes.
+> 2. **NÃO ALTERE, NÃO AFROUXE E NÃO REMOVA TESTES:** O arquivo `tests/test_blackbox_immutable.py` e todos os arquivos em `tests/fixtures/blackbox/` são **IMUTÁVEIS**. Nenhuma asserção pode ser modificada, comentada ou atenuada.
+> 3. **PAPEL EXCLUSIVO DA IA:** Seu único papel é desenvolver a lógica pura de negócio dentro do diretório `src/` a partir dos documentos de especificação em `docs/`.
+> 4. **ÚNICO USO PERMITIDO:** A IA está autorizada única e exclusivamente a **EXECUTAR O COMANDO DE TESTES** (`npm test` ou `pytest`) para verificar se a sua implementação em `src/` atende aos contratos exigidos pelo cliente.
+
+---
+
 ## 🎯 1. Visão Geral do Projeto
 
 A **Tarvo Pagamentos** é uma subadquirente de nicho focada no mercado de educação internacional (~25 lojistas ativos). O projeto consiste em construir uma solução automatizada de fechamento financeiro para o mês de **setembro/2026** baseada nos arquivos brutos do cliente em `docs/Tarvo_Data_Pack_set2026/`.
@@ -85,17 +96,21 @@ A **Tarvo Pagamentos** é uma subadquirente de nicho focada no mercado de educa�
 ## 🛠️ 5. Comandos Frequentes
 
 ```bash
-# Ativar ambiente
+# Executar a suíte de testes caixa-preta (comando padrão)
+npm test
+
+# Executar todos os testes (incluindo parsers de dados reais)
+npm run test:all
+
+# Ativar ambiente Python diretamente (alternativa)
 source .venv/bin/activate
+pytest tests/test_blackbox_immutable.py
 
 # Executar a pipeline de conciliação
 python -m src.main run
 
 # Validar arquivos de saída contra as regras de esquema do desafio
 python -m src.main validate
-
-# Executar testes
-pytest
 
 # Linters e checagem de tipos
 ruff check src tests

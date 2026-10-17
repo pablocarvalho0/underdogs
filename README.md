@@ -119,10 +119,16 @@ Para validar a integridade dos arquivos gerados contra o esquema oficial:
 python -m src.main validate
 ```
 
-Para rodar a suíte de testes:
+### 5. Executar a Suíte de Testes Caixa-Preta (Imutável)
 ```bash
-pytest
+# Comando padrão para checar se a solução atende ao contrato:
+npm test
+
+# Ou diretamente via pytest:
+pytest tests/test_blackbox_immutable.py -v
 ```
+
+> ⚠️ **Regra Imutável:** A suíte em `tests/test_blackbox_immutable.py` e os gabaritos em `tests/fixtures/blackbox/` são **imutáveis**. Nenhuma IA está autorizada a inspecioná-los ou alterá-los para sobreajustar código. Apenas o comando de teste deve ser disparado para aferir o progresso.
 
 ---
 
