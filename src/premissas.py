@@ -8,6 +8,7 @@ Valores marcados PROVISÓRIO são o default até o dono da trilha confirmar.
 """
 
 from dataclasses import dataclass, field
+from datetime import date
 from decimal import Decimal
 from typing import Literal
 
@@ -22,14 +23,44 @@ class AliasEC:
 
 
 @dataclass(frozen=True)
+class Isencao:
+    """Tarifa zero no checkout (MDR e antecipação) para um CNPJ, em [inicio, fim]."""
+
+    cnpj: str
+    inicio: date
+    fim: date
+    aprovador: str
+    fonte: str
+
+
+_ALIASES_EC: dict[str, AliasEC] = {
+    "1043300981": AliasEC("66564512000199", "R-05: Novo Horizonte Intercâmbio", True),
+    "1043396662": AliasEC("78576234000179", "R-05: Horizonte Viagens (empresa diferente da anterior)", True),
+    "1038867654": AliasEC("07752116000126", "R-05: Kiwi Experience", True),
+}
+
+_ISENCOES_CHECKOUT: tuple[Isencao, ...] = (
+    Isencao(
+        cnpj="00520815000100",
+        inicio=date(2026, 9, 1),
+        fim=date(2026, 12, 31),
+        aprovador="Comercial (concessão), registrada pela Helena",
+        fonte="R-08, R-44 [T7][T35][T41]",
+    ),
+)
+
+
+@dataclass(frozen=True)
 class Premissas:
     # --- Trilha A (checkout) ---
-    # F-01. PROVISÓRIO. CONTRATADA: comissão pela taxa do contrato, excedente é divergência.
+    # R-01 (era F-01), respondido. CONTRATADA: comissão pela taxa do contrato, excedente é divergência.
     comissao_checkout_base: Literal["CONTRATADA", "APLICADA"] = "CONTRATADA"
-    # F-04. PROVISÓRIO. Estorno de venda de mês anterior abate a comissão de setembro.
+    # R-03 (era F-04), respondido. Estorno de venda de mês anterior abate a comissão de setembro.
     estorno_mes_anterior_abate: bool = True
-    # F-03. Preenchido pelo dono da trilha A, com justificativa.
-    aliases_ec: dict[str, AliasEC] = field(default_factory=dict)
+    # R-05 (era F-03), confirmados pelo financeiro.
+    aliases_ec: dict[str, AliasEC] = field(default_factory=lambda: dict(_ALIASES_EC))
+    # R-08, R-44: concessões de tarifa zero no checkout.
+    isencoes_checkout: tuple["Isencao", ...] = field(default_factory=lambda: _ISENCOES_CHECKOUT)
 
     # --- Trilha B (remessa) ---
     participacao_spread_tarvo: Decimal = Decimal("0.5")  # fato: e-mail da Ponte
