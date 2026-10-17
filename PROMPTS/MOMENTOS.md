@@ -33,10 +33,10 @@ Este documento registra os momentos críticos na interação com a IA durante o 
 
 ---
 
-### Momento 5: [A preencher durante a validação contra o gabarito]
-- **O que foi pedido:** *(Registrar validação final de números)*
-- **O que a IA devolveu:** *(Registrar retorno da IA)*
-- **O que foi feito com isso:** *(Registrar decisão e ajuste adotado)*
+### Momento 5: Conferência cruzada dos números e um diagnóstico errado da IA
+- **O que foi pedido:** Uma régua independente para os números de setembro antes de confiar em qualquer saída: prévia própria das regras do `HIPOTESES.md` e, no fim, uma segunda implementação das 3 trilhas feita por subagents em paralelo, para comparar com o MVP da `main`.
+- **O que a IA devolveu:** As duas implementações e a prévia deram os mesmos valores em todas as saídas (checkout R$ 203.735,34, remessa R$ 39.543,45, 115 divergências, 184 lançamentos nas mesmas contas). Antes disso, porém, a IA tinha escrito no plano que a Rota estava sendo cobrada pela "tabela 2025", o que era falso.
+- **O que foi feito com isso:** O diagnóstico da Rota foi conferido contra a planilha antes de ir para o time: o padrão real é +0,50 p.p. em todo o crédito desde 12/09, com débito e Pix iguais, e o texto foi corrigido. A suíte caixa-preta, que falha em um valor nas duas implementações, ficou para triagem humana em vez de a IA ajustar o código até passar.
 
 ---
 
