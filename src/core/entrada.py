@@ -7,6 +7,7 @@ derrubam a execução: viram `Aviso`, que o pipeline transforma em pendência (R
 """
 
 import email
+import io
 import re
 from dataclasses import dataclass, field
 from datetime import date, datetime
@@ -25,6 +26,7 @@ from src.loaders import (
     load_ponte_cambio_report,
     load_taxas_contratadas,
 )
+from src.loaders.extratos import ler_texto
 
 # Papéis do data pack.
 ORBE = "orbe"
@@ -173,7 +175,8 @@ def _carregar_orbe(arquivos: list[Path], avisos: list[Aviso]) -> pd.DataFrame:
     """Concatena todos os arquivos da Orbe em ordem de nome (o ajuste vem depois)."""
     por_id: dict[str, dict[str, Any]] = {}
     for arq in arquivos:
-        bruto = pd.read_csv(arq, sep=";", dtype=str, keep_default_na=False, encoding="utf-8")
+        # R-42: utf-8 ou cp1252, sem derrubar a execução por encoding.
+        bruto = pd.read_csv(io.StringIO(ler_texto(arq)), sep=";", dtype=str, keep_default_na=False)
         faltando = [c for c in COLUNAS_ORBE if c not in bruto.columns]
         if faltando:
             avisos.append(
@@ -272,14 +275,30 @@ def carregar(input_dir: Path) -> DadosEntrada:
             return pd.DataFrame()
 
     orbe = _carregar_orbe(papeis[ORBE], avisos)
+    # Mesma ordem de antes: os avisos de carga saem numerados nessa sequência.
+    taxas = um(TAXAS, load_taxas_contratadas)
+    ponte = um(PONTE, load_ponte_cambio_report)
+    plano = um(PLANO, load_plano_de_contas)
+    aurora = um(AURORA, load_extrato_aurora)
+    puladas: list[str] = list(aurora.attrs.get("linhas_puladas") or [])
+    if puladas:
+        nome = papeis[AURORA][0].name
+        avisos.append(
+            Aviso(
+                "LINHA_IGNORADA_AURORA",
+                nome,
+                f"{len(puladas)} linha(s) de {nome} com menos de 5 campos ficaram fora da "
+                f"classificação: {', '.join(puladas)}. Confira no extrato se é lançamento.",
+            )
+        )
     if papeis[ORBE]:
         arquivos[ORBE] = ", ".join(p.name for p in papeis[ORBE])
     return DadosEntrada(
         orbe=orbe,
-        taxas=um(TAXAS, load_taxas_contratadas),
-        ponte=um(PONTE, load_ponte_cambio_report),
-        plano_contas=um(PLANO, load_plano_de_contas),
-        aurora=um(AURORA, load_extrato_aurora),
+        taxas=taxas,
+        ponte=ponte,
+        plano_contas=plano,
+        aurora=aurora,
         meridiano=um(MERIDIANO, load_extrato_meridiano),
         arquivos=arquivos,
         avisos=avisos,

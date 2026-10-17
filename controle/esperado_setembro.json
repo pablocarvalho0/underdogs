@@ -1,5 +1,5 @@
 {
-  "_sobre": "Prévia independente de setembro (01 + 06), calculada fora do src/. Fonte: HIPOTESES.md §5 e plano-construcao.md §7 e §8. Usada por tests/test_controle_setembro.py e pela página de conferência. Diferença aqui se investiga; não se ajusta o número no código.",
+  "_sobre": "Prévia independente de setembro (01 + 06), calculada fora do src/ por controle/previa_independente.py. Fonte: HIPOTESES.md §5 e plano-construcao.md §7 e §8. Usada por tests/test_controle_setembro.py e pela página de conferência. Diferença aqui se investiga; não se ajusta o número no código.",
   "data_pack": "docs/Tarvo_Data_Pack_set2026",
   "totais": [
     {"grupo": "Comissões", "item": "Comissão CHECKOUT, soma dos lojistas", "arquivo": "comissoes_por_lojista.csv", "filtro": {"linha_negocio": "CHECKOUT"}, "metrica": "soma", "coluna": "comissao_brl", "esperado": "203735.34", "fonte": "HIPOTESES §5"},
@@ -34,13 +34,13 @@
   ],
   "pendencias": [
     {"id_saida": "PEN-CHK-SEMCONTRATO-1076801732", "caso": "Atlas sem contrato, 57 linhas (não faturar)", "esperado": "7876.05", "quem_decide": "Comercial"},
-    {"id_saida": "PEN-CHK-DEVOLUCAO-00520815000100", "caso": "Casa: devolução ao lojista, 118 linhas", "esperado": "15396.77", "quem_decide": "Helena + Comercial"},
+    {"id_saida": "PEN-CHK-DEVOLUCAO-00520815000100", "caso": "Casa: devolução ao lojista, 118 linhas", "esperado": "15396.77", "linhas_rastro": 118, "quem_decide": "Helena + Comercial"},
     {"id_saida": "PEN-CHK-SEMNOTA-00520815000100", "caso": "Casa: nota não emitida (comissão negativa)", "esperado": "-5.50", "quem_decide": "Helena"},
     {"id_saida": "PEN-CHK-CONTESTACAO-95927868000148", "caso": "Rota: contestar com a Orbe, 87 linhas", "esperado": "1546.28", "quem_decide": "Helena"},
     {"id_saida": "PEN-CHK-CONTESTACAO-22224579000109", "caso": "Bridge: contestar com a Orbe, 5 linhas", "esperado": "29.95", "quem_decide": "Helena"},
     {"id_saida": "PEN-CHK-ALERTA-ANTECIPACAO-1076801732", "caso": "Atlas: antecipação acima das vendas (pico 15/09)", "esperado": "124235.32", "quem_decide": "Helena + Comercial"},
     {"id_saida": "PEN-REM-CONTESTACAO-17217888000111", "caso": "Mundo Aberto: spread acima do contrato, 23 operações", "esperado": "1418.85", "quem_decide": "Helena → Ponte"},
-    {"id_saida": "PEN-REM-DUPLICATA", "caso": "PC-0926-0162 duplicada no relatório", "esperado": null, "quem_decide": "Ponte"},
+    {"id_saida": "PEN-REM-DUPLICATA", "caso": "PC-0926-0162 duplicada no relatório (spread da cópia)", "esperado": "821.88", "quem_decide": "Ponte"},
     {"id_saida": "PEN-REM-REPASSE-75374179000146", "caso": "Acompanhar o repasse da Ponte em outubro", "esperado": "39543.45", "quem_decide": "Helena"},
     {"id_saida": "PEN-EXT-NAOIDENT-L50", "caso": "Aurora L50: crédito sem identificação", "esperado": "7350.00", "quem_decide": "Helena"},
     {"id_saida": "PEN-EXT-DEVOLUCAO-L65", "caso": "Aurora L65: devolução de Pix, motivo desconhecido", "esperado": "12400.00", "quem_decide": "Helena"},

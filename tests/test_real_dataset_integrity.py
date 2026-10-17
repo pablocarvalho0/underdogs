@@ -1,22 +1,23 @@
 """Testes de integridade e completude das regras contra o Data Pack real de Setembro/2026.
 
 Este arquivo complementa a suíte caixa-preta sintética, garantindo que
-os contratos de negócio do mês real (1943 transações Orbe, 230 remessas,
+os contratos de negócio do mês real (1.943 transações no 01 e 14 no 06 da Orbe;
+233 linhas da Ponte, 232 operações únicas,
 planilha de taxas com renegociação em 15/09, extratos bancários e ERP Fênix)
 não quebrem ao rodar a solução final.
 """
 
-from datetime import datetime
+from decimal import Decimal
+
 import pandas as pd
-import pytest
 
 from src.loaders import (
-    load_orbe_report,
-    load_taxas_contratadas,
-    load_ponte_cambio_report,
-    load_plano_de_contas,
     load_extrato_aurora,
     load_extrato_meridiano,
+    load_orbe_report,
+    load_plano_de_contas,
+    load_ponte_cambio_report,
+    load_taxas_contratadas,
 )
 
 
@@ -39,15 +40,36 @@ def test_taxas_renegociacao_temporal_bridge():
 
 
 def test_ponte_cambio_spread_negativo_existente():
-    """Valida que o relatório de câmbio contém casos de spread negativo a serem isolados em pendências."""
+    """O relatório da Ponte tem 4 operações com spread negativo, somando -R$ 1.834,05 (R-14)."""
     df_ponte = load_ponte_cambio_report()
-    spread_col = [c for c in df_ponte.columns if "spread" in c.lower()]
-    assert len(spread_col) > 0, "Coluna de spread não encontrada no relatório da Ponte Câmbio"
-    col_name = spread_col[0]
-    # Converter para float
-    spreads = pd.to_numeric(df_ponte[col_name].astype(str).str.replace(".", "").str.replace(",", "."), errors="coerce")
+    unicas = df_ponte.drop_duplicates("Nº Operação")
+    spreads = pd.to_numeric(unicas["Spread R$"], errors="raise")
     negativos = spreads[spreads < 0]
-    assert len(negativos) > 0, "Deve haver operações com spread negativo no dataset real da Ponte Câmbio"
+    assert len(negativos) == 4
+    assert round(Decimal(str(negativos.sum())), 2) == Decimal("-1834.05")
+
+
+def test_ponte_linhas_e_operacoes_unicas():
+    """233 linhas no relatório e 232 Nº Operação únicos: PC-0926-0162 vem repetida (R-13)."""
+    df_ponte = load_ponte_cambio_report()
+    assert len(df_ponte) == 233
+    assert df_ponte["Nº Operação"].nunique() == 232
+    repetidas = df_ponte[df_ponte.duplicated("Nº Operação", keep=False)]["Nº Operação"].unique()
+    assert list(repetidas) == ["PC-0926-0162"]
+
+
+def test_orbe_01_mais_06_pela_descoberta():
+    """O caminho do pipeline acha os dois arquivos da Orbe pelo conteúdo: 1.943 + 14 = 1.957 (R-43)."""
+    from src.config import DATA_PACK_DIR
+    from src.core.entrada import carregar
+
+    orbe = carregar(DATA_PACK_DIR).orbe
+    assert len(orbe) == 1957
+    por_arquivo = orbe["arquivo_origem"].value_counts().to_dict()
+    assert por_arquivo == {
+        "01_orbe_relatorio_comissoes_set2026.csv": 1943,
+        "06_orbe_ajustes_tardios_set2026.csv": 14,
+    }
 
 
 def test_plano_de_contas_fenix_contas_chave():

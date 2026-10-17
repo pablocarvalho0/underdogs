@@ -88,7 +88,7 @@
 | R-43 | **Ajuste tardio da Orbe** chega num arquivo à parte, no mesmo formato do 01, e só quando a Orbe tem ajuste (não é todo mês). Se chegar **antes** da aprovação do fechamento, entra no mês do movimento: é o caso do 06, que entra em setembro. Se chegar **depois** da aprovação, entra no mês seguinte. Consequência: a entrada tem que ler **todos** os arquivos da Orbe da pasta do mês, e não um nome fixo. | [T40] [T43] |
 | R-44 | Isenção da Casa na **antecipação**: vale a data da antecipação, não a das vendas antecipadas. Antecipação feita em setembro é isenta, e não é preciso procurar as vendas de origem. | [T41] |
 | R-50 | **Bandeira** não muda a taxa. A Orbe às vezes troca a bandeira no estorno: não precisa contestar nem abrir pendência. O estorno se liga à venda pela referência (`id_referencia`). | [T46] |
-| R-51 | Estorno ou reversão num ajuste da Orbe que aponta para transação **ausente** de todos os arquivos da Orbe: entra pelo valor que veio e vira pendência para a Helena pedir a original à Orbe. Não acontece em setembro: todas as referências do 06 estão no 01. | [T47] |
+| R-51 | Estorno ou reversão num ajuste da Orbe que aponta para transação **ausente** de todos os arquivos da Orbe: entra pelo valor que veio e vira pendência para a Helena pedir a original à Orbe. Não acontece em setembro: todas as referências do 06 estão no 01. **Implementada:** a pendência `ORIGINAL_AUSENTE` sai por EC só quando a `data_venda_original` é do mês fechado; estorno de venda de mês anterior (os 9 de agosto) aponta para id ausente por natureza e não gera pendência. | [T47] |
 
 ### 2.2 Comissão de remessa
 | ID | Regra | Fonte |
@@ -196,6 +196,11 @@ Status: **proposta**, a confirmar pelo time no PR, menos onde está marcado **de
 | P-16 | **Fonte: briefing interno (áudio de 17/10).** O sistema **detecta e registra** divergências e pendências, mas não as resolve: a decisão fica com o time (o `quem_decide` de cada linha). Não implementamos heurística de resolução. | Fala do briefing: "depois disso, o resto do time vai pensar o que fazer com essas pendências e divergências". É consistente com a regra 3 do `CLAUDE.md` e corta escopo antes do prazo das 18h30. | Briefing interno |
 | P-17 | Nome do lojista nas saídas = nome da **primeira** linha do CNPJ na aba vigente. | A linha do aditivo da Bridge traz a anotação "Bridge Idiomas (NOVA)", que não é razão social e iria para o tomador da nota. | — |
 | P-18 | `metodo` e `confianca` nos lançamentos: regra determinística = `REGRA` com confiança **1**; linha que nenhuma regra pega (ou cuja conta não aceita lançamento) = `HUMANO` com confiança **0**, conta vazia e pendência. **Não há IA no pipeline**: `usar_ia_extratos` e `confianca_minima_ia` em `premissas.py` não são lidos (não implementado). Em setembro, as 184 linhas saem como `REGRA`/1. | A confiança mede a origem da classificação, não a chance de acerto. Ressalva: o Pix enviado reconhecido pelo começo do nome do lojista também recebe 1, e pode errar o lojista com nome curto (README, Limitações); muda só a conta, nunca uma comissão. | — |
+| P-19 | Ajuste da Ponte ("AJUSTE REF PC-…", R-18): enquanto a Q-04 está aberta, o `Spread R$` é lido como **spread inteiro** e a participação cai **50%** (R-11), com o arredondamento da R-02. Entra na comissão do lojista e na nota única do mês em que aparece, **mesmo com data de contratação de outro mês**. No rastro, `ref_origem` é o Nº da operação original. Cada ajuste gera uma pendência para a Helena com o abatimento em 50% e em 100%. A comissão do lojista pode ficar negativa no mês. | R-18 + R-46. Leitura simétrica da R-11; a Helena vê os dois números antes de liberar. Não há ajuste em setembro. | [T31] [T44] |
+| P-20 | Nº de operação da Ponte repetido com **algum valor diferente** entre as cópias (a Observação não conta): **nenhuma cópia** entra na comissão nem na nota, e abre pendência para a Ponte com as versões. Cópia idêntica segue a R-13. | Não há como saber qual versão vale; contar uma das duas seria heurística arbitrária (CLAUDE.md §2.3). Em setembro a única repetida (PC-0926-0162) é idêntica. | — |
+| P-21 | Competência da remessa = mês mais frequente da `Data Contratação` no relatório. Operação de outro mês, ou sem data, fica fora da comissão e vira pendência "operação de outro mês" para a Helena (R-16). | R-16. Não acontece em setembro. | [T6] |
+| P-22 | O spread contratado vem da linha da planilha **vigente na data de contratação**, como o MDR no checkout. Se a planilha não decide (nenhuma ou duas linhas vigentes), fica a última linha. | Mesma regra do MDR; setembro não muda. | — |
+| P-23 | Leitura robusta para outro mês (R-42): Orbe e Aurora são lidos em UTF-8 e, se falhar, em cp1252/latin-1. Linha do Aurora com conteúdo e menos campos que o layout vira aviso `LINHA_IGNORADA_AURORA` com o número da linha, em vez de sumir. Contestação com a Orbe de total negativo (cobrou abaixo do contrato) diz "caso a caso, nada a ressarcir ao lojista" (R-24). Alias de EC com `confirmado_financeiro=False` gera pendência `ALIAS_NAO_CONFIRMADO`. | R-42, R-24, R-05. Nenhum desses casos ocorre em setembro; cobertos por `tests/test_checkout_outubro.py`. | — |
 
 ---
 
@@ -226,7 +231,7 @@ Não são perguntas para o canal: são escolhas nossas, levantadas na consolida�
 
 ## 5. Prévia independente dos números de setembro (para controle)
 
-Calculada por um script de exploração, fora do `src/`, aplicando as regras acima aos arquivos **01 + 06** da Orbe. **A implementação das trilhas tem que chegar aos mesmos valores.** Se não chegar, alguém errou, e vale investigar antes de entregar.
+Calculada por `controle/previa_independente.py`, que não importa nada do `src/` e aplica as regras acima aos arquivos **01 + 06** da Orbe. **A implementação das trilhas tem que chegar aos mesmos valores.** Se não chegar, alguém errou, e vale investigar antes de entregar.
 
 | Item | Valor | Regras |
 | :--- | ---: | :--- |
@@ -289,6 +294,7 @@ Todas as 7 notas de checkout mudam de valor, e nenhuma fica zerada ou negativa.
 - **17/10 14:15** — Briefing interno em áudio transcrito (faster-whisper large-v3, 36 s). Entraram a P-15 (entrada reprocessável com outro data pack, reforça a D-01 (a)) e a P-16 (o sistema registra pendências e divergências, mas não as resolve).
 - **17/10 14:55** — Nível Mínimo implementado (PR #16): comissão de checkout por lojista com rastro, conferida contra a §5 (R$ 203.735,34 em 21 lojistas). D-03 decidida como (a): a Atlas fica fora da comissão e a pendência dela entra no Alvo (P-02 reescrita).
 - **17/10 17:35** — Conferência cruzada: a branch `feat/alvo` (implementação independente das 3 trilhas, feita sobre o PR #16) e o MVP da `main` (b64734f) geram **os mesmos valores** em todas as saídas: comissões (R$ 243.278,79 nas duas linhas), divergências (R$ 2.995,08 em 115 linhas), notas (R$ 243.284,29 em 21), lançamentos (184, mesmas contas) e pendências (16, mesmo total). Os dois batem com a prévia da §5. Entrou a P-17 (nome do lojista nas saídas).
+- **17/10 17:55** — Nível Extra, "roda em outubro sem retrabalho" (`feat/extra`): R-51 implementada (`ORIGINAL_AUSENTE`), R-18 implementada com a Q-04 em aberto (P-19), duplicata divergente da Ponte (P-20), competência da remessa (P-21), spread pela vigência (P-22) e leitura robusta (P-23). Prévia independente agora reproduzível (`controle/previa_independente.py`). Setembro sem mudança de número: só a concordância de 5 motivos em `pendencias.csv`. Testes novos com dados sintéticos de outubro: `tests/test_remessa_outubro.py` e `tests/test_checkout_outubro.py`.
 
 ---
 

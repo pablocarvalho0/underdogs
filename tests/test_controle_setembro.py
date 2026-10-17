@@ -57,3 +57,27 @@ def test_rastro_fecha(saida: dict[str, pd.DataFrame]) -> None:
         df = saida[nome]
         for ids, v in zip(df.id_saida, df[col]):
             assert somas[ids] == Decimal(v), (nome, ids)
+
+
+def test_linhas_no_rastro_das_pendencias(saida: dict[str, pd.DataFrame]) -> None:
+    """Pendência com contagem esperada (ex.: Casa, 118 transações isentas) tem essas linhas no rastro."""
+    rastro = saida["rastro.csv"]
+    for p in ESPERADO["pendencias"]:
+        if "linhas_rastro" in p:
+            n = int((rastro["id_saida"] == p["id_saida"]).sum())
+            assert n == p["linhas_rastro"], (p["id_saida"], n)
+
+
+def test_previa_independente_reproduz_o_esperado() -> None:
+    """A régua não é um número digitado: `controle/previa_independente.py` recalcula tudo dos brutos."""
+    import subprocess
+    import sys
+
+    raiz = Path(__file__).resolve().parent.parent
+    r = subprocess.run(
+        [sys.executable, str(raiz / "controle" / "previa_independente.py"), str(DATA_PACK_DIR)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert r.returncode == 0, r.stdout[-2000:] + r.stderr[-2000:]
