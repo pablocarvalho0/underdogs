@@ -100,7 +100,7 @@ def validate_all_outputs(output_dir: Path = OUTPUT_DIR) -> Tuple[bool, List[str]
         all_errors.extend(col_errs)
 
         if not col_errs and file_path.exists():
-            df = pd.read_csv(file_path, sep=";")
+            df = pd.read_csv(file_path, sep=";", dtype=str)
             if "cnpj" in df.columns:
                 all_errors.extend(validate_cnpj_format(df, file_name, "cnpj"))
             if "tomador_cnpj" in df.columns:

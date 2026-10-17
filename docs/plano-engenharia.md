@@ -207,9 +207,27 @@ Formato: "[Underdogs] …", sempre com um caso concreto do arquivo.
 - **F-10 Competência:** operação contratada em 30/09 e liquidada em 01/10 (ex.
   PC-0926-0002) entra em setembro?
 
-## 7. Decisões de engenharia em aberto
+## 7. Organização do time (D-01, decidido)
 
-- **D-01** Divisão das trilhas entre Pablo e os 2 devs.
+| Quem | Durante a Fase 0 (Pablo no serial) | Fase 1 |
+| :--- | :--- | :--- |
+| **Pablo** | Fase 0a + 0b; dispara F-01..F-10 | Trilha B (remessa) + respostas do financeiro |
+| **Dev 1** | Estuda a trilha A: hipóteses, 3 casos calculados na mão, invariante | Trilha A (checkout), branch `feat/trilha-checkout` |
+| **Dev 2** | Estuda a trilha C: rascunho da tabela de regras, invariante | Trilha C (extratos), branch `feat/trilha-extratos` |
+
+O estudo de cada dev precisa sair com três coisas escritas, para virar código direto
+quando o contrato cair na `main`:
+1. As hipóteses da trilha que ainda não estão em §6 — viram pergunta ou flag.
+2. **Condições de controle:** o invariante de conservação da trilha (§4) e 3 casos
+   reais calculados na mão, com o valor esperado — viram a verificação da trilha.
+3. **Dev 1:** tabela EC → lojista → taxa vigente para os 22 ECs, marcando onde não há
+   taxa ou EC. **Dev 2:** lista dos padrões de descrição dos dois extratos → conta
+   analítica, marcando os que não têm regra óbvia.
+
+Quando 0a estiver na `main`, cada dev faz `git pull` e rebase da própria branch. Merge
+final na Fase 2, um PR por trilha, aprovado pelo Pablo.
+
+## 8. Decisões de engenharia em aberto
 - **D-02** IA em runtime na classificação dos extratos: sim (resíduo, com cache) ou não.
 - **D-03** Default enquanto o financeiro não responde F-01 (comissão pela aplicada ou
   pela contratada).

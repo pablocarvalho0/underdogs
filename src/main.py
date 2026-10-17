@@ -1,18 +1,18 @@
 """Ponto de entrada CLI para execução e validação da conciliação Tarvo."""
 
-from pathlib import Path
 import typer
 from rich.console import Console
 from rich.table import Table
 
 from src.config import DATA_PACK_DIR, OUTPUT_DIR
+from src.core.pipeline import run_pipeline
 from src.loaders import (
-    load_orbe_report,
-    load_taxas_contratadas,
-    load_ponte_cambio_report,
-    load_plano_de_contas,
     load_extrato_aurora,
     load_extrato_meridiano,
+    load_orbe_report,
+    load_plano_de_contas,
+    load_ponte_cambio_report,
+    load_taxas_contratadas,
 )
 from src.validators import validate_all_outputs
 
@@ -92,8 +92,16 @@ def validate():
 def run():
     """Executa o pipeline completo de conciliação financeira e gera os CSVs em saida/."""
     console.print("\n[bold yellow]Executando pipeline de conciliação Tarvo...[/bold yellow]")
-    status()
-    console.print("\n[bold green]Infraestrutura e parsers operacionais! Pronto para execução dos cálculos financeiros.[/bold green]\n")
+    resultado = run_pipeline(DATA_PACK_DIR, OUTPUT_DIR)
+    for nome, n in resultado["arquivos"].items():
+        console.print(f"  {nome}: {n} linhas")
+    console.print("\n[bold cyan]Invariantes de conservação (diferença deve ser 0):[/bold cyan]")
+    for trilha, inv in resultado["conservacao"].items():
+        if not inv:
+            console.print(f"  [yellow]{trilha}: nenhum invariante reportado[/yellow]")
+        for nome, dif in inv.items():
+            cor = "green" if dif == 0 else "red"
+            console.print(f"  [{cor}]{trilha}.{nome}: {dif}[/{cor}]")
 
 
 if __name__ == "__main__":
