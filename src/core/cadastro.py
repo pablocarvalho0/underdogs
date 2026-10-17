@@ -113,7 +113,8 @@ class CadastroPlanilha:
             ini, fim = vigencia(r.get("Vigência"))
             self._linhas.setdefault(cnpj, []).append(_LinhaTaxa(loj, ini, fim, {str(k): v for k, v in r.items()}))
 
-        self._por_cnpj = {c: ls[-1].lojista for c, ls in self._linhas.items()}
+        # Nome da primeira linha do CNPJ: a linha de aditivo pode trazer anotação ("Bridge Idiomas (NOVA)").
+        self._por_cnpj = {c: replace(ls[-1].lojista, nome=ls[0].lojista.nome) for c, ls in self._linhas.items()}
         self._por_ec = {l.ec_orbe: l for l in self._por_cnpj.values() if l.ec_orbe}
 
     def lojistas(self) -> list[Lojista]:
