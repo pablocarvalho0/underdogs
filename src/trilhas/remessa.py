@@ -253,9 +253,17 @@ def rodar(dados: DadosEntrada, cadastro: Cadastro, premissas: Premissas) -> Resu
         res.linhas.append(
             pendencia(
                 "REM", f"CONTESTACAO-{cnpj}", "DIVERGENCIA_SPREAD", comps,
-                f"{nome_de[cnpj]}: spread cobrado acima do contratado em {_ops(len(comps))}, "
-                f"{_brl_txt(total)} pagos a mais pelo lojista (valor cheio). Comissão e nota "
-                "saíram pelo realizado; contestar com a Ponte (R-17, R-23).",
+                (
+                    f"{nome_de[cnpj]}: spread cobrado acima do contratado em {_ops(len(comps))}, "
+                    f"{_brl_txt(total)} pagos a mais pelo lojista (valor cheio). Comissão e nota "
+                    "saíram pelo realizado; contestar com a Ponte (R-17, R-23)."
+                    if total > 0
+                    # R-23 pelo sinal: abaixo do contrato não há o que devolver ao lojista.
+                    else f"{nome_de[cnpj]}: spread cobrado abaixo do contratado em "
+                    f"{_ops(len(comps))}, {_brl_txt(total)} (valor cheio). Comissão e nota saíram "
+                    "pelo realizado; nada a devolver ao lojista, decidir caso a caso com a Ponte "
+                    "(R-17, R-23)."
+                ),
                 f"Helena ({nome_ponte})",
             )
         )  # fmt: skip
@@ -278,7 +286,7 @@ def rodar(dados: DadosEntrada, cadastro: Cadastro, premissas: Premissas) -> Resu
                 "REM", "DUPLICATA", "OPERACAO_DUPLICADA", repetidas,
                 f"{_ops(len(repetidas), 'repetida')} no relatório da Ponte, cópia idêntica. "
                 "Contou uma vez; pedir à Ponte que corrija o relatório e o total do rodapé (R-13).",
-                nome_ponte,
+                f"Helena ({nome_ponte})",
             )
         )  # fmt: skip
     if copias_div:
@@ -298,7 +306,7 @@ def rodar(dados: DadosEntrada, cadastro: Cadastro, premissas: Premissas) -> Resu
                 f"{_ops(len(divergentes), 'repetida')} com valores diferentes entre as cópias: "
                 + " | ".join(versoes) + ". Nenhuma cópia entrou na comissão nem na nota; "
                 "pedir à Ponte qual versão vale (R-13).",
-                nome_ponte,
+                f"Helena ({nome_ponte})",
             )
         )  # fmt: skip
     for cnpj, nop, original, comp_aj, cheio in ajustes:

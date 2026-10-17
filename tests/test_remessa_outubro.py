@@ -125,7 +125,7 @@ def test_duplicata_identica_conta_uma_vez(res: ResultadoTrilha) -> None:
 
 def test_duplicata_divergente_fica_fora_e_vai_para_a_ponte(res: ResultadoTrilha) -> None:
     pen = _linha(res, "PEN-REM-DUPLICATA-DIVERGENTE")
-    assert pen.campos["quem_decide"] == PREMISSAS.nome_ponte_cambio
+    assert pen.campos["quem_decide"] == f"Helena ({PREMISSAS.nome_ponte_cambio})"
     assert pen.campos["ref_origem"] == "PC-1026-0006"
     assert pen.valor == Decimal(170)
     assert "80.0" in pen.campos["motivo"] and "90.0" in pen.campos["motivo"]
