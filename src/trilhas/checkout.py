@@ -13,7 +13,7 @@ from src.core.cadastro import Cadastro, Lojista
 from src.core.entrada import DadosEntrada, competencia
 from src.core.model import Componente, LinhaSaida, ResultadoTrilha, brl
 from src.core.pendencias import pendencia
-from src.premissas import Premissas
+from src.premissas import AliasEC, Premissas
 
 ANTECIPACOES = ("ANTECIPACAO", "REVERSAO ANTECIPACAO")
 
@@ -38,6 +38,20 @@ def _data_ref(r: dict[str, Any], por_id: dict[str, dict[str, Any]]) -> date:
         if orig is not None:
             return orig["data_movimento"]  # type: ignore[no-any-return]  # R-04, R-44
     return r["data_movimento"]  # type: ignore[no-any-return]
+
+
+def _original_ausente(
+    r: dict[str, Any], por_id: dict[str, dict[str, Any]], inicio_mes: date
+) -> bool:
+    """R-51, D-02 (a): estorno ou reversão cuja original é do mês, mas não veio em nenhum
+    arquivo da Orbe. Estorno de venda de mês anterior (os de agosto) não entra: a original
+    é de outro mês e não deveria mesmo estar nos arquivos deste."""
+    if r["tipo_lancamento"] not in ("ESTORNO", "REVERSAO ANTECIPACAO"):
+        return False
+    if r["id_referencia"] in por_id:
+        return False
+    dvo: date | None = r["data_venda_original"]
+    return dvo is not None and (dvo.year, dvo.month) == (inicio_mes.year, inicio_mes.month)
 
 
 def _alerta_antecipacao(
@@ -97,6 +111,9 @@ def rodar(dados: DadosEntrada, cadastro: Cadastro, premissas: Premissas) -> Resu
     inativo: dict[str, list[Componente]] = defaultdict(list)
     sem_taxa: dict[str, list[Componente]] = defaultdict(list)
     acima_12x: dict[str, list[Componente]] = defaultdict(list)
+    ausente: dict[str, list[Componente]] = defaultdict(list)
+    alias_pendente: dict[str, list[Componente]] = defaultdict(list)
+    alias_de: dict[str, AliasEC] = {}
     nome_ec: dict[str, str] = {}
     destinos = 0
 
@@ -104,6 +121,9 @@ def rodar(dados: DadosEntrada, cadastro: Cadastro, premissas: Premissas) -> Resu
         ec, idt, arq = r["cod_estabelecimento"], r["id_transacao"], r["arquivo_origem"]
         cobrado = Componente(arq, idt, r["valor_taxa"] or Decimal(0))
         nome_ec.setdefault(ec, r["nome_estabelecimento"])
+        if _original_ausente(r, por_id, inicio_mes):
+            # Abate pelo valor que veio (segue o fluxo normal) e avisa a Helena.
+            ausente[ec].append(Componente(arq, idt, r["valor_bruto"]))
         loj = cadastro.lojista_por_ec(ec)
         if loj is None:
             # R-06: sem contrato vigente não fatura; inativo idem, mas com outro motivo.
@@ -111,6 +131,9 @@ def rodar(dados: DadosEntrada, cadastro: Cadastro, premissas: Premissas) -> Resu
             destinos += 1
             continue
         lojista_de[loj.cnpj] = loj
+        if loj.alias is not None and not loj.alias.confirmado_financeiro:
+            alias_pendente[ec].append(cobrado)  # premissas.AliasEC: fatura, mas pede confirmação
+            alias_de[ec] = loj.alias
         tipo = r["tipo_lancamento"]
         data_ref = _data_ref(r, por_id)
 
@@ -202,12 +225,18 @@ def rodar(dados: DadosEntrada, cadastro: Cadastro, premissas: Premissas) -> Resu
     for cnpj, comps in sorted(contestar.items()):
         loj = lojista_de[cnpj]
         total = sum((c.valor for c in comps), Decimal(0))
+        # R-24: cobrança abaixo do contrato também é divergência, mas não há o que devolver.
+        acao = (
+            "Contestar com a Orbe e ressarcir o lojista (R-22, R-25)."
+            if total > 0
+            else "No total a Orbe cobrou abaixo do contrato: decisão caso a caso com a Orbe, "
+            "sem nada a ressarcir ao lojista (R-24)."
+        )
         res.linhas.append(
             pendencia(
                 "CHK", f"CONTESTACAO-{cnpj}", "DIVERGENCIA_TAXA_ORBE", comps,
                 f"{loj.nome}: a Orbe aplicou taxa diferente do contrato em {len(comps)} "
-                f"transações de {comp}, somando {_brl_txt(total)}. Contestar com a Orbe e "
-                "ressarcir o lojista (R-22, R-25).",
+                f"transações de {comp}, somando {_brl_txt(total)}. {acao}",
                 "Helena (contestação com a Orbe)",
             )
         )  # fmt: skip
@@ -259,6 +288,30 @@ def rodar(dados: DadosEntrada, cadastro: Cadastro, premissas: Premissas) -> Resu
                 f"{lojista_de[cnpj].nome}: {len(comps)} vendas acima de 12x, que a Tarvo não "
                 "vende (R-10). Fora da comissão até o comercial explicar.",
                 "Comercial",
+            )
+        )  # fmt: skip
+
+    for ec, comps in sorted(ausente.items()):
+        total = sum((c.valor for c in comps), Decimal(0))
+        res.linhas.append(
+            pendencia(
+                "CHK", f"ORIGINAL-AUSENTE-{ec}", "ORIGINAL_AUSENTE", comps,
+                f"EC {ec} ({nome_ec[ec]}): {len(comps)} estornos/reversões somando "
+                f"{_brl_txt(total)} de bruto apontam para transação de {comp} que não veio em "
+                "nenhum arquivo da Orbe. Venda original não veio: pedir à Orbe. O abatimento "
+                "já entrou na comissão pelo valor que veio (R-51, D-02).",
+                "Helena (pedir à Orbe)",
+            )
+        )  # fmt: skip
+    for ec, comps in sorted(alias_pendente.items()):
+        alias = alias_de[ec]
+        res.linhas.append(
+            pendencia(
+                "CHK", f"ALIAS-{ec}", "ALIAS_NAO_CONFIRMADO", comps,
+                f"EC {ec} ({nome_ec[ec]}) foi ligado ao CNPJ {alias.cnpj} por alias de "
+                f"premissas ({alias.justificativa}) ainda não confirmado pelo financeiro: "
+                f"{len(comps)} transações ligadas por esse vínculo. Confirmar antes de liberar.",
+                "Helena",
             )
         )  # fmt: skip
 
