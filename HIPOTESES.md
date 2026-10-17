@@ -215,6 +215,60 @@ Na Rota, o débito (1,49%) e o Pix (0,89%) foram cobrados certo o mês inteiro. 
 - **17/10 08:30** — Repositório criado com proteção de branch e aprovação por PR.
 - **17/10 08:35** — Arquitetura com `rastro.csv` nativo.
 - **17/10 13:45** — Reescrita a partir das respostas do financeiro no canal (R-01..R-42), com premissas propostas (P-01..P-13), perguntas abertas (Q-01..Q-03) e prévia de controle (§5).
+- **17/10 13:40** — Releitura do canal inteiro, com as 42 threads (37 respondidas, 5 sem resposta até a coleta). Acrescentados à §8 o que faltava: R-43..R-47, L-07..L-11 e Q-04..Q-06. Nada das seções 1 a 7 foi alterado.
+
+---
+
+## 8. Complemento: releitura do canal às 13h40
+
+Releitura de todas as threads do canal, comparada linha a linha com as seções 2 a 4. O que já
+estava registrado acima **não** foi reescrito. Aqui entra só o que estava no Slack e faltava
+neste arquivo. Os threads `[T40]..[T45]` são posteriores à versão das 13h45 ou não tinham
+resposta. Citações entre aspas são o texto do financeiro ou da organização, copiado do canal.
+
+### 8.1 Regras e contexto do financeiro que faltavam
+
+| ID | Regra | Fonte |
+| :--- | :--- | :--- |
+| R-43 | A nota de checkout **não gera cobrança nova**: "A Orbe já liquida o líquido: a taxa é descontada na hora em que ela paga, e o lojista vê no extrato de repasse que a gente manda. A nota só documenta a taxa que já foi descontada e não gera cobrança nova. Por isso, quando a Orbe cobra a mais, o lojista já recebeu a menos e eu preciso devolver." | [T25] |
+| R-44 | Retorno da contestação: "A Ponte responde por e-mail e manda o ajuste no relatório do mês seguinte, como crédito ou débito. Eu confiro e registro no fechamento do mês em que o ajuste aparece." (Complementa a R-18.) | [T25] |
+| R-45 | Caso que nenhuma regra cobre: "Para o que aparecer fora disso, me digam como vocês tratariam e por quê." O agente propõe tratamento com motivo e vira pendência; não decide sozinho. | [T6] |
+| R-46 | **A Helena não valida número nem conta contábil.** "Número eu não valido. Quem fecha é você, e a banca vai olhar o rastro." [T12]; "Conta por conta eu não valido." [T28] [T29]; "Os números eu não confiro." [T35]. Toda tabela de contas proposta por times no canal (TED da Orbe → 1.1.03.001, Pix ao lojista → 2.1.01.001 etc.) é **proposta**, não regra: o que está confirmado é só o critério da contrapartida (R-29). Os lançamentos que um participante propôs na thread [T7] depois da resposta da Helena também não tiveram resposta. | [T7] [T12] [T28] [T29] [T35] |
+| R-47 | Ninguém avisa a Orbe nem a Ponte de condição nova: "O comercial fecha e, quando lembra, manda um e-mail para a Orbe ou a Ponte. A Bridge foi avisada alguns dias depois de 15/09, e a Casa do Estudante e a Mundo Aberto não foram avisadas." (Contexto da R-22: o aviso não muda quem deve.) | [T22] |
+
+**Contexto do processo atual** [T25], útil para o pitch e não para o código: a Bia cuida do
+checkout e da planilha de taxas, o Caio cuida dos bancos e das remessas, e a Helena confere,
+decide as exceções e fala com comercial, Orbe e Ponte. O fechamento leva uns 3 dias de comissão
+de checkout (metade manual, metade retrabalho por planilha desatualizada), uns 2 de remessa
+(a maior parte espera), uns 2 de classificação de extrato (quase tudo manual), e o último dia é
+das notas e da revisão. A conclusão de cada etapa é marcada com "ok" e data numa aba de controle
+da planilha. Nas palavras dela: "Quase tudo que vocês já descobriram aqui no canal estava só na
+minha cabeça".
+
+### 8.2 Logística que faltava
+
+| ID | Regra | Fonte |
+| :--- | :--- | :--- |
+| L-07 | **Arquivo novo, `06_orbe_ajustes_tardios_set2026.csv`**: "A Orbe mandou os ajustes de setembro que ficaram fora do relatório […]. São só 14 linhas, no mesmo formato do arquivo 01. Se a solução de vocês já recebe os arquivos do mês, deve bastar rodar de novo. **O fechamento entregue às 18h30 precisa considerar esse arquivo.**" Está na pasta do case no Drive da organização (link no [T42]) e anexado à mensagem. Ainda não está em `docs/Tarvo_Data_Pack_set2026/`. | [T42] |
+| L-08 | Chave de API: "quem quiser enviar sua chave de API junto do desenvolvimento para testarmos, ok. lembrem-se de limitar o uso dela". É opcional; o README precisa dizer onde configurá-la (L-02). | [T41] |
+| L-09 | Agenda completa do dia: 11h45 checkpoint 1 (opcional, já passou), 16h00 checkpoint 2 (opcional), **17h45 fim do atendimento do financeiro**, **18h30 link do repositório por e-mail**, **19h00 link do pitch por e-mail**, 19h30 apresentação dos finalistas, 20h30 premiação. O checkpoint 2 pede: o que roda de ponta a ponta, o que mudou no plano, o que vai ser cortado, o maior risco e em que a banca pode ajudar. Uma pessoa do time manda por mensagem privada ao organizador, começando com o nome do time. | [T24] |
+| L-10 | O canal `#tarvo-financeiro` citado no documento do desafio e no `CLAUDE.md` **não existe**. A organização respondeu: "podem enviar aqui. explicitem na thread de duvida se é tarvo ou hackaton". As perguntas vão em `#duvidas-hackathon-ai`. | [T1] |
+| L-11 | O repositório entregue precisa ter "código, `saida/`, `PROMPTS/`, `HIPOTESES.md` e um `README.md` que rode a solução do zero". Parte em plataforma online (n8n, Lovable) vai como link no README, com instruções de teste. "A regra das 18h30 vale para tudo: o que mudar depois não conta." (Detalha a L-05.) | [T3] |
+
+### 8.3 Perguntas abertas novas (sem resposta até 13h40)
+
+| ID | Quem perguntou | Pergunta | O que destrava |
+| :--- | :--- | :--- | :--- |
+| Q-04 | Lucca Landeiro, 13h19 [T45] | O arquivo de ajustes tardios vem todo mês e sempre fecha junto com o mês dele? Se um ajuste trouxer um `id_transacao` que já está no relatório 01, a linha do ajuste substitui a original? | Como juntar o 06 ao 01 sem contar duas vezes, em setembro e em outubro |
+| Q-05 | David Deodato, 13h19 [T44] | A isenção da Casa na **antecipação** vale pela data da antecipação ou pela data das vendas que geraram os recebíveis? Ex.: `AN88445172`, de 09/09, sem referência às vendas originais. | A R-08 fala de venda e estorno; para antecipação, só "Vale para MDR e antecipação" [T7]. Se valer pela data das vendas, uma antecipação de recebíveis de agosto não seria isenta |
+| Q-06 | Desbravadores, 12h04 [T40] | No ajuste da Ponte ("AJUSTE REF PC-…"), o `Spread R$` negativo é o spread inteiro (a nota cai 50% dele) ou já a nossa parte (cai 100%)? Ex.: devolução de R$ 235,74 da `PC-0926-0434`. | O cálculo da R-18 de outubro em diante. Não afeta setembro |
+
+**Sobre a Q-03:** os fatos responderam em parte, não a Helena. Em setembro o ajuste da Orbe
+chegou como arquivo separado (06), no layout do 01 (L-07). Como ele se comporta nos outros
+meses é a Q-04.
+
+**Pergunta repetida sem resposta:** Dogshow, 13h18 [T43], perguntou de novo o que é o Pix de
+R$ 18.240 no Meridiano. A R-34 já responde.
 
 ---
 
@@ -259,3 +313,9 @@ Na Rota, o débito (1,49%) e o Pix (0,89%) foram cobrados certo o mês inteiro. 
 [T37]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792250828101959 "Turma do Barulho: mudanças de mês a mês (17/10 12h27)"
 [T38]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792251374757469 "Fox AI: alerta da Atlas pelo pico (17/10 12h36)"
 [T39]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792251861625499 "Participante: devolução pelo valor descontado (17/10 12h44)"
+[T40]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792249449403979 "Desbravadores: valor do ajuste da Ponte (17/10 12h04, sem resposta)"
+[T41]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792250704054669 "Organização: chave de API (17/10 12h25)"
+[T42]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792253401618969 "Organização: arquivo 06 de ajustes tardios (17/10 13h10)"
+[T43]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792253934475539 "Dogshow: Pix de R$ 18.240 (17/10 13h18, sem resposta)"
+[T44]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792253993517819 "Participante: isenção da Casa na antecipação (17/10 13h19, sem resposta)"
+[T45]: https://bartehackathonai.slack.com/archives/C0CA0S5D37B/p1792253999043339 "Participante: regras do arquivo 06 (17/10 13h19, sem resposta)"
