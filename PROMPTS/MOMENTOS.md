@@ -37,3 +37,34 @@ Este documento registra os momentos críticos na interação com a IA durante o 
 - **O que foi pedido:** *(Registrar validação final de números)*
 - **O que a IA devolveu:** *(Registrar retorno da IA)*
 - **O que foi feito com isso:** *(Registrar decisão e ajuste adotado)*
+
+---
+
+## Candidatos a momento (para o time escolher)
+
+As instruções pedem de 2 a 4 momentos. Os registros abaixo são da exploração do data pack e das respostas do financeiro. O time decide quais entram e quais saem.
+
+### Candidato A: a IA leu os valores da planilha e ignorou o comentário e o tachado (erro da IA)
+- **O que foi pedido:** Perfilar a planilha de taxas (`02_...xlsx`) para montar o cadastro de lojistas.
+- **O que a IA devolveu:** Um perfil só com os valores das células. Ficaram de fora o comentário da Bia na célula A13 ("conversar com Diego (comercial) sobre condição especial", da Casa do Estudante) e a linha tachada da Globo Trotter. Com isso, a Casa foi tratada como lojista comum.
+- **O que foi feito com isso:** Lendo o canal, vimos perguntas de outros times sobre uma condição especial da Casa. Voltamos ao arquivo com um script que lê comentários, formatação e linhas ocultas, e achamos os dois sinais. A Helena confirmou a isenção de set a dez (R-08 no `HIPOTESES.md`). Lição para o agente: a leitura de planilha tem que reportar comentário, tachado e linha oculta como aviso, nunca descartar em silêncio.
+
+### Candidato B: mapeamento de EC pela "impressão digital" das taxas, tratado como hipótese
+- **O que foi pedido:** Descobrir de quem são os 3 ECs da Orbe que não estão na planilha.
+- **O que a IA devolveu:** O mapeamento pelo conjunto de taxas cobradas em cada EC, comparado com as linhas sem EC da planilha: `1038867654` = Kiwi; `1043300981` = Novo Horizonte; `1043396662` = Horizonte Viagens.
+- **O que foi feito com isso:** Não usamos como fato. Perguntamos no canal e a Helena confirmou os três (R-05). O alias ficou como dado, com fonte e aprovador, e não como código. Assim, um EC novo em outubro vira pendência de cadastro em vez de ser adivinhado.
+
+### Candidato C: arredondar a soma ou cada linha (R$ 0,57 de diferença)
+- **O que foi pedido:** O total da comissão de remessa de setembro.
+- **O que a IA devolveu:** R$ 39.542,88 na primeira conta, arredondando só a soma das metades de spread.
+- **O que foi feito com isso:** A Helena definiu arredondamento comum por linha, depois soma (R-02). O total correto é R$ 39.543,45. Essa regra é também a única compatível com a invariante do `rastro.csv` (a soma das linhas do rastro tem que ser igual ao número reportado), então ela virou regra de contrato do código, não detalhe de implementação.
+
+### Candidato D: não confiar a priori no que já está escrito (direção humana)
+- **O que foi pedido:** "Reveja os dados e o contexto que temos [...] não tome como verdade o que está escrito hoje no repositório; leia sem confiar a priori."
+- **O que a IA devolveu:** Uma releitura contra os arquivos, que achou erros no plano (o Aurora tem 84 lançamentos, não 80; a divergência da Rota começa em 12/09, não em 01/09; o canal `#tarvo-financeiro` não existe). Achou também uma afirmação de outro participante no canal que os dados contradizem: o débito da Rota continua em 1,49%; só o crédito mudou.
+- **O que foi feito com isso:** O `HIPOTESES.md` foi reescrito com três níveis separados: fato medido, regra do financeiro (com link do thread) e premissa nossa. Os totais de controle foram calculados de forma independente, fora do `src/` (§5 do `HIPOTESES.md`).
+
+### Candidato E: releitura do canal inteiro antes de fechar (direção humana)
+- **O que foi pedido:** Ler o `#duvidas-hackathon-ai` inteiro, thread por thread, e comparar com o que o `HIPOTESES.md` já registrava: o que bate, o que diverge e o que falta. Separar o que o financeiro **disse** do que um time **propôs**.
+- **O que a IA devolveu:** 42 threads lidas. A comparação achou o que faltava, entre outras coisas a recusa explícita da Helena em validar números e contas ("Número eu não valido", "Conta por conta eu não valido"), e itens registrados como regra que, pelo texto, eram decisões delegadas ao time (R-19). Duas leituras paralelas do mesmo canal, com 20 minutos de diferença, divergiram: uma tratava como abertas duas perguntas que a Helena já tinha respondido.
+- **O que foi feito com isso:** As duas leituras foram consolidadas conferindo cada thread divergente direto no Slack, e não escolhendo uma versão. O que faltava entrou como R-45..R-49, L-06..L-09 e Q-04..Q-07. Lição: proposta de time que ninguém respondeu não vira regra, e registro do canal tem prazo de validade curto; antes de decidir em cima de "sem resposta", reler a thread.
