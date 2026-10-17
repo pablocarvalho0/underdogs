@@ -1,5 +1,7 @@
 """Testes automatizados para os parsers de dados brutos."""
 
+from decimal import Decimal
+
 from src.loaders import (
     load_orbe_report,
     load_taxas_contratadas,
@@ -15,7 +17,8 @@ def test_load_orbe_report():
     assert len(df) == 1943
     assert "id_transacao" in df.columns
     assert "valor_bruto" in df.columns
-    assert df["valor_bruto"].dtype in ["float64", "float32"]
+    # Valores em Decimal a partir do texto cru (sem passar por float).
+    assert all(isinstance(v, Decimal) for v in df["valor_bruto"])
 
 
 def test_load_taxas_contratadas():

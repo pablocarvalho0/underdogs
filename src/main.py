@@ -1,5 +1,7 @@
 """Ponto de entrada CLI para execução e validação da conciliação Tarvo."""
 
+from pathlib import Path
+
 import typer
 from rich.console import Console
 from rich.table import Table
@@ -90,10 +92,13 @@ def validate():
 
 
 @app.command()
-def run():
+def run(
+    input: Path = typer.Option(DATA_PACK_DIR, "--input", help="Pasta do data pack do mês"),
+    output: Path = typer.Option(OUTPUT_DIR, "--output", help="Pasta onde os CSVs são gravados"),
+):
     """Executa o pipeline completo de conciliação financeira e gera os CSVs em saida/."""
     console.print("\n[bold yellow]Executando pipeline de conciliação Tarvo...[/bold yellow]")
-    resultado = run_pipeline(DATA_PACK_DIR, OUTPUT_DIR)
+    resultado = run_pipeline(input, output)
     for nome, n in resultado["arquivos"].items():
         console.print(f"  {nome}: {n} linhas")
     console.print("\n[bold cyan]Invariantes de conservação (diferença deve ser 0):[/bold cyan]")
