@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tarvo · Mapa do fechamento de setembro/2026</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7;
+    --surface: #fcfcfb;
+    --surface-2: #ffffff;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --muted: #898781;
+    --grid: #e1e0d9;
+    --axis: #c3c2b7;
+    --border: rgba(11,11,11,0.10);
+    --checkout: #2a78d6;
+    --remessa: #eb6834;
+    --receita: #1baf7a;
+    --band: rgba(42,120,214,0.07);
+    --st-good: #0ca30c;
+    --st-warn: #fab219;
+    --st-serious: #ec835a;
+    --st-crit: #d03b3b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --page: #0d0d0d;
+      --surface: #1a1a19;
+      --surface-2: #222221;
+      --ink: #f0efec;
+      --ink-2: #c3c2b7;
+      --muted: #898781;
+      --grid: #2c2c2a;
+      --axis: #383835;
+      --border: rgba(255,255,255,0.10);
+      --checkout: #3987e5;
+      --remessa: #d95926;
+      --receita: #199e70;
+      --band: rgba(57,135,229,0.10);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--page); color: var(--ink);
+    font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  main { max-width: 1240px; margin: 0 auto; padding: 32px 24px 80px; }
+  h1 { font-size: 28px; margin: 0 0 4px; }
+  h2 { font-size: 21px; margin: 56px 0 6px; padding-top: 8px; border-top: 1px solid var(--grid); }
+  h3 { font-size: 16px; margin: 24px 0 8px; }
+  p, li { color: var(--ink-2); }
+  strong { color: var(--ink); }
+  .sub { color: var(--ink-2); margin: 0 0 20px; }
+  nav { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; margin: 16px 0 8px; }
+  nav a { color: var(--ink-2); text-decoration: none; border-bottom: 1px dotted var(--muted); }
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px 20px; margin: 14px 0;
+  }
+  .lede { font-size: 16.5px; }
+  .lede p { color: var(--ink); margin: 6px 0; }
+  figure { margin: 14px 0; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+  figure svg { display: block; width: 100%; height: auto; }
+  figcaption { font-size: 13px; color: var(--muted); padding: 8px 4px 0; }
+
+  /* Selos: sempre ícone + texto, nunca só cor */
+  .b { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600;
+       padding: 1px 8px; border-radius: 999px; border: 1.5px solid; color: var(--ink); white-space: nowrap; vertical-align: 1px; }
+  .b-fato { border-color: var(--st-good); }
+  .b-hip  { border-color: var(--st-warn); }
+  .b-perg { border-color: var(--st-serious); }
+  .b-crit { border-color: var(--st-crit); }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 13.5px; color: var(--ink-2); margin: 6px 0 4px; }
+  .legend span { display: inline-flex; align-items: center; gap: 8px; }
+  .sw { width: 34px; height: 0; border-top: 3px solid; display: inline-block; }
+  .sw-checkout { border-color: var(--checkout); }
+  .sw-remessa { border-color: var(--remessa); }
+  .sw-receita { border-color: var(--receita); border-top-style: dashed; }
+  .sw-interno { border-color: var(--muted); }
+  .sw-fraca { border-color: var(--muted); border-top-style: dashed; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--grid); }
+  th { color: var(--ink); font-weight: 600; background: var(--surface-2); position: sticky; top: 0; }
+  td { color: var(--ink-2); }
+  td code, li code, p code { font-size: 12.5px; background: var(--surface-2); border: 1px solid var(--border); padding: 0 4px; border-radius: 4px; color: var(--ink); }
+  .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .center { text-align: center; }
+  .dot { font-size: 15px; color: var(--ink); }
+  .scroll { overflow-x: auto; }
+
+  .pipe { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; counter-reset: step; }
+  @media (max-width: 900px) { .pipe { grid-template-columns: repeat(2, 1fr); } }
+  .step { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 14px 12px; position: relative; }
+  .step h4 { margin: 0 0 6px; font-size: 14.5px; }
+  .step h4::before { counter-increment: step; content: counter(step); display: inline-grid; place-items: center;
+       width: 22px; height: 22px; border-radius: 50%; background: var(--ink); color: var(--surface); font-size: 12px; margin-right: 8px; }
+  .step p { margin: 6px 0 0; font-size: 13px; }
+  .m { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .04em; padding: 1px 7px; border-radius: 5px;
+       border: 1px solid var(--axis); color: var(--ink); margin-right: 4px; }
+  .m-ia { border-style: dashed; }
+  .m-hum { border-width: 2px; }
+
+  .tl-list { columns: 2; column-gap: 32px; padding-left: 0; list-style: none; margin: 8px 0 0; }
+  @media (max-width: 900px) { .tl-list { columns: 1; } }
+  .tl-list li { break-inside: avoid; margin: 0 0 10px; display: flex; gap: 10px; }
+  .tl-n { flex: 0 0 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700;
+          color: #fff; }
+  .n-checkout { background: var(--checkout); }
+  .n-remessa { background: var(--remessa); }
+  .n-interno { background: var(--muted); }
+
+  ol.q { padding-left: 22px; }
+  ol.q li { margin: 0 0 12px; }
+  ol.q .why { display: block; font-size: 13px; color: var(--muted); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 900px) { .two { grid-template-columns: 1fr; } }
+  footer { margin-top: 56px; font-size: 13px; color: var(--muted); }
+
+  /* ---------- SVG ---------- */
+  svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .t-h  { font-size: 14.5px; font-weight: 650; fill: var(--ink); }
+  .t-b  { font-size: 12.5px; fill: var(--ink-2); }
+  .t-s  { font-size: 11.5px; fill: var(--muted); }
+  .t-l  { font-size: 12px; fill: var(--ink); font-weight: 600; }
+  .t-ln { font-size: 11.5px; fill: var(--ink-2); }
+  .t-big { font-size: 13px; font-weight: 700; fill: var(--ink); letter-spacing: .08em; }
+  .halo { paint-order: stroke; stroke: var(--surface); stroke-width: 5px; stroke-linejoin: round; }
+  .mid { text-anchor: middle; }
+  .end { text-anchor: end; }
+  .node { fill: var(--surface-2); stroke: var(--axis); stroke-width: 1.5; }
+  .node-checkout { stroke: var(--checkout); stroke-width: 2; }
+  .node-remessa { stroke: var(--remessa); stroke-width: 2; }
+  .node-receita { stroke: var(--receita); stroke-width: 2; }
+  .node-tarvo { fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 7 6; }
+  .node-new { stroke: var(--ink); stroke-width: 2; stroke-dasharray: 6 4; }
+  .e { fill: none; }
+  .e-checkout { stroke: var(--checkout); stroke-width: 3; }
+  .e-remessa { stroke: var(--remessa); stroke-width: 3; }
+  .e-receita { stroke: var(--receita); stroke-width: 2.5; stroke-dasharray: 8 5; }
+  .e-interno { stroke: var(--muted); stroke-width: 2.5; }
+  .e-forte { stroke: var(--ink-2); stroke-width: 2.5; }
+  .e-fraca { stroke: var(--muted); stroke-width: 2; stroke-dasharray: 6 5; }
+  .mk-checkout { fill: var(--checkout); }
+  .mk-remessa { fill: var(--remessa); }
+  .mk-receita { fill: var(--receita); }
+  .mk-interno { fill: var(--muted); }
+  .mk-forte { fill: var(--ink-2); }
+  .axis { stroke: var(--axis); stroke-width: 2; }
+  .tick { stroke: var(--axis); stroke-width: 1.5; }
+  .band { fill: var(--band); }
+  .stem { stroke: var(--axis); stroke-width: 1.5; }
+  .c-checkout { fill: var(--checkout); }
+  .c-remessa { fill: var(--remessa); }
+  .c-interno { fill: var(--muted); }
+  .c-txt { fill: #fff; font-size: 12px; font-weight: 700; text-anchor: middle; }
+  .today { stroke: var(--ink-2); stroke-width: 1.5; stroke-dasharray: 4 4; }
+  .update { border-left: 4px solid var(--st-warn); background: var(--surface-2); border-radius: 8px; padding: 12px 16px; margin: 0 0 20px; box-shadow: 0 0 0 1px var(--border); }
+  .update p { margin: 0 0 8px; } .update ul { margin: 0; padding-left: 20px; } .update li { margin: 2px 0; }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Tarvo Pagamentos · mapa do fechamento de setembro/2026</h1>
+<p class="sub">Para o time entender, antes de construir, de onde vem cada número e por onde passa cada real.</p>
+
+<div class="update" role="note">
+  <p><strong>⚠ Atualização de 17/10, 13h25.</strong> Este mapa é um retrato da exploração feita <strong>antes</strong> das respostas do financeiro. Os fluxos (seções 1, 1b, 2 e 3) e os fatos medidos continuam valendo. As regras de negócio agora estão no <a href="../../HIPOTESES.md"><code>HIPOTESES.md</code></a>, com o link de cada thread. O que mudou:</p>
+  <ul>
+    <li><strong>1c, modelos A/B:</strong> não importam mais para a comissão. Ela é a taxa contratada inteira × bruto, linha a linha, sem descontar o custo da Orbe (R-01).</li>
+    <li><strong>1b, Pix de R$ 18.240:</strong> é dinheiro de uma remessa que sai em outubro (R-34). O <strong>saldo negativo do Aurora</strong> é a conta garantida (R-35).</li>
+    <li><strong>5 · Armadilhas:</strong> continuam valendo como achados. O tratamento de cada uma está nas regras R-xx.</li>
+    <li><strong>6 · Perguntas:</strong> todas já foram respondidas no canal. O canal certo é o <code>#duvidas-hackathon-ai</code>; o <code>#tarvo-financeiro</code> não existe.</li>
+    <li><strong>7 · Plano de contas:</strong> o critério é a contrapartida, e só os itens de agosto e o repasse da Ponte de 04/09 já estavam registrados (R-29..R-33).</li>
+  </ul>
+</div>
+
+<div class="legend" aria-label="Legenda de selos">
+  <span><span class="b b-fato">✔ fato</span> conferido nos arquivos por script</span>
+  <span><span class="b b-hip">≈ hipótese</span> parece ser assim, mas ninguém confirmou</span>
+  <span><span class="b b-perg">? perguntar</span> regra de negócio, quem responde é o financeiro</span>
+</div>
+
+<nav>
+  <a href="#resumo">Resumo</a>
+  <a href="#dinheiro">1 · Fluxo do dinheiro</a>
+  <a href="#quando">1b · Quem paga quem, e quando</a>
+  <a href="#checkout">1c · Checkout por dentro</a>
+  <a href="#informacao">2 · Fluxo da informação</a>
+  <a href="#tempo">3 · Competência × caixa</a>
+  <a href="#pipeline">4 · Do arquivo à saída</a>
+  <a href="#armadilhas">5 · Armadilhas nos dados</a>
+  <a href="#perguntas">6 · Perguntas ao financeiro</a>
+  <a href="#contas">7 · Extratos → plano de contas</a>
+</nav>
+
+<!-- ============================================================ -->
+<div class="card lede" id="resumo">
+  <p><strong>Duas linhas de negócio, dois bancos.</strong> No <strong style="color:var(--checkout)">checkout</strong>, o dinheiro do aluno passa pela Orbe, cai no Banco Aurora e é repassado ao lojista. Na <strong style="color:var(--remessa)">remessa</strong>, o lojista manda reais ao Banco Meridiano, a Tarvo paga a Ponte Câmbio e a escola no exterior recebe em moeda estrangeira.</p>
+  <p><strong>A receita da Tarvo não aparece pronta em nenhum lugar.</strong> No checkout, ela é a taxa (MDR + antecipação) descontada do lojista. Na remessa, ela é 50% do spread, pago pela Ponte no mês seguinte e só contra nota fiscal.</p>
+  <p><strong>Nenhum arquivo conversa com o outro por uma chave única.</strong> A Orbe identifica o lojista por código de estabelecimento (EC), a Ponte por CNPJ e os bancos só pelo nome, truncado. A ponte entre eles é uma planilha mantida à mão. Por isso o fechamento leva 8 dias e depende de quem "sabe".</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="dinheiro">1 · Fluxo do dinheiro</h2>
+<p>Quem paga quem, por qual banco, com os volumes de setembro tirados dos arquivos.</p>
+<div class="legend">
+  <span><i class="sw sw-checkout"></i> dinheiro do checkout</span>
+  <span><i class="sw sw-remessa"></i> dinheiro da remessa</span>
+  <span><i class="sw sw-receita"></i> receita da Tarvo</span>
+  <span><i class="sw sw-interno"></i> transferência entre contas da própria Tarvo</span>
+</div>
+
+<figure>
+<svg viewBox="0 0 1180 660" role="img" aria-labelledby="fig1t fig1d">
+  <title id="fig1t">Fluxo do dinheiro da Tarvo</title>
+  <desc id="fig1d">Checkout: aluno paga a Orbe, que liquida no Banco Aurora, de onde a Tarvo repassa por Pix aos lojistas. Remessa: lojista envia Pix ao Banco Meridiano, a Tarvo paga a Ponte Câmbio por TED e a Ponte paga a escola no exterior em moeda estrangeira. A Ponte devolve 50% do spread à Tarvo no mês seguinte, contra nota fiscal.</desc>
+  <defs>
+    <marker id="a-checkout" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk-checkout"/></marker>
+    <marker id="a-remessa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk-remessa"/></marker>
+    <marker id="a-receita" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk-receita"/></marker>
+    <marker id="a-interno" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk-interno"/></marker>
+  </defs>
+
+  <!-- Lane labels -->
+  <text x="10" y="80" class="t-big" style="fill:var(--checkout)">CHECKOUT</text>
+  <text x="10" y="420" class="t-big" style="fill:var(--remessa)">REMESSA</text>
+
+  <!-- Tarvo container -->
+  <rect x="490" y="24" width="370" height="612" rx="16" class="node-tarvo"/>
+  <text x="675" y="50" class="t-big mid">TARVO PAGAMENTOS</text>
+  <text x="675" y="70" class="t-s mid">arquivo 04 · plano de contas (ERP Fênix) classifica o que passa aqui</text>
+
+  <!-- Nodes: checkout lane -->
+  <rect x="10" y="110" width="150" height="80" rx="10" class="node"/>
+  <text x="85" y="146" class="t-h mid">Aluno</text>
+  <text x="85" y="168" class="t-b mid">paga curso / viagem</text>
+
+  <rect x="250" y="110" width="160" height="80" rx="10" class="node node-checkout"/>
+  <text x="330" y="138" class="t-h mid">Orbe</text>
+  <text x="330" y="158" class="t-b mid">adquirente</text>
+  <text x="330" y="178" class="t-s mid">arquivo 01 · CSV do portal</text>
+
+  <rect x="515" y="96" width="320" height="108" rx="10" class="node node-checkout"/>
+  <text x="675" y="124" class="t-h mid">Banco Aurora · CC 4471-0</text>
+  <text x="675" y="144" class="t-b mid">conta principal · arquivo 05a (CSV)</text>
+  <text x="675" y="164" class="t-b mid">84 lançamentos em setembro</text>
+  <text x="675" y="188" class="t-s mid">também: folha, tributos, AWS, aluguel, tarifas</text>
+
+  <rect x="950" y="96" width="220" height="448" rx="12" class="node"/>
+  <text x="1060" y="290" class="t-h mid">Lojistas</text>
+  <text x="1060" y="312" class="t-b mid">~25 agências de intercâmbio,</text>
+  <text x="1060" y="330" class="t-b mid">escolas de idiomas e</text>
+  <text x="1060" y="348" class="t-b mid">operadoras de turismo</text>
+  <text x="1060" y="380" class="t-s mid">arquivo 02 · taxas contratadas</text>
+  <text x="1060" y="396" class="t-s mid">(planilha mantida à mão)</text>
+
+  <!-- Receita -->
+  <rect x="515" y="268" width="200" height="112" rx="10" class="node node-receita"/>
+  <text x="615" y="294" class="t-h mid">Receita da Tarvo</text>
+  <text x="615" y="316" class="t-b mid">Checkout: MDR + antecipação</text>
+  <text x="615" y="336" class="t-b mid">Remessa: 50% do spread</text>
+  <text x="615" y="362" class="t-s mid">→ vira nota fiscal a emitir</text>
+
+  <!-- Nodes: remessa lane -->
+  <rect x="515" y="436" width="320" height="108" rx="10" class="node node-remessa"/>
+  <text x="675" y="464" class="t-h mid">Banco Meridiano · CC 90233-5</text>
+  <text x="675" y="484" class="t-b mid">conta das remessas · arquivo 05b (OFX)</text>
+  <text x="675" y="504" class="t-b mid">100 transações em setembro</text>
+  <text x="675" y="528" class="t-s mid">também: CDB automático, seguro, IOF, tarifas</text>
+
+  <rect x="250" y="450" width="160" height="80" rx="10" class="node node-remessa"/>
+  <text x="330" y="478" class="t-h mid">Ponte Câmbio</text>
+  <text x="330" y="498" class="t-b mid">parceiro de câmbio</text>
+  <text x="330" y="518" class="t-s mid">arquivo 03 · e-mail + xlsx</text>
+
+  <rect x="10" y="450" width="150" height="80" rx="10" class="node"/>
+  <text x="85" y="484" class="t-h mid">Escola no</text>
+  <text x="85" y="502" class="t-h mid">exterior</text>
+
+  <!-- Edges: checkout -->
+  <line x1="160" y1="150" x2="246" y2="150" class="e e-checkout" marker-end="url(#a-checkout)"/>
+  <text x="205" y="138" class="t-l mid halo">cartão / Pix</text>
+  <text x="205" y="170" class="t-ln mid halo">1.840 vendas</text>
+  <text x="205" y="184" class="t-ln mid halo">R$ 6,55 mi</text>
+
+  <line x1="410" y1="150" x2="511" y2="150" class="e e-checkout" marker-end="url(#a-checkout)"/>
+  <text x="460" y="138" class="t-l mid halo">TED diária</text>
+  <text x="460" y="170" class="t-ln mid halo">21 TEDs</text>
+  <text x="460" y="184" class="t-ln mid halo">R$ 3,56 mi</text>
+
+  <line x1="835" y1="150" x2="946" y2="150" class="e e-checkout" marker-end="url(#a-checkout)"/>
+  <text x="892" y="138" class="t-l mid halo">Pix de repasse</text>
+  <text x="892" y="170" class="t-ln mid halo">44 Pix · 2×/mês</text>
+  <text x="892" y="184" class="t-ln mid halo">R$ 4,23 mi</text>
+
+  <!-- Edges: remessa -->
+  <line x1="950" y1="475" x2="839" y2="475" class="e e-remessa" marker-end="url(#a-remessa)"/>
+  <text x="892" y="463" class="t-l mid halo">Pix pré-pago</text>
+  <text x="892" y="495" class="t-ln mid halo">64 Pix · terças</text>
+  <text x="892" y="509" class="t-ln mid halo">R$ 5,63 mi</text>
+
+  <line x1="515" y1="475" x2="414" y2="475" class="e e-remessa" marker-end="url(#a-remessa)"/>
+  <text x="462" y="463" class="t-l mid halo">TED diária</text>
+  <text x="462" y="495" class="t-ln mid halo">21 TEDs</text>
+  <text x="462" y="509" class="t-ln mid halo">R$ 5,61 mi</text>
+
+  <line x1="250" y1="490" x2="164" y2="490" class="e e-remessa" marker-end="url(#a-remessa)"/>
+  <text x="205" y="466" class="t-l mid halo">moeda</text>
+  <text x="205" y="479" class="t-l mid halo">estrangeira</text>
+  <text x="205" y="508" class="t-ln mid halo">233 linhas</text>
+  <text x="205" y="522" class="t-ln mid halo">D+1 útil</text>
+
+  <!-- Receita edges -->
+  <path d="M330,530 C330,618 620,618 620,548" class="e e-receita" marker-end="url(#a-receita)"/>
+  <text x="470" y="630" class="t-l mid halo">repasse de 50% do spread · no mês seguinte · contra NF</text>
+
+  <line x1="580" y1="204" x2="580" y2="264" class="e e-receita" marker-end="url(#a-receita)"/>
+  <text x="590" y="232" class="t-ln halo">retém a taxa</text>
+  <text x="590" y="246" class="t-ln halo">no repasse ≈</text>
+
+  <line x1="580" y1="436" x2="580" y2="384" class="e e-receita" marker-end="url(#a-receita)"/>
+  <text x="590" y="414" class="t-ln halo">recebe da Ponte</text>
+
+  <!-- Transferência interna -->
+  <line x1="770" y1="204" x2="770" y2="432" class="e e-interno" marker-end="url(#a-interno)"/>
+  <text x="780" y="290" class="t-l halo">transf.</text>
+  <text x="780" y="304" class="t-l halo">própria</text>
+  <text x="780" y="324" class="t-ln halo">4 envios</text>
+  <text x="780" y="338" class="t-ln halo">R$ 1,45 mi</text>
+  <text x="780" y="358" class="t-ln halo">⚠ 1 não chega</text>
+  <text x="780" y="372" class="t-ln halo">em setembro</text>
+</svg>
+<figcaption>Volumes somados por script a partir dos arquivos 01, 03, 05a e 05b. "R$ 6,55 mi" é o valor bruto das vendas na Orbe; o relatório da Ponte soma R$ 5,65 mi em reais, com uma linha duplicada incluída.</figcaption>
+</figure>
+
+<div class="two">
+  <div class="card">
+    <h3 style="margin-top:0">Como ler</h3>
+    <ul>
+      <li><strong>Os valores não batem dentro do mês, e isso é esperado.</strong> A Orbe liquidou R$ 3,56 mi no Aurora e a Tarvo repassou R$ 4,23 mi aos lojistas. A diferença pode vir de prazo (parcelado, D+30), de antecipação e do saldo do mês anterior. <span class="b b-hip">≈ hipótese</span></li>
+      <li><strong>Remessa é dinheiro de terceiros que só passa pela Tarvo.</strong> Os R$ 5,63 mi que entram no Meridiano saem quase todos para a Ponte (R$ 5,61 mi). A receita é só a parte do spread. <span class="b b-fato">✔ fato</span></li>
+      <li><strong>O spread de setembro só vira caixa em 06/10, e só se a Tarvo emitir a NF.</strong> Comissão que não vira nota é receita que nunca entra. <span class="b b-fato">✔ fato</span> (e-mail da Ponte)</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0">Quem é quem</h3>
+    <table>
+      <tr><th>Ator</th><th>Papel</th></tr>
+      <tr><td><strong>Tarvo</strong></td><td>Subadquirente. CNPJ 84.626.315/0001-39.</td></tr>
+      <tr><td><strong>Orbe</strong></td><td>Adquirente do checkout. CNPJ 99.876.669/0001-09; aparece nas TEDs do Aurora.</td></tr>
+      <tr><td><strong>Ponte Câmbio</strong></td><td>Parceiro de câmbio. CNPJ 75.374.179/0001-46. Não confundir com o lojista <em>Ponte Aérea Estudantil</em>.</td></tr>
+      <tr><td><strong>Lojistas</strong></td><td>24 CNPJs na planilha. Alguns só fazem checkout, outros só remessa ("só remessa": Ponte Aérea e Nórdica).</td></tr>
+      <tr><td><strong>Financeiro</strong></td><td>3 pessoas; uma mantém a planilha ("Bia", última atualização em 02/09).</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="quando">1b · Quem paga quem, e quando</h2>
+<p>Cada seta do diagrama acima tem um ritmo próprio. Na remessa, os valores <strong>batem ao centavo</strong> entre o relatório da Ponte e o extrato do Meridiano. No checkout, a regra do repasse ainda não está clara.</p>
+
+<div class="scroll card" style="padding:0">
+<table>
+  <tr><th>Fluxo</th><th>De → para</th><th>Meio</th><th>Quando</th><th>O que compõe o valor</th><th>Confere?</th></tr>
+  <tr><td><strong>Pagamento do aluno</strong></td><td>Aluno → Orbe</td><td>cartão ou Pix, no checkout da Tarvo</td><td>contínuo</td><td><code>valor_bruto</code> da venda</td><td>—</td></tr>
+  <tr><td><strong>Liquidação da Orbe</strong></td><td>Orbe → Tarvo (Aurora)</td><td>TED</td><td>todo dia útil (21 TEDs)</td><td>Não bate com o líquido do dia: parcelado e crédito à vista caem depois, e há antecipação.</td><td><span class="b b-hip">≈ hipótese</span></td></tr>
+  <tr><td><strong>Repasse ao lojista</strong></td><td>Tarvo (Aurora) → lojista</td><td>Pix</td><td>2× no mês (08–10/09 e 22–24/09)</td><td>Regra desconhecida. Ex.: a Rota Global recebeu R$ 207,6 mil em repasses e tem R$ 507,1 mil líquidos na Orbe no mês.</td><td><span class="b b-perg">? perguntar</span></td></tr>
+  <tr><td><strong>Pré-pagamento da remessa</strong></td><td>Lojista → Tarvo (Meridiano)</td><td>Pix</td><td>toda terça (01, 08, 15, 22, 29/09)</td><td>Soma de <code>Valor R$</code> + <code>IOF R$</code> das operações que o lojista contrata nos 7 dias seguintes.</td><td><span class="b b-fato">✔ 63 de 64</span></td></tr>
+  <tr><td><strong>Pagamento à Ponte</strong></td><td>Tarvo (Meridiano) → Ponte</td><td>TED "LIQ OPERACOES"</td><td>todo dia útil, no dia da contratação</td><td>Soma de <code>Valor R$</code> + <code>IOF R$</code> das operações contratadas no dia.</td><td><span class="b b-fato">✔ 21 de 21</span></td></tr>
+  <tr><td><strong>Entrega no exterior</strong></td><td>Ponte → escola</td><td>câmbio (fora dos nossos arquivos)</td><td>D+1 útil (<code>Data Liquidação</code>)</td><td><code>Valor ME</code> na moeda da escola. A escola não aparece em nenhum arquivo.</td><td>não visível</td></tr>
+  <tr><td><strong>Comissão de câmbio</strong></td><td>Ponte → Tarvo (Meridiano)</td><td>TED</td><td>mês seguinte (agosto chegou em 04/09; setembro, previsto para 06/10)</td><td>50% do spread realizado, contra nota fiscal.</td><td><span class="b b-fato">✔ e-mail</span></td></tr>
+  <tr><td><strong>Transferência interna</strong></td><td>Aurora → Meridiano</td><td>TED, mesma titularidade</td><td>4× no mês</td><td>R$ 1,45 mi. Os lojistas pré-pagam as remessas, então o motivo não é óbvio.</td><td><span class="b b-perg">? perguntar</span></td></tr>
+</table>
+</div>
+
+<h3>Remessa passo a passo</h3>
+<figure>
+<svg viewBox="0 0 1180 600" role="img" aria-labelledby="fig1bt fig1bd">
+  <title id="fig1bt">Sequência de uma remessa internacional</title>
+  <desc id="fig1bd">Toda terça o lojista faz um Pix para a conta Meridiano da Tarvo com o valor das operações da semana. Na véspera, ele pede a remessa. No dia da contratação, a Tarvo paga a Ponte com uma TED diária. No dia útil seguinte, a Ponte entrega a moeda estrangeira à escola e fica com o spread. No mês seguinte, a Ponte manda o relatório, a Tarvo emite a nota fiscal e a Ponte devolve 50% do spread.</desc>
+  <defs>
+    <marker id="s-remessa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk-remessa"/></marker>
+    <marker id="s-receita" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk-receita"/></marker>
+    <marker id="s-info" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk-interno"/></marker>
+  </defs>
+  <style>
+    .life { stroke: var(--axis); stroke-width: 1.5; stroke-dasharray: 3 5; }
+    .e-info { stroke: var(--muted); stroke-width: 2; stroke-dasharray: 5 4; }
+  </style>
+
+  <!-- lane headers -->
+  <rect x="190" y="14" width="200" height="58" rx="10" class="node"/>
+  <text x="290" y="40" class="t-h mid">Lojista</text><text x="290" y="60" class="t-s mid">agência / escola de idiomas</text>
+  <rect x="450" y="14" width="200" height="58" rx="10" class="node node-remessa"/>
+  <text x="550" y="40" class="t-h mid">Tarvo</text><text x="550" y="60" class="t-s mid">conta Banco Meridiano</text>
+  <rect x="710" y="14" width="200" height="58" rx="10" class="node node-remessa"/>
+  <text x="810" y="40" class="t-h mid">Ponte Câmbio</text><text x="810" y="60" class="t-s mid">parceiro de câmbio</text>
+  <rect x="970" y="14" width="200" height="58" rx="10" class="node"/>
+  <text x="1070" y="40" class="t-h mid">Escola no exterior</text><text x="1070" y="60" class="t-s mid">beneficiária final</text>
+
+  <line x1="290" y1="72" x2="290" y2="585" class="life"/>
+  <line x1="550" y1="72" x2="550" y2="585" class="life"/>
+  <line x1="810" y1="72" x2="810" y2="585" class="life"/>
+  <line x1="1070" y1="72" x2="1070" y2="585" class="life"/>
+
+  <!-- 1: toda terça, Pix pré-pago -->
+  <text x="14" y="118" class="t-l">toda terça</text>
+  <text x="14" y="134" class="t-s">01, 08, 15, 22, 29/09</text>
+  <line x1="292" y1="122" x2="546" y2="122" class="e e-remessa" marker-end="url(#s-remessa)"/>
+  <text x="420" y="110" class="t-l mid halo">Pix de pré-pagamento</text>
+  <text x="420" y="140" class="t-ln mid halo">Valor R$ + IOF das operações</text>
+  <text x="420" y="154" class="t-ln mid halo">dos 7 dias seguintes</text>
+  <text x="420" y="170" class="t-s mid halo">✔ 63 de 64 Pix batem ao centavo</text>
+
+  <!-- 2: D-1 pedido -->
+  <text x="14" y="214" class="t-l">D-1</text>
+  <text x="14" y="230" class="t-s">véspera · ≈ hipótese</text>
+  <line x1="292" y1="218" x2="546" y2="218" class="e e-info" marker-end="url(#s-info)"/>
+  <text x="420" y="206" class="t-l mid halo">pedido: escola, moeda, valor</text>
+  <text x="420" y="236" class="t-s mid halo">≈ o canal não aparece nos arquivos</text>
+  <line x1="552" y1="218" x2="806" y2="218" class="e e-info" marker-end="url(#s-info)"/>
+  <text x="680" y="206" class="t-l mid halo">reserva o câmbio</text>
+  <text x="680" y="236" class="t-s mid halo">≈ indício: coluna "Spread Estimado (D-1)"</text>
+
+  <!-- 3: D0 TED -->
+  <text x="14" y="300" class="t-l">D0</text>
+  <text x="14" y="316" class="t-s">dia da contratação</text>
+  <line x1="552" y1="304" x2="806" y2="304" class="e e-remessa" marker-end="url(#s-remessa)"/>
+  <text x="680" y="292" class="t-l mid halo">1 TED por dia útil</text>
+  <text x="680" y="322" class="t-ln mid halo">Valor R$ + IOF de todas as</text>
+  <text x="680" y="336" class="t-ln mid halo">operações contratadas no dia</text>
+  <text x="680" y="352" class="t-s mid halo">✔ 21 de 21 TEDs batem ao centavo</text>
+
+  <!-- 4: D+1 liquidação -->
+  <text x="14" y="398" class="t-l">D+1 útil</text>
+  <text x="14" y="414" class="t-s">liquidação</text>
+  <line x1="812" y1="402" x2="1066" y2="402" class="e e-remessa" marker-end="url(#s-remessa)"/>
+  <text x="940" y="390" class="t-l mid halo">moeda estrangeira (Valor ME)</text>
+  <text x="940" y="420" class="t-ln mid halo">a Ponte retém o spread:</text>
+  <text x="940" y="434" class="t-ln mid halo">(taxa cliente − PTAX) × Valor ME</text>
+  <text x="940" y="450" class="t-s mid halo">a escola não aparece em nenhum arquivo</text>
+
+  <!-- 5-7: mês seguinte -->
+  <text x="14" y="488" class="t-l">mês seguinte</text>
+  <text x="14" y="504" class="t-s">~dia 2 a 6</text>
+  <line x1="808" y1="484" x2="554" y2="484" class="e e-info" marker-end="url(#s-info)"/>
+  <text x="680" y="474" class="t-ln mid halo">e-mail com o relatório (xlsx) · arquivo 03</text>
+  <line x1="552" y1="520" x2="806" y2="520" class="e e-info" marker-end="url(#s-info)"/>
+  <text x="680" y="510" class="t-ln mid halo">nota fiscal de intermediação</text>
+  <path d="M808,560 L554,560" class="e e-receita" marker-end="url(#s-receita)"/>
+  <text x="680" y="550" class="t-l mid halo">TED: 50% do spread</text>
+  <text x="680" y="578" class="t-s mid halo">agosto: R$ 61.884,12 em 04/09</text>
+</svg>
+<figcaption>Setas sólidas: dinheiro. Setas tracejadas cinza: informação. Seta verde tracejada: receita da Tarvo. A correspondência entre Pix, TEDs e operações foi conferida por script, operação a operação.</figcaption>
+</figure>
+
+<div class="card">
+  <strong>O que isso esclarece</strong>
+  <ul style="margin:6px 0 0">
+    <li><strong>O Pix do lojista vai para a Tarvo, não para a escola.</strong> Pix só movimenta reais dentro do Brasil. Quem converte e paga a escola é a Ponte. <span class="b b-fato">✔ fato</span></li>
+    <li><strong>A conta Meridiano só faz passar o dinheiro.</strong> Entra o pré-pagamento do lojista, sai a TED para a Ponte. A receita da Tarvo vem depois, separada. <span class="b b-fato">✔ fato</span></li>
+    <li><strong>O extrato serve de prova contra o relatório.</strong> A TED de 22/09 (R$ 325.387,31) paga a <code>PC-0926-0162</code> uma vez só, então a duplicata é erro do relatório e não pagamento em dobro. <span class="b b-fato">✔ fato</span></li>
+    <li><strong>Um Pix sobra:</strong> R$ 18.240,00 em 17/09 (quinta-feira), de "PONTE AEREA ESTUDANTIL" escrito sem acento, sem nenhuma operação correspondente. <span class="b b-perg">? perguntar</span></li>
+    <li><strong>Não dá para ver se o lojista usa o dinheiro do checkout para pagar a remessa.</strong> A conta do lojista não está nos arquivos, e alguns lojistas só usam uma das duas linhas. <span class="b b-hip">≈ fora do escopo</span></li>
+  </ul>
+</div>
+
+<div class="card">
+  <strong>Existe um "vai e volta" de dinheiro?</strong>
+  <ul style="margin:6px 0 0">
+    <li><strong>Em parte.</strong> 12 lojistas aparecem nas duas pontas: recebem repasse do checkout pelo Aurora e pré-pagam remessa pelo Meridiano. Outros 10 só usam o checkout e 2 só a remessa (Nórdica e Ponte Aérea). <span class="b b-fato">✔ fato</span></li>
+    <li><strong>Não é o mesmo dinheiro voltando.</strong> Esses 12 receberam R$ 2,13 mi em repasses e pré-pagaram R$ 4,69 mi em remessas, mais que o dobro. A maior parte do dinheiro das remessas vem de fora da Tarvo. <span class="b b-fato">✔ fato</span></li>
+    <li><strong>Em 5 casos, ida e volta caem no mesmo dia.</strong> Exemplo: em 08/09 a Tarvo mandou R$ 157.710,59 à Kiwi pelo Aurora e recebeu R$ 210.718,35 dela pelo Meridiano. Os outros casos: Rota Global, Novo Horizonte e Dublin Hub em 08/09 e Lisboa em 22/09. <span class="b b-fato">✔ fato</span></li>
+    <li><strong>Por que não compensar?</strong> As duas pontas são obrigações diferentes no próprio plano de contas (2.1.01 repasses × 2.1.02 recursos para remessas). No câmbio, o dinheiro costuma ter que vir do próprio cliente da operação (há coluna de compliance). E recebíveis de cartão podem estar dados em garantia a um banco. <span class="b b-hip">≈ hipótese</span> <span class="b b-perg">? perguntar</span></li>
+    <li><strong>Para o código:</strong> classificar cada lado separadamente, sem compensar. Somar ida e volta esconderia dois fluxos com contas e donos diferentes.</li>
+  </ul>
+</div>
+
+<div class="card">
+  <strong>A Tarvo segura parte do dinheiro?</strong>
+  <ul style="margin:6px 0 0">
+    <li><strong>Segura a taxa:</strong> MDR e antecipação no checkout. É a receita da Tarvo. <span class="b b-hip">≈ como é retida, a confirmar</span></li>
+    <li><strong>No checkout, segura também por alguns dias</strong>, entre a TED diária da Orbe e o repasse a cada 15 dias. Mas em setembro a Tarvo repassou mais do que recebeu da Orbe (R$ 4,23 mi × R$ 3,56 mi), e o saldo do Aurora ficou negativo a partir de 09/09 (mínimo de −R$ 2,29 mi em 24/09; fechou o mês em −R$ 1,92 mi). <span class="b b-fato">✔ fato</span> <span class="b b-perg">? por quê?</span></li>
+    <li><strong>Na remessa, segura por até 6 dias</strong>, da terça do pré-pagamento até o dia da operação. O Meridiano tem CDB automático e rendeu R$ 3.912,66 em setembro. <span class="b b-hip">≈ o rendimento pode vir desse dinheiro parado</span></li>
+  </ul>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="checkout">1c · Checkout por dentro: venda × dinheiro, e quem fica com a taxa</h2>
+<p>Em setembro, os alunos compraram <strong>R$ 6,55 mi</strong> (bruto), mas a Orbe transferiu <strong>R$ 3,56 mi</strong> à Tarvo. A diferença de quase R$ 3 mi não é dinheiro sumido: é <strong>prazo</strong>. Venda é competência, TED é caixa.</p>
+
+<h3>Para onde vão os R$ 6,55 mi vendidos em setembro</h3>
+<div class="scroll card" style="padding:0">
+<table>
+  <tr><th>Parte da venda</th><th class="num">Valor</th><th>Quando vira dinheiro</th><th>Selo</th></tr>
+  <tr><td>Taxa (MDR) descontada do lojista</td><td class="num">R$ 214.558,33</td><td>Não é repassada ao lojista: fica na cadeia (emissor, bandeira, Orbe, Tarvo)</td><td><span class="b b-fato">✔ fato</span></td></tr>
+  <tr><td>Pix + débito, líquidos (345 vendas)</td><td class="num">R$ 262.288,79</td><td>D+0 / D+1: <strong>ainda em setembro</strong></td><td><span class="b b-hip">≈ prazo de mercado</span></td></tr>
+  <tr><td>Crédito à vista, líquido (575 vendas)</td><td class="num">R$ 940.731,88</td><td>D+30: <strong>outubro</strong></td><td><span class="b b-hip">≈ prazo de mercado</span></td></tr>
+  <tr><td>Crédito parcelado, líquido (920 vendas, 5,9 parcelas em média)</td><td class="num">R$ 5.131.620,22</td><td>Uma parcela por mês, <strong>de out/26 a set/27</strong></td><td><span class="b b-hip">≈ prazo de mercado</span></td></tr>
+</table>
+</div>
+<p style="font-size:13px">Somando: R$ 214.558,33 + R$ 262.288,79 + R$ 940.731,88 + R$ 5.131.620,22 = R$ 6.549.199,22, o bruto das vendas. <strong>81% do valor vendido é cartão parcelado.</strong> O emissor do cartão só paga conforme o aluno paga a fatura, e a Orbe repassa nesse mesmo ritmo.</p>
+
+<figure>
+<svg viewBox="0 0 1100 280" role="img" aria-labelledby="fig1ct fig1cd">
+  <title id="fig1ct">Quando as vendas líquidas de setembro viram dinheiro</title>
+  <desc id="fig1cd">Simulação com prazos padrão de mercado: só R$ 0,26 mi cai em setembro, R$ 2,00 mi em outubro e o restante se espalha até setembro de 2027.</desc>
+  <style>
+    .grid { stroke: var(--grid); stroke-width: 1; }
+    .bar-fill { fill: var(--checkout); }
+    .hit { fill: transparent; }
+    .bar:hover .bar-fill { opacity: .75; }
+  </style>
+  <line x1="80" y1="240.0" x2="1080" y2="240.0" class="axis"/>
+  <text x="70" y="244.0" class="t-s end">0</text>
+  <line x1="80" y1="196.2" x2="1080" y2="196.2" class="grid"/>
+  <text x="70" y="200.2" class="t-s end">R$ 0,5 mi</text>
+  <line x1="80" y1="152.5" x2="1080" y2="152.5" class="grid"/>
+  <text x="70" y="156.5" class="t-s end">R$ 1,0 mi</text>
+  <line x1="80" y1="108.8" x2="1080" y2="108.8" class="grid"/>
+  <text x="70" y="112.8" class="t-s end">R$ 1,5 mi</text>
+  <line x1="80" y1="65.0" x2="1080" y2="65.0" class="grid"/>
+  <text x="70" y="69.0" class="t-s end">R$ 2,0 mi</text>
+  <g class="bar"><title>set/26: R$ 259.752,59</title><rect x="80.0" y="30" width="76.9" height="210" class="hit"/><path d="M96.5,240 L96.5,221.3 Q96.5,217.3 100.5,217.3 L136.5,217.3 Q140.5,217.3 140.5,221.3 L140.5,240 Z" class="bar-fill"/></g>
+  <text x="118.5" y="258" class="t-s mid">set/26</text>
+  <text x="118.5" y="209.3" class="t-l mid">R$ 0,26 mi</text>
+  <g class="bar"><title>out/26: R$ 1.996.742,34</title><rect x="156.9" y="30" width="76.9" height="210" class="hit"/><path d="M173.4,240 L173.4,69.3 Q173.4,65.3 177.4,65.3 L213.4,65.3 Q217.4,65.3 217.4,69.3 L217.4,240 Z" class="bar-fill"/></g>
+  <text x="195.4" y="258" class="t-s mid">out/26</text>
+  <text x="195.4" y="57.3" class="t-l mid">R$ 2,00 mi</text>
+  <g class="bar"><title>nov/26: R$ 1.024.418,37</title><rect x="233.8" y="30" width="76.9" height="210" class="hit"/><path d="M250.3,240 L250.3,154.4 Q250.3,150.4 254.3,150.4 L290.3,150.4 Q294.3,150.4 294.3,154.4 L294.3,240 Z" class="bar-fill"/></g>
+  <text x="272.3" y="258" class="t-s mid">nov/26</text>
+  <text x="272.3" y="142.4" class="t-l mid">R$ 1,02 mi</text>
+  <g class="bar"><title>dez/26: R$ 749.330,15</title><rect x="310.8" y="30" width="76.9" height="210" class="hit"/><path d="M327.2,240 L327.2,178.4 Q327.2,174.4 331.2,174.4 L367.2,174.4 Q371.2,174.4 371.2,178.4 L371.2,240 Z" class="bar-fill"/></g>
+  <text x="349.2" y="258" class="t-s mid">dez/26</text>
+  <g class="bar"><title>jan/27: R$ 602.580,86</title><rect x="387.7" y="30" width="76.9" height="210" class="hit"/><path d="M404.2,240 L404.2,191.3 Q404.2,187.3 408.2,187.3 L444.2,187.3 Q448.2,187.3 448.2,191.3 L448.2,240 Z" class="bar-fill"/></g>
+  <text x="426.2" y="258" class="t-s mid">jan/27</text>
+  <g class="bar"><title>fev/27: R$ 431.921,79</title><rect x="464.6" y="30" width="76.9" height="210" class="hit"/><path d="M481.1,240 L481.1,206.2 Q481.1,202.2 485.1,202.2 L521.1,202.2 Q525.1,202.2 525.1,206.2 L525.1,240 Z" class="bar-fill"/></g>
+  <text x="503.1" y="258" class="t-s mid">fev/27</text>
+  <g class="bar"><title>mar/27: R$ 372.715,20</title><rect x="541.5" y="30" width="76.9" height="210" class="hit"/><path d="M558.0,240 L558.0,211.4 Q558.0,207.4 562.0,207.4 L598.0,207.4 Q602.0,207.4 602.0,211.4 L602.0,240 Z" class="bar-fill"/></g>
+  <text x="580.0" y="258" class="t-s mid">mar/27</text>
+  <g class="bar"><title>abr/27: R$ 280.651,13</title><rect x="618.5" y="30" width="76.9" height="210" class="hit"/><path d="M634.9,240 L634.9,219.4 Q634.9,215.4 638.9,215.4 L674.9,215.4 Q678.9,215.4 678.9,219.4 L678.9,240 Z" class="bar-fill"/></g>
+  <text x="656.9" y="258" class="t-s mid">abr/27</text>
+  <g class="bar"><title>mai/27: R$ 229.568,79</title><rect x="695.4" y="30" width="76.9" height="210" class="hit"/><path d="M711.8,240 L711.8,223.9 Q711.8,219.9 715.8,219.9 L751.8,219.9 Q755.8,219.9 755.8,223.9 L755.8,240 Z" class="bar-fill"/></g>
+  <text x="733.8" y="258" class="t-s mid">mai/27</text>
+  <g class="bar"><title>jun/27: R$ 169.083,59</title><rect x="772.3" y="30" width="76.9" height="210" class="hit"/><path d="M788.8,240 L788.8,229.2 Q788.8,225.2 792.8,225.2 L828.8,225.2 Q832.8,225.2 832.8,229.2 L832.8,240 Z" class="bar-fill"/></g>
+  <text x="810.8" y="258" class="t-s mid">jun/27</text>
+  <g class="bar"><title>jul/27: R$ 117.680,84</title><rect x="849.2" y="30" width="76.9" height="210" class="hit"/><path d="M865.7,240 L865.7,233.7 Q865.7,229.7 869.7,229.7 L905.7,229.7 Q909.7,229.7 909.7,233.7 L909.7,240 Z" class="bar-fill"/></g>
+  <text x="887.7" y="258" class="t-s mid">jul/27</text>
+  <g class="bar"><title>ago/27: R$ 71.787,36</title><rect x="926.2" y="30" width="76.9" height="210" class="hit"/><path d="M942.6,240 L942.6,236.9 Q942.6,233.7 945.8,233.7 L983.5,233.7 Q986.6,233.7 986.6,236.9 L986.6,240 Z" class="bar-fill"/></g>
+  <text x="964.6" y="258" class="t-s mid">ago/27</text>
+  <g class="bar"><title>set/27: R$ 28.407,88</title><rect x="1003.1" y="30" width="76.9" height="210" class="hit"/><path d="M1019.5,240 L1019.5,238.8 Q1019.5,237.5 1020.8,237.5 L1062.3,237.5 Q1063.5,237.5 1063.5,238.8 L1063.5,240 Z" class="bar-fill"/></g>
+  <text x="1041.5" y="258" class="t-s mid">set/27</text>
+  <line x1="156.9" y1="24" x2="156.9" y2="240" class="today"/>
+  <text x="150.9" y="36" class="t-s end">até aqui:</text><text x="150.9" y="50" class="t-s end">cai em</text><text x="150.9" y="64" class="t-s end">setembro</text>
+  <text x="164.9" y="36" class="t-s">daqui em diante: cai nos próximos 12 meses</text>
+</svg>
+<figcaption>Agenda simulada das vendas líquidas de setembro (R$ 6,33 mi), com Pix em D+0, débito em D+1, crédito à vista em D+30 e parcelado com uma parcela a cada 30 dias. Sem antecipações e estornos. Passe o mouse sobre as barras para ver o valor. <span class="b b-hip">≈ os prazos são premissa; a Orbe não informa o prazo</span></figcaption>
+<details style="padding:6px 4px 0"><summary style="font-size:13px;color:var(--muted);cursor:pointer">ver os valores em tabela</summary>
+<table style="max-width:360px;margin-top:6px"><tr><th>Mês</th><th class="num">Valor líquido</th></tr><tr><td>set/26</td><td class='num'>R$ 259.752,59</td></tr><tr><td>out/26</td><td class='num'>R$ 1.996.742,34</td></tr><tr><td>nov/26</td><td class='num'>R$ 1.024.418,37</td></tr><tr><td>dez/26</td><td class='num'>R$ 749.330,15</td></tr><tr><td>jan/27</td><td class='num'>R$ 602.580,86</td></tr><tr><td>fev/27</td><td class='num'>R$ 431.921,79</td></tr><tr><td>mar/27</td><td class='num'>R$ 372.715,20</td></tr><tr><td>abr/27</td><td class='num'>R$ 280.651,13</td></tr><tr><td>mai/27</td><td class='num'>R$ 229.568,79</td></tr><tr><td>jun/27</td><td class='num'>R$ 169.083,59</td></tr><tr><td>jul/27</td><td class='num'>R$ 117.680,84</td></tr><tr><td>ago/27</td><td class='num'>R$ 71.787,36</td></tr><tr><td>set/27</td><td class='num'>R$ 28.407,88</td></tr></table></details>
+</figure>
+
+<h3>De onde vieram os R$ 3,56 mi transferidos em setembro</h3>
+<div class="scroll card" style="padding:0">
+<table>
+  <tr><th>Componente das 21 TEDs da Orbe</th><th class="num">Valor</th><th>Como chegamos</th><th>Selo</th></tr>
+  <tr><td>Pix e débito de setembro</td><td class="num">R$ 250.915,92</td><td>Líquido de Pix e débito entre uma TED e a anterior</td><td><span class="b b-hip">≈ premissa D+0/D+1</span></td></tr>
+  <tr><td>Antecipações de setembro, líquidas das reversões</td><td class="num">R$ 1.138.944,65</td><td>38 antecipações (R$ 1.421.490,30) − 6 reversões (R$ 282.545,65)</td><td><span class="b b-fato">✔ fato</span> no arquivo</td></tr>
+  <tr><td><strong>O resto: recebíveis de vendas anteriores</strong></td><td class="num"><strong>R$ 2.167.385,72</strong></td><td>Crédito à vista de agosto e parcelas de vendas de meses anteriores, já descontados os estornos. Essas vendas <strong>não estão no arquivo</strong>.</td><td><span class="b b-hip">≈ hipótese</span></td></tr>
+  <tr><td>Total das TEDs (extrato Aurora)</td><td class="num">R$ 3.557.246,29</td><td>21 TEDs "ORBE ADQUIRENCIA", uma por dia útil</td><td><span class="b b-fato">✔ fato</span></td></tr>
+</table>
+</div>
+<p style="font-size:13px">O resto é positivo em todos os 21 dias, o que é coerente com a hipótese, mas varia muito de um dia para outro (de R$ 20 mil a R$ 214 mil). <strong>Não dá para reconciliar a TED diária usando só o arquivo do mês</strong>: faltaria a agenda de recebíveis da Orbe. Para o fechamento isso não pesa, porque nenhuma saída pede essa conciliação.</p>
+
+<h3>Antecipação: trazer parcelas futuras para hoje</h3>
+<div class="card">
+  <ul style="margin:0">
+    <li>O lojista que não quer esperar as parcelas pede para receber agora e paga uma taxa por isso. No arquivo, <strong>as 38 antecipações cobram 2,10%</strong>, a mesma taxa da planilha. <span class="b b-fato">✔ fato</span></li>
+    <li>Juntas, somam R$ 1,45 mi de recebíveis trazidos para setembro e R$ 30.491,41 de taxa. O arquivo não diz <strong>quais vendas</strong> foram antecipadas: a linha de antecipação não tem <code>id_referencia</code>. <span class="b b-fato">✔ fato</span></li>
+    <li><strong>6 antecipações foram revertidas</strong> de 1 a 3 dias depois, sempre pelo valor integral. 4 delas são da Kiwi e da Atlas, justamente dois dos ECs que não estão na planilha. <span class="b b-fato">✔ fato</span> <span class="b b-perg">? coincidência?</span></li>
+    <li>Quem adianta o dinheiro, a Orbe ou a Tarvo? E os 2,10% ficam inteiros com a Tarvo? <span class="b b-perg">? perguntar</span></li>
+  </ul>
+</div>
+
+<h3>Quem fica com a taxa (MDR)</h3>
+<figure>
+<svg viewBox="0 0 1100 290" role="img" aria-labelledby="fig1cmt fig1cmd">
+  <title id="fig1cmt">Cadeia de uma venda no cartão e onde a taxa é descontada</title>
+  <desc id="fig1cmd">O aluno paga a fatura ao banco emissor, que repassa à Orbe descontando o intercâmbio. A bandeira cobra uma tarifa. A Orbe repassa à Tarvo descontando o custo dela, e a Tarvo repassa ao lojista descontando a sua margem. O lojista vê um único número, o MDR.</desc>
+  <defs>
+    <marker id="m-flow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk-checkout"/></marker>
+  </defs>
+  <rect x="10" y="100" width="170" height="70" rx="10" class="node"/>
+  <text x="95" y="130" class="t-h mid">Aluno</text><text x="95" y="150" class="t-b mid">dono do cartão</text>
+  <rect x="235" y="100" width="170" height="70" rx="10" class="node"/>
+  <text x="320" y="130" class="t-h mid">Banco emissor</text><text x="320" y="150" class="t-b mid">quem emitiu o cartão</text>
+  <rect x="460" y="100" width="170" height="70" rx="10" class="node node-checkout"/>
+  <text x="545" y="130" class="t-h mid">Orbe</text><text x="545" y="150" class="t-b mid">adquirente</text>
+  <rect x="685" y="100" width="170" height="70" rx="10" class="node node-checkout"/>
+  <text x="770" y="130" class="t-h mid">Tarvo</text><text x="770" y="150" class="t-b mid">subadquirente</text>
+  <rect x="910" y="100" width="180" height="70" rx="10" class="node"/>
+  <text x="1000" y="130" class="t-h mid">Lojista</text><text x="1000" y="150" class="t-b mid">recebe o líquido</text>
+  <rect x="345" y="14" width="170" height="46" rx="10" class="node"/>
+  <text x="430" y="36" class="t-h mid">Bandeira</text><text x="430" y="52" class="t-s mid">Visa, Master, Elo…</text>
+
+  <line x1="180" y1="135" x2="231" y2="135" class="e e-checkout" marker-end="url(#m-flow)"/>
+  <line x1="405" y1="135" x2="456" y2="135" class="e e-checkout" marker-end="url(#m-flow)"/>
+  <line x1="630" y1="135" x2="681" y2="135" class="e e-checkout" marker-end="url(#m-flow)"/>
+  <line x1="855" y1="135" x2="906" y2="135" class="e e-checkout" marker-end="url(#m-flow)"/>
+  <line x1="430" y1="60" x2="430" y2="128" class="e e-fraca"/>
+
+  <text x="95" y="196" class="t-ln mid">paga a fatura,</text><text x="95" y="210" class="t-ln mid">parcela a parcela</text>
+  <text x="320" y="196" class="t-l mid">− intercâmbio</text><text x="320" y="210" class="t-ln mid">(em geral a maior fatia)</text>
+  <text x="430" y="86" class="t-l mid halo">− tarifa de bandeira</text>
+  <text x="545" y="196" class="t-l mid">− custo da Orbe</text><text x="545" y="210" class="t-ln mid">TED diária à Tarvo</text>
+  <text x="770" y="196" class="t-l mid">− margem da Tarvo</text><text x="770" y="210" class="t-ln mid">Pix 2× por mês</text>
+
+  <path d="M235,232 L235,242 L855,242 L855,232" class="e e-forte" style="stroke-width:1.5"/>
+  <text x="545" y="262" class="t-l mid">MDR do lojista = soma de tudo que é descontado no caminho (ex.: 2,69% no crédito à vista)</text>
+  <text x="545" y="280" class="t-s mid">O arquivo da Orbe e a planilha mostram só esse total. A divisão entre emissor, bandeira, Orbe e Tarvo não aparece em nenhum arquivo.</text>
+</svg>
+<figcaption>Modelo geral de mercado de cartões, não tirado dos arquivos <span class="b b-hip">≈ hipótese</span>. Pix não passa por emissor nem bandeira; no arquivo, a tarifa de Pix fica entre 0,79% e 0,99%.</figcaption>
+</figure>
+
+<div class="two">
+  <div class="card">
+    <strong>O que os arquivos mostram</strong>
+    <ul style="margin:6px 0 0">
+      <li>Uma taxa por transação (<code>taxa_aplicada_pct</code>), na mesma faixa das taxas contratadas com os lojistas: a Orbe aplica o MDR <em>do lojista</em>, configurado por EC. <span class="b b-fato">✔ fato</span></li>
+      <li>Um EC por lojista na Orbe: a Tarvo cadastra cada lojista como subcredenciado. <span class="b b-fato">✔ fato</span></li>
+      <li>O nome do arquivo é "relatório de <em>comissões</em>". <span class="b b-fato">✔ fato</span></li>
+      <li>O case chama a operação de "checkout" (cartão e Pix pela Tarvo), não de maquininha. Deve ser pagamento online, por link ou página de checkout. <span class="b b-hip">≈ hipótese</span></li>
+    </ul>
+  </div>
+  <div class="card">
+    <strong>O que falta saber: como a parte da Tarvo chega até ela?</strong>
+    <ul style="margin:6px 0 0">
+      <li><strong>Modelo A:</strong> a Orbe manda à Tarvo o bruto menos o custo dela, e a Tarvo desconta o MDR do lojista no repasse. A margem fica retida no Aurora.</li>
+      <li><strong>Modelo B:</strong> a Orbe já desconta o MDR inteiro, manda à Tarvo o líquido do lojista e paga a comissão da Tarvo à parte (daí o nome "relatório de comissões"?).</li>
+      <li>Com um mês de dados não dá para separar os dois, porque o prazo embaralha tudo. <span class="b b-perg">? perguntar</span> Isso define se a comissão é o <code>valor_taxa</code> inteiro ou só uma parte dele.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="informacao">2 · Fluxo da informação: como os arquivos se ligam</h2>
+<p>O problema central não é calcular, e sim <strong>saber quem é quem</strong> em cada arquivo. Cada fonte identifica o lojista de um jeito diferente.</p>
+<div class="legend">
+  <span><i class="sw" style="border-color:var(--ink-2)"></i> chave forte (código ou CNPJ)</span>
+  <span><i class="sw sw-fraca"></i> chave fraca (só nome: truncado, sem acento, com variações)</span>
+</div>
+
+<figure>
+<svg viewBox="0 0 1180 540" role="img" aria-labelledby="fig2t fig2d">
+  <title id="fig2t">Como os arquivos se ligam</title>
+  <desc id="fig2d">No centro, um cadastro mestre de lojistas a construir. A Orbe se liga por código de estabelecimento, a tabela de taxas por EC e CNPJ, a Ponte por CNPJ. Os extratos bancários só se ligam pelo nome, uma chave fraca. Os extratos são classificados no plano de contas.</desc>
+  <defs>
+    <marker id="b-forte" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk-forte"/></marker>
+    <marker id="b-fraca" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk-interno"/></marker>
+  </defs>
+
+  <!-- edges first (under nodes) -->
+  <line x1="340" y1="120" x2="428" y2="236" class="e e-forte" marker-end="url(#b-forte)"/>
+  <text x="372" y="182" class="t-l end halo">EC ✔ forte</text>
+  <text x="372" y="198" class="t-ln end halo">⚠ 4 ECs fora</text>
+  <text x="372" y="212" class="t-ln end halo">da planilha</text>
+
+  <line x1="590" y1="140" x2="590" y2="211" class="e e-forte" marker-end="url(#b-forte)"/>
+  <text x="600" y="172" class="t-l halo">EC + CNPJ</text>
+  <text x="600" y="188" class="t-ln halo">+ taxas por vigência</text>
+
+  <line x1="840" y1="120" x2="752" y2="236" class="e e-forte" marker-end="url(#b-forte)"/>
+  <text x="808" y="182" class="t-l halo">CNPJ ✔ forte</text>
+  <text x="808" y="198" class="t-ln halo">⚠ 3 jeitos de</text>
+  <text x="808" y="212" class="t-ln halo">escrever o CNPJ</text>
+
+  <line x1="340" y1="420" x2="428" y2="304" class="e e-fraca" marker-end="url(#b-fraca)"/>
+  <text x="372" y="350" class="t-l end halo">só nome ⚠ fraca</text>
+  <text x="372" y="366" class="t-ln end halo">sem CNPJ do lojista</text>
+
+  <line x1="840" y1="420" x2="752" y2="304" class="e e-fraca" marker-end="url(#b-fraca)"/>
+  <text x="808" y="350" class="t-l halo">só nome ⚠ fraca</text>
+  <text x="808" y="366" class="t-ln halo">truncado no MEMO</text>
+
+  <line x1="340" y1="470" x2="428" y2="470" class="e e-forte" marker-end="url(#b-forte)"/>
+  <text x="384" y="460" class="t-ln mid halo">classificar</text>
+  <line x1="840" y1="470" x2="752" y2="470" class="e e-forte" marker-end="url(#b-forte)"/>
+  <text x="796" y="460" class="t-ln mid halo">classificar</text>
+
+  <!-- nodes -->
+  <rect x="20" y="20" width="320" height="120" rx="10" class="node node-checkout"/>
+  <text x="36" y="48" class="t-h">01 · Orbe: transações</text>
+  <text x="36" y="70" class="t-b">1.943 linhas · 22 ECs · 31 grafias de nome</text>
+  <text x="36" y="92" class="t-b">chave: cod_estabelecimento (EC)</text>
+  <text x="36" y="118" class="t-s">ref_origem = id_transacao · não traz CNPJ</text>
+
+  <rect x="430" y="20" width="320" height="120" rx="10" class="node"/>
+  <text x="446" y="48" class="t-h">02 · Tabela de taxas (planilha manual)</text>
+  <text x="446" y="70" class="t-b">25 linhas · 24 CNPJs · aba antiga "não usar"</text>
+  <text x="446" y="92" class="t-b">chaves: EC Orbe + CNPJ</text>
+  <text x="446" y="118" class="t-s">MDR por modalidade, antecipação, spread</text>
+
+  <rect x="840" y="20" width="320" height="120" rx="10" class="node node-remessa"/>
+  <text x="856" y="48" class="t-h">03 · Ponte: xlsx anexo ao e-mail</text>
+  <text x="856" y="70" class="t-b">233 linhas · 14 CNPJs · 6 moedas</text>
+  <text x="856" y="92" class="t-b">chave: CNPJ Cliente</text>
+  <text x="856" y="118" class="t-s">ref_origem = Nº Operação · nome cortado em 20 letras</text>
+
+  <rect x="430" y="214" width="320" height="112" rx="10" class="node node-new"/>
+  <text x="590" y="242" class="t-h mid">Cadastro mestre de lojistas</text>
+  <text x="590" y="262" class="t-s mid">a construir · a fonte da verdade</text>
+  <text x="590" y="286" class="t-b mid">CNPJ (14 dígitos) ↔ EC Orbe ↔ grafias</text>
+  <text x="590" y="306" class="t-b mid">+ taxas contratadas com vigência</text>
+
+  <rect x="20" y="400" width="320" height="120" rx="10" class="node node-checkout"/>
+  <text x="36" y="428" class="t-h">05a · Extrato Aurora (CSV)</text>
+  <text x="36" y="450" class="t-b">84 lançamentos (linhas L9 a L92)</text>
+  <text x="36" y="472" class="t-b">chave: só o nome na descrição</text>
+  <text x="36" y="498" class="t-s">ref_origem = nº da linha física · cabeçalho e rodapé</text>
+
+  <rect x="840" y="400" width="320" height="120" rx="10" class="node node-remessa"/>
+  <text x="856" y="428" class="t-h">05b · Extrato Meridiano (OFX)</text>
+  <text x="856" y="450" class="t-b">100 transações · FITID sem repetição</text>
+  <text x="856" y="472" class="t-b">chave: só o nome no MEMO</text>
+  <text x="856" y="498" class="t-s">ref_origem = FITID · codificação cp1252</text>
+
+  <rect x="430" y="420" width="320" height="100" rx="10" class="node"/>
+  <text x="590" y="448" class="t-h mid">04 · Plano de contas (ERP Fênix)</text>
+  <text x="590" y="470" class="t-b mid">52 contas · 32 aceitam lançamento</text>
+  <text x="590" y="494" class="t-s mid">codificação ISO-8859-1</text>
+</svg>
+<figcaption>A Orbe não traz CNPJ e a Ponte não traz EC. O que liga as duas é a planilha (arquivo 02). Os bancos só trazem nomes, por isso casar lançamento bancário com lojista exige cuidado.</figcaption>
+</figure>
+
+<h3>Qual arquivo alimenta qual saída</h3>
+<div class="scroll card" style="padding:0">
+<table>
+  <tr>
+    <th>Saída (pasta <code>saida/</code>)</th>
+    <th class="center">01 Orbe</th><th class="center">02 Taxas</th><th class="center">03 Ponte</th>
+    <th class="center">04 Plano</th><th class="center">05a Aurora</th><th class="center">05b Meridiano</th>
+    <th>Observação</th>
+  </tr>
+  <tr><td><code>comissoes_por_lojista</code> · CHECKOUT</td><td class="center dot">●</td><td class="center dot">●</td><td></td><td></td><td></td><td></td><td>Soma da taxa por lojista; a planilha dá o CNPJ a partir do EC.</td></tr>
+  <tr><td><code>comissoes_por_lojista</code> · REMESSA</td><td></td><td class="center dot">○</td><td class="center dot">●</td><td></td><td></td><td></td><td>50% do spread por lojista. <span class="b b-perg">? regra de rateio</span></td></tr>
+  <tr><td><code>divergencias_taxa</code></td><td class="center dot">●</td><td class="center dot">●</td><td class="center dot">●</td><td></td><td></td><td></td><td>Aplicada (01 ou 03) contra contratada (02), linha a linha.</td></tr>
+  <tr><td><code>notas_a_emitir</code></td><td class="center dot">●</td><td class="center dot">●</td><td class="center dot">●</td><td></td><td></td><td></td><td>Derivada das comissões. <span class="b b-perg">? tomador na remessa</span></td></tr>
+  <tr><td><code>lancamentos_classificados</code></td><td></td><td class="center dot">○</td><td></td><td class="center dot">●</td><td class="center dot">●</td><td class="center dot">●</td><td>A planilha ajuda a reconhecer o nome do lojista no histórico.</td></tr>
+  <tr><td><code>pendencias</code></td><td class="center dot">●</td><td class="center dot">●</td><td class="center dot">●</td><td class="center dot">●</td><td class="center dot">●</td><td class="center dot">●</td><td>Tudo que uma regra não resolve com segurança.</td></tr>
+  <tr><td><code>rastro</code></td><td class="center dot">●</td><td class="center dot">●</td><td class="center dot">●</td><td class="center dot">●</td><td class="center dot">●</td><td class="center dot">●</td><td>Liga cada número às linhas de origem; a soma por <code>id_saida</code> tem que bater.</td></tr>
+</table>
+</div>
+<p style="font-size:13px">● fonte principal &nbsp; ○ apoio (cadastro ou nomes)</p>
+
+<!-- ============================================================ -->
+<h2 id="tempo">3 · Competência × caixa: o que é de setembro</h2>
+<p>Parte do que aparece nos extratos de setembro pertence a agosto, e parte do que é de setembro só vira dinheiro em outubro. Misturar as duas coisas gera número errado.</p>
+
+<figure>
+<svg viewBox="0 0 1180 160" role="img" aria-labelledby="fig3t">
+  <title id="fig3t">Linha do tempo de 15/08 a 20/10 com os eventos que afetam a competência de setembro</title>
+  <rect x="340.5" y="14" width="495" height="132" class="band"/>
+  <text x="588" y="32" class="t-l mid">SETEMBRO · competência deste fechamento</text>
+  <line x1="40" y1="110" x2="1150" y2="110" class="axis"/>
+  <!-- ticks: 15/08 idx0 → x=60; 16.5 px/dia -->
+  <line x1="60" y1="104" x2="60" y2="116" class="tick"/><text x="60" y="134" class="t-s mid">15/08</text>
+  <line x1="340.5" y1="104" x2="340.5" y2="116" class="tick"/><text x="340.5" y="134" class="t-s mid">01/09</text>
+  <line x1="571.5" y1="104" x2="571.5" y2="116" class="tick"/><text x="571.5" y="134" class="t-s mid">15/09</text>
+  <line x1="835.5" y1="104" x2="835.5" y2="116" class="tick"/><text x="835.5" y="134" class="t-s mid">01/10</text>
+  <line x1="1066.5" y1="104" x2="1066.5" y2="116" class="tick"/><text x="1066.5" y="134" class="t-s mid">15/10</text>
+  <!-- hoje 17/10 idx63 -->
+  <line x1="1099.5" y1="40" x2="1099.5" y2="110" class="today"/>
+  <text x="1099.5" y="34" class="t-l mid">hoje</text>
+
+  <!-- stems + markers -->
+  <line x1="175.5" y1="91" x2="175.5" y2="110" class="stem"/><circle cx="175.5" cy="80" r="11" class="c-checkout"/><text x="175.5" y="84" class="c-txt">1</text>
+  <line x1="357" y1="91" x2="357" y2="110" class="stem"/><circle cx="357" cy="80" r="11" class="c-interno"/><text x="357" y="84" class="c-txt">2</text>
+  <line x1="390" y1="91" x2="390" y2="110" class="stem"/><circle cx="390" cy="80" r="11" class="c-remessa"/><text x="390" y="84" class="c-txt">3</text>
+  <line x1="571.5" y1="91" x2="571.5" y2="110" class="stem"/><circle cx="571.5" cy="80" r="11" class="c-checkout"/><text x="571.5" y="84" class="c-txt">4</text>
+  <line x1="819" y1="91" x2="819" y2="110" class="stem"/><circle cx="819" cy="80" r="11" class="c-interno"/><text x="819" y="84" class="c-txt">5</text>
+  <line x1="835.5" y1="63" x2="835.5" y2="110" class="stem"/><circle cx="835.5" cy="52" r="11" class="c-remessa"/><text x="835.5" y="56" class="c-txt">6</text>
+  <line x1="852" y1="91" x2="852" y2="110" class="stem"/><circle cx="852" cy="80" r="11" class="c-remessa"/><text x="852" y="84" class="c-txt">7</text>
+  <line x1="918" y1="91" x2="918" y2="110" class="stem"/><circle cx="918" cy="80" r="11" class="c-remessa"/><text x="918" y="84" class="c-txt">8</text>
+</svg>
+</figure>
+
+<ul class="tl-list">
+  <li><span class="tl-n n-checkout">1</span><span><strong>Agosto · estornos que chegam em setembro.</strong> Dos 59 estornos da Orbe em setembro, 9 são de vendas de agosto, que não estão no arquivo. <span class="b b-perg">? abatem a comissão de setembro?</span></span></li>
+  <li><span class="tl-n n-interno">2</span><span><strong>02/09 · última atualização da planilha de taxas</strong> ("Bia"). Tudo que o comercial fechou depois disso não está nela. <span class="b b-fato">✔ fato</span></span></li>
+  <li><span class="tl-n n-remessa">3</span><span><strong>04/09 · a Ponte paga a comissão de AGOSTO:</strong> R$ 61.884,12 no Meridiano (FITID <code>MRD2026090132</code>). O dinheiro entra em setembro, mas a receita é de agosto. <span class="b b-fato">✔ fato</span></span></li>
+  <li><span class="tl-n n-checkout">4</span><span><strong>15/09 · a Bridge Idiomas muda de taxa</strong> no crédito à vista: 2,59% até 14/09 e 2,19% a partir de 15/09. A taxa certa depende da data. <span class="b b-perg">? data da venda ou do movimento?</span></span></li>
+  <li><span class="tl-n n-interno">5</span><span><strong>30/09 · o Aurora envia R$ 300 mil ao Meridiano</strong> (L92), que não aparecem no extrato do Meridiano em setembro. <span class="b b-hip">≈ em trânsito</span></span></li>
+  <li><span class="tl-n n-remessa">6</span><span><strong>01/10 · 6 remessas contratadas em setembro liquidam em outubro.</strong> <span class="b b-perg">? competência pela contratação ou pela liquidação?</span></span></li>
+  <li><span class="tl-n n-remessa">7</span><span><strong>02/10 · a Ponte manda o relatório por e-mail.</strong> O prazo para contestar é de 5 dias úteis. <span class="b b-fato">✔ fato</span></span></li>
+  <li><span class="tl-n n-remessa">8</span><span><strong>06/10 · a Ponte credita 50% do spread de setembro</strong>, mediante nota fiscal de intermediação. <span class="b b-fato">✔ fato</span> (e-mail)</span></li>
+</ul>
+
+<!-- ============================================================ -->
+<h2 id="pipeline">4 · Do arquivo à saída: a solução em 8 passos <span class="b b-hip">≈ proposta</span></h2>
+<p>Cada passo diz quem decide: <span class="m">REGRA</span> é código determinístico, <span class="m m-ia">IA</span> sugere com nota de confiança e <span class="m m-hum">HUMANO</span> é uma pessoa do financeiro. Os números (comissão, divergência, nota) saem só de regras.</p>
+
+<div class="pipe">
+  <div class="step"><h4>Ler como chega</h4><span class="m">REGRA</span>
+    <p>Um leitor por formato: CSV com <code>;</code> e vírgula decimal, OFX em cp1252, xlsx dentro do .eml, cabeçalhos e rodapés descartados. Sem limpeza manual.</p></div>
+  <div class="step"><h4>Normalizar</h4><span class="m">REGRA</span>
+    <p>CNPJ com 14 dígitos (repor o zero à esquerda), "1,49%" vira 0,0149, datas no formato AAAA-MM-DD, acentos consertados.</p></div>
+  <div class="step"><h4>Cadastro mestre</h4><span class="m">REGRA</span><span class="m m-hum">HUMANO</span>
+    <p>EC ↔ CNPJ pela planilha. EC desconhecido vira <strong>pendência</strong>, nunca casamento aproximado automático.</p></div>
+  <div class="step"><h4>Taxa vigente</h4><span class="m">REGRA</span>
+    <p>Lojista × modalidade × parcelas (1, 2–6, 7–12) × data. Para remessa, o spread contratado, ou o "padrão".</p></div>
+  <div class="step"><h4>Comissão e divergência</h4><span class="m">REGRA</span>
+    <p>Linha a linha: (aplicada − contratada) × valor bruto. Duplicatas e spread negativo são tratados conforme a resposta do financeiro.</p></div>
+  <div class="step"><h4>Classificar extratos</h4><span class="m">REGRA</span><span class="m m-ia">IA</span><span class="m m-hum">HUMANO</span>
+    <p>Padrões conhecidos por regra. O que sobrar, a IA sugere com confiança; abaixo do limiar, decide uma pessoa.</p></div>
+  <div class="step"><h4>Pendências</h4><span class="m m-hum">HUMANO</span>
+    <p>Cada item com motivo, valor em R$, linha de origem e quem decide (financeiro, comercial, Ponte).</p></div>
+  <div class="step"><h4>Saídas + rastro</h4><span class="m">REGRA</span>
+    <p>Os 6 CSVs. Teste automático: soma do <code>rastro</code> = número reportado, para cada <code>id_saida</code>.</p></div>
+</div>
+
+<div class="card">
+  <strong>Onde a IA entra e onde não entra.</strong>
+  <ul style="margin:6px 0 0">
+    <li><strong>Entra:</strong> sugerir a conta para históricos bancários que nenhuma regra cobre, sugerir qual lojista é um nome truncado (para uma pessoa confirmar) e redigir o motivo das pendências e a discriminação das notas.</li>
+    <li><strong>Não entra:</strong> calcular comissão ou divergência, escolher a regra de negócio e aceitar sozinha um casamento de nomes. Erro nessas três coisas vira dinheiro errado na nota de alguém.</li>
+  </ul>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="armadilhas">5 · Armadilhas encontradas nos dados</h2>
+<p>Tudo abaixo foi conferido por script nos arquivos do data pack. A coluna "Por que importa" diz o que dá errado se a solução ignorar o item.</p>
+<div class="scroll card" style="padding:0">
+<table>
+  <tr><th>#</th><th>Onde</th><th>O que vimos</th><th>Por que importa</th><th>Selo</th></tr>
+  <tr><td>1</td><td>01 Orbe</td><td>22 ECs com 31 grafias de nome. A Mundo Aberto, sozinha, aparece de 3 jeitos ("MUNDO ABERTO INTERC LTDA", "MUNDO ABERTO INTERCAMBIO", "Mundo Aberto").</td><td>Agrupar por nome parte um lojista em vários. Tem que agrupar por EC.</td><td><span class="b b-fato">✔ fato</span></td></tr>
+  <tr><td>2</td><td>01 × 02</td><td>4 ECs da Orbe sem linha na planilha: <code>1038867654</code> KIWI (a planilha diz "EC pendente"), <code>1043300981</code> HORIZONTE INTERCAMBIO, <code>1043396662</code> HORIZONTE VIAGENS TURISMO e <code>1076801732</code> ATLAS IDIOMAS.</td><td>Sem taxa contratada não há como calcular divergência nem saber o CNPJ da nota.</td><td><span class="b b-perg">? perguntar</span></td></tr>
+  <tr><td>3</td><td>02 Taxas</td><td>A planilha tem "Horizonte Viagens" e "Novo Horizonte Intercambio", ambos sem EC. A Orbe tem "HORIZONTE INTERCAMBIO" e "HORIZONTE VIAGENS TURISMO".</td><td>O caso clássico de casamento por nome que parece certo e troca dois lojistas.</td><td><span class="b b-perg">? perguntar</span></td></tr>
+  <tr><td>4</td><td>02 Taxas</td><td>Atlas Idiomas só existe na aba "ANTIGO 2025 - nao usar", mas transaciona na Orbe e recebe Pix de repasse no Aurora.</td><td>Ou falta uma linha na tabela vigente, ou o lojista deveria estar inativo.</td><td><span class="b b-perg">? perguntar</span></td></tr>
+  <tr><td>5</td><td>02 Taxas</td><td>A Bridge tem 2 linhas com vigências diferentes: crédito à vista 2,59% até 14/09 e 2,19% a partir de 15/09.</td><td>Um lookup só por lojista pega a taxa errada em metade do mês.</td><td><span class="b b-fato">✔ fato</span></td></tr>
+  <tr><td>6</td><td>02 Taxas</td><td>O CNPJ aparece de 3 jeitos: com pontuação, só dígitos e como número (Fluente e Campus Global perderam o zero à esquerda). Oxford Prep e Sol Nascente têm taxas como texto ("1,49%").</td><td>Quebra o join com a Ponte e a leitura das taxas, sem erro aparente.</td><td><span class="b b-fato">✔ fato</span></td></tr>
+  <tr><td>7</td><td>02 Taxas</td><td>Spread em branco significa "padrão" (nota no rodapé), e a Canguru tem literalmente "padrão". O valor do padrão não está escrito em lugar nenhum.</td><td>Sem esse número não dá para checar o spread da maioria dos lojistas.</td><td><span class="b b-perg">? perguntar</span></td></tr>
+  <tr><td>8</td><td>02 × 03</td><td>Mundo Aberto: a planilha diz spread de 1,2% ("negociado em jul/26"), e a Ponte aplicou cerca de 1,5% nas 23 operações dela.</td><td>Candidata a divergência de remessa. Lembra o lojista que reclamou de taxa a mais.</td><td><span class="b b-perg">? perguntar</span></td></tr>
+  <tr><td>9</td><td>03 Ponte</td><td><code>PC-0926-0162</code> aparece 2 vezes; a segunda vem marcada "reprocessada". O rodapé conta 233 operações e R$ 78.073,59 de spread, com a duplicata incluída (R$ 821,88). A TED de 22/09 no Meridiano prova que ela foi paga uma vez só.</td><td>O total do próprio relatório está inflado. Somar a coluna repete o erro.</td><td><span class="b b-fato">✔ fato</span></td></tr>
+  <tr><td>10</td><td>03 Ponte</td><td>4 operações com spread negativo, −R$ 1.834,05 no total, todas com a observação "Taxa travada no pedido (D-1)": <code>PC-0926-0210</code>, <code>0326</code>, <code>0491</code> e <code>0545</code>.</td><td>É a dúvida que o financeiro citou ("não sei se aceito").</td><td><span class="b b-perg">? perguntar</span></td></tr>
+  <tr><td>11</td><td>03 Ponte</td><td>16 operações "APROVADO C/ RESSALVA". O e-mail diz que seguem normalmente para liquidação.</td><td>Parece alarme, mas provavelmente não é. Marcar como divergência seria alarme falso.</td><td><span class="b b-hip">≈ hipótese</span></td></tr>
+  <tr><td>12</td><td>03 Ponte</td><td>Cliente "PONTE AÉREA ESTUDANTIL" (lojista) ≠ "Ponte Câmbio" (parceiro).</td><td>Uma busca por "PONTE" mistura cliente e fornecedor.</td><td><span class="b b-fato">✔ fato</span></td></tr>
+  <tr><td>13</td><td>01 Orbe</td><td>59 estornos: 50 apontam para vendas do próprio arquivo e 9 para vendas de agosto. 6 reversões de antecipação, todas de antecipações do mês.</td><td>Define se a comissão é líquida dos estornos e o que fazer com a receita de antecipação revertida.</td><td><span class="b b-perg">? perguntar</span></td></tr>
+  <tr><td>14</td><td>05a Aurora</td><td>L50: "PIX RECEBIDO 38686002000180 SEM IDENTIFICACAO", R$ 7.350,00. L65: "DEVOLUCAO PIX - MUNDO ABERTO", R$ 12.400,00.</td><td>Não há regra óbvia para nenhum dos dois: são pendências, não chutes.</td><td><span class="b b-perg">? perguntar</span></td></tr>
+  <tr><td>15</td><td>05a × 05b</td><td>4 transferências saem do Aurora (R$ 1,45 mi), mas só 3 entram no Meridiano em setembro. Os R$ 300 mil de 30/09 (L92) ficam sem par.</td><td>A conta transitória não zera no mês.</td><td><span class="b b-hip">≈ hipótese</span></td></tr>
+  <tr><td>16</td><td>formatos</td><td>Plano em ISO-8859-1, OFX em cp1252 e os demais em UTF-8. O Aurora e a Ponte têm linhas de cabeçalho e de total que não são dados. O xlsx da Ponte vem dentro do .eml.</td><td>A regra do case diz "sem limpeza manual": o leitor tem que lidar com tudo isso.</td><td><span class="b b-fato">✔ fato</span></td></tr>
+  <tr><td>17</td><td>05b Meridiano</td><td>Pix de R$ 18.240,00 em 17/09 (quinta), de "PONTE AEREA ESTUDANTIL L" sem acento (FITID <code>MRD2026090425</code>). Os outros 63 Pix são de terça e batem com operações; este não bate com nenhuma.</td><td>Dinheiro de lojista parado na conta da Tarvo: devolver, guardar como crédito ou é outra coisa?</td><td><span class="b b-perg">? perguntar</span></td></tr>
+</table>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="perguntas">6 · Perguntas ao financeiro, em ordem de impacto</h2>
+<p>Pergunta vaga recebe resposta vaga. Cada pergunta abaixo cita o dado concreto e diz qual saída ela destrava. Comece a mensagem com o nome do time no <code>#tarvo-financeiro</code>.</p>
+<div class="card">
+<ol class="q">
+  <li><strong>Comissão de checkout:</strong> é o <code>valor_taxa</code> que a Orbe cobrou ou a taxa contratada × valor bruto? Quando a Orbe cobra a mais, a diferença é devolvida ao lojista?
+    <span class="why">Destrava: comissões, divergências e notas. É a pergunta que mais mexe nos números.</span></li>
+  <li><strong>Estornos e reversões:</strong> o estorno abate a comissão do mês em que acontece, inclusive os 9 de vendas de agosto? E a receita de antecipação das 6 reversões sai da comissão?
+    <span class="why">Destrava: comissão líquida de checkout.</span></li>
+  <li><strong>Vigência:</strong> qual data vale para escolher a taxa, a da venda ou a do movimento? (Caso Bridge, 15/09.)
+    <span class="why">Destrava: divergências da Bridge e de qualquer renegociação futura.</span></li>
+  <li><strong>ECs sem cadastro:</strong> <code>1038867654</code> é a Kiwi Experience (07.752.116/0001-26)? Qual dos ECs <code>1043300981</code> e <code>1043396662</code> é a Horizonte Viagens e qual é a Novo Horizonte? A Atlas Idiomas (<code>1076801732</code>) ainda é cliente, e com qual taxa?
+    <span class="why">Destrava: comissão e nota desses 4 lojistas; o resto vira pendência.</span></li>
+  <li><strong>Spread "padrão":</strong> quanto é? Vale para a Canguru e para todos que estão em branco?
+    <span class="why">Destrava: divergências de remessa.</span></li>
+  <li><strong>Mundo Aberto:</strong> vale o 1,2% negociado em jul/26? Se sim, quem devolve a diferença ao lojista e quem cobra a Ponte?
+    <span class="why">Destrava: divergência de remessa e possível devolução.</span></li>
+  <li><strong>Spread negativo</strong> ("taxa travada D-1", 4 operações, −R$ 1.834,05): a Tarvo aceita a parte dela no prejuízo, contesta com a Ponte ou zera? Lembrando que o prazo de contestação é de 5 dias úteis.
+    <span class="why">Destrava: comissão de remessa e pendências.</span></li>
+  <li><strong>Duplicata <code>PC-0926-0162</code>:</strong> confirmar que conta uma vez só e que a Ponte será avisada.
+    <span class="why">Destrava: comissão de remessa (R$ 821,88 de spread a menos).</span></li>
+  <li><strong>Competência das remessas:</strong> as 6 operações que liquidam em 01/10 entram em setembro (pela contratação) ou em outubro?</li>
+  <li><strong>Nota fiscal da remessa:</strong> o tomador é a Ponte Câmbio (o e-mail fala em "nota fiscal de intermediação") ou cada lojista? E no checkout, é uma nota por lojista por mês?
+    <span class="why">Destrava: <code>notas_a_emitir</code> inteira.</span></li>
+  <li><strong>Aurora L50 e L65:</strong> o que é o Pix sem identificação de R$ 7.350 e a devolução de Pix da Mundo Aberto de R$ 12.400? Em que conta lançar cada um?</li>
+  <li><strong>Folha e tributos pagos em setembro</strong> (referentes a 08/2026): baixam a obrigação (2.1.04, 2.1.03) ou vão direto para despesa?</li>
+  <li><strong>Pix de R$ 18.240,00 da Ponte Aérea Estudantil em 17/09</strong> (FITID <code>MRD2026090425</code>): não corresponde a nenhuma remessa. É para devolver, fica como crédito para outubro ou é outra coisa?</li>
+  <li><strong>Regra do repasse do checkout:</strong> os Pix aos lojistas saem 2× no mês (08–10 e 22–24/09). O que entra em cada repasse: vendas de qual período, já líquidas de quê?
+    <span class="why">Não é saída obrigatória, mas explica o fluxo de caixa do Aurora.</span></li>
+  <li><strong>Transferências Aurora → Meridiano</strong> (4×, R$ 1,45 mi): para que servem, se os lojistas pré-pagam as remessas? Vão para o CDB automático?</li>
+  <li><strong>Compensação:</strong> quando a Tarvo deve repasse a um lojista e ele está pré-pagando remessa no mesmo dia (Kiwi, 08/09), existe algum impedimento para compensar, como recebíveis em garantia ou regra de câmbio? Ou foi decisão de produto?
+    <span class="why">Não muda o fechamento; serve para o pitch ("o que faria com mais um mês").</span></li>
+  <li><strong>Como a parte da Tarvo na taxa chega até ela?</strong> A Orbe transfere o bruto menos o custo dela, e a Tarvo desconta o MDR do lojista no repasse (modelo A)? Ou a Orbe transfere o líquido do lojista e paga a comissão da Tarvo à parte (modelo B)? Existe um custo da Orbe que sai do <code>valor_taxa</code>?
+    <span class="why">Destrava: o que é "comissão" no checkout. Liga-se à pergunta 1.</span></li>
+  <li><strong>Antecipação:</strong> quem adianta o dinheiro, a Orbe ou a Tarvo? Os 2,10% ficam inteiros com a Tarvo? Por que 4 das 6 reversões são da Kiwi e da Atlas?</li>
+  <li><strong>Saldo do Aurora negativo</strong> a partir de 09/09 (mínimo de −R$ 2,29 mi): é conta garantida, limite de crédito ou falta algum lançamento no extrato?</li>
+</ol>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="contas">7 · Rascunho: históricos bancários → plano de contas <span class="b b-hip">≈ hipótese</span></h2>
+<p>Primeira leitura dos padrões que aparecem nos extratos, só para orientar as regras. Nada aqui foi validado com o financeiro.</p>
+<div class="scroll card" style="padding:0">
+<table>
+  <tr><th>Padrão no histórico</th><th>Banco</th><th>Conta sugerida</th><th>Método provável</th></tr>
+  <tr><td><code>TED RECEBIDA … ORBE ADQUIRENCIA SA</code> (21×)</td><td>Aurora</td><td>1.1.03.001 Recebíveis de adquirente – Orbe</td><td>REGRA</td></tr>
+  <tr><td><code>PIX ENVIADO &lt;lojista&gt;</code> (44×, 22 nomes)</td><td>Aurora</td><td>2.1.01.001 Repasses a lojistas a pagar</td><td>REGRA + cadastro</td></tr>
+  <tr><td><code>TRANSF ENTRE CONTAS P/ BCO MERIDIANO</code> / <code>TED RECEBIDA TARVO … MESMA TITULARIDADE</code></td><td>ambos</td><td>1.1.09.001 Transferências entre contas próprias</td><td>REGRA</td></tr>
+  <tr><td><code>TAR PACOTE</code>, <code>TAR TED/PIX</code>, <code>TARIFA MANUTENCAO</code>, <code>TARIFA PACOTE CAMBIO</code></td><td>ambos</td><td>4.2.01 Tarifas bancárias</td><td>REGRA</td></tr>
+  <tr><td><code>DEBITO DARF 0561 IRRF</code> · <code>8109 PIS</code> · <code>2172 COFINS</code> · <code>PAGTO ISS … DAMSP</code></td><td>Aurora</td><td>2.1.03.004 / .001 / .002 / .003</td><td>REGRA <span class="b b-perg">? perguntar</span></td></tr>
+  <tr><td><code>PAGTO SALARIOS - FOLHA 08/2026</code> · <code>GPS INSS</code> · <code>GRF FGTS</code></td><td>Aurora</td><td>2.1.04.001 / .002 / .003</td><td>REGRA <span class="b b-perg">? perguntar</span></td></tr>
+  <tr><td><code>BOLETO CONDOMINIO</code> · <code>AMAZON WEB SERVICES</code> · <code>GOOGLE WORKSPACE</code> · <code>CONTABILIDADE EXATA</code></td><td>Aurora</td><td>4.2.02 · 4.2.03 · 4.2.04 · 4.2.06</td><td>REGRA ou IA</td></tr>
+  <tr><td><code>PIX RECEBIDO … SEM IDENTIFICACAO</code> (L50)</td><td>Aurora</td><td>1.1.09.002 Créditos não identificados</td><td>HUMANO (pendência)</td></tr>
+  <tr><td><code>DEVOLUCAO PIX - MUNDO ABERTO</code> (L65)</td><td>Aurora</td><td>? (estorno de repasse?)</td><td>HUMANO (pendência)</td></tr>
+  <tr><td><code>PIX RECEB &lt;lojista&gt;</code> (64×)</td><td>Meridiano</td><td>2.1.02.001 Recursos de lojistas para remessas</td><td>REGRA + cadastro</td></tr>
+  <tr><td><code>TED ENVIADA PONTE CAMBIO SA LIQ OPERACOES</code> (21×)</td><td>Meridiano</td><td>2.1.02.001 Recursos de lojistas para remessas</td><td>REGRA</td></tr>
+  <tr><td><code>TED RECEB PONTE CAMBIO SA REPASSE COMISSAO 08/2026</code></td><td>Meridiano</td><td>1.1.03.002 Comissões de intermediação a receber</td><td>REGRA</td></tr>
+  <tr><td><code>APLICACAO</code> / <code>RESGATE AUTOMATICO CDB DI</code> · <code>RENDIMENTO APLIC</code></td><td>Meridiano</td><td>1.1.02.001 · 3.2.01</td><td>REGRA</td></tr>
+  <tr><td><code>SEGURO EMPRESARIAL</code> · <code>IOF S/ OPERACAO CREDITO</code></td><td>Meridiano</td><td>4.2.05 · 4.3.01</td><td>REGRA</td></tr>
+</table>
+</div>
+
+<footer>
+  Gerado em 17/10/2026 a partir de <code>Tarvo_Data_Pack_set2026/</code> (arquivos 01 a 05b e o anexo do e-mail). Contagens e somas conferidas por script; o que não foi confirmado com o financeiro está marcado como ≈ hipótese ou ? perguntar. Dados sintéticos.
+</footer>
+
+</main>
+</body>
+</html>
