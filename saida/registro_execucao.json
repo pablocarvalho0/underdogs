@@ -1,5 +1,5 @@
 {
-  "executado_em": "2026-10-17T17:29:21",
+  "executado_em": "2026-10-17T17:30:49",
   "pasta_entrada": "docs/Tarvo_Data_Pack_set2026",
   "arquivos_na_pasta": [
     "00_LEIA-ME.md",
@@ -30,8 +30,7 @@
   },
   "conservacao": {
     "checkout": {
-      "linhas_orbe": "0",
-      "sem_contrato_1076801732": "57"
+      "linhas_orbe": "0"
     },
     "remessa": {
       "linhas_ponte": "0",

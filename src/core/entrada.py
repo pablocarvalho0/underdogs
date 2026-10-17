@@ -28,13 +28,20 @@ def _cabecalho_orbe() -> str:
     return "id_transacao;data_movimento;cod_estabelecimento;nome_estabelecimento;tipo_lancamento;modalidade;qtd_parcelas;bandeira;valor_bruto;taxa_aplicada_pct;valor_taxa;valor_liquido;id_referencia;data_venda_original"
 
 
+def _colunas(linha: str) -> list[str]:
+    return [c.strip().strip('"').strip().lower() for c in linha.strip().rstrip(";").split(";")]
+
+
 def _arquivos_orbe(input_dir: Path) -> list[Path]:
-    """R-43: todo *.csv da pasta com o cabeçalho da Orbe é arquivo da Orbe."""
-    cab = _cabecalho_orbe()
+    """R-43, D-01: todo CSV da pasta que tem as colunas da Orbe é arquivo da Orbe.
+
+    Tolera aspas, ';' no fim, coluna a mais, ordem diferente e extensão maiúscula.
+    """
+    exigidas = set(_colunas(_cabecalho_orbe()))
     achados = []
-    for p in sorted(input_dir.glob("*.csv")):
+    for p in sorted(x for x in input_dir.iterdir() if x.is_file() and x.suffix.lower() == ".csv"):
         with p.open(encoding="utf-8-sig", errors="replace") as f:
-            if f.readline().strip() == cab:
+            if exigidas <= set(_colunas(f.readline())):
                 achados.append(p)
     return achados
 

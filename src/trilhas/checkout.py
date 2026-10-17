@@ -3,7 +3,7 @@
 Regras: HIPOTESES.md §2.1 (comissão), §2.3 (divergências), §2.4 (notas), P-08 e P-13 (pendências).
 """
 
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import date, datetime
 from decimal import Decimal
 from typing import Any
@@ -57,6 +57,7 @@ def rodar(dados: DadosEntrada, cadastro: Cadastro, premissas: Premissas) -> Resu
     isentos: dict[str, list[Componente]] = defaultdict(list)
     sem_contrato: dict[str, list[Componente]] = defaultdict(list)
     sem_contrato_info: dict[str, tuple[str, str]] = {}
+    sem_contrato_motivos: dict[str, Counter[str]] = defaultdict(Counter)
     fora_regra: list[tuple[Componente, str]] = []
 
     for r in registros:
@@ -65,6 +66,10 @@ def rodar(dados: DadosEntrada, cadastro: Cadastro, premissas: Premissas) -> Resu
         ref = str(r["id_transacao"])
         arq = r["arquivo_origem"]
         valor_taxa = r["valor_taxa"] if r["valor_taxa"] is not None else Decimal(0)
+        if r["valor_bruto"] is None:
+            # R-42: sem valor bruto não há comissão a calcular; avisa sem quebrar.
+            fora_regra.append((Componente(arq, ref, valor_taxa), "valor_bruto vazio no arquivo da Orbe"))
+            continue
         if tipo not in TIPOS:
             # R-42: avisa sem quebrar. Fica fora da comissão até alguém dizer o que é.
             fora_regra.append((Componente(arq, ref, valor_taxa), f"tipo_lancamento desconhecido {tipo!r}"))
@@ -94,6 +99,12 @@ def rodar(dados: DadosEntrada, cadastro: Cadastro, premissas: Premissas) -> Resu
             # R-06: sem taxa vigente não fatura; o que a Orbe cobrou fica na pendência.
             sem_contrato[ec].append(Componente(arq, ref, valor_taxa))
             sem_contrato_info.setdefault(ec, (str(r["nome_estabelecimento"]).strip(), "" if loj is None else loj.cnpj))
+            if loj is None:
+                sem_contrato_motivos[ec]["EC sem lojista na aba de taxas vigente"] += 1
+            elif data_ref is None:
+                sem_contrato_motivos[ec][f"{tipo} sem data de referência (data da venda original vazia)"] += 1
+            else:
+                sem_contrato_motivos[ec][f"{tipo} {modalidade}: nenhuma (ou mais de uma) taxa vigente na data"] += 1
             continue
 
         assert data_ref is not None  # taxa só existe com data
@@ -191,16 +202,23 @@ def rodar(dados: DadosEntrada, cadastro: Cadastro, premissas: Premissas) -> Resu
         nome_orbe, cnpj = sem_contrato_info[ec]
         total = sum((c.valor for c in comps), Decimal(0))
         quem_e = f"EC {ec} ({nome_orbe})" + (f", CNPJ {cnpj}" if cnpj else ", sem lojista na aba de taxas vigente")
+        if cnpj:
+            quem_e += " (" + "; ".join(f"{m}: {n}" for m, n in sorted(sem_contrato_motivos[ec].items())) + ")"
         res.linhas.append(
             _pendencia(
                 f"SEMCONTRATO-{ec}",
                 "SEM_CONTRATO",
                 comps,
                 f"{quem_e}: {len(comps)} transações sem taxa contratada vigente, fora da comissão e da nota. "
-                f"A Orbe cobrou {_brl_txt(total)}. Não faturar até o comercial confirmar a taxa; quando confirmar, "
-                "a taxa vale desde o início e estas linhas entram no fechamento seguinte.",
-                "Comercial",
-                "R-06 R-07",
+                f"A Orbe cobrou {_brl_txt(total)}. "
+                + (
+                    "Lojista com contrato: conferir o dado da Orbe ou a vigência na planilha antes de faturar."
+                    if cnpj
+                    else "Não faturar até o comercial confirmar a taxa; quando confirmar, "
+                    "a taxa vale desde o início e estas linhas entram no fechamento seguinte."
+                ),
+                HELENA if cnpj else "Comercial",
+                "R-42" if cnpj else "R-06 R-07",
             )
         )
 
@@ -240,8 +258,6 @@ def rodar(dados: DadosEntrada, cadastro: Cadastro, premissas: Premissas) -> Resu
 
     n_saida = sum(len(v) for v in comp.values()) + sum(len(v) for v in sem_contrato.values()) + len(fora_regra)
     res.conservacao["linhas_orbe"] = Decimal(len(registros) - n_saida)
-    for ec, cs in sorted(sem_contrato.items()):
-        res.conservacao[f"sem_contrato_{ec}"] = Decimal(len(cs))
     return res
 
 
