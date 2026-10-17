@@ -283,7 +283,7 @@ Todas as 7 notas de checkout mudam de valor, e nenhuma fica zerada ou negativa.
 - **17/10 13:40** — Entrou o `06_orbe_ajustes_tardios_set2026.csv` (fatos na §1, R-43, R-44, P-14, §5 recalculada). P-09 decidida: 2.69. Q-01 e Q-03 saíram da lista.
 - **17/10 13:50** — Consolidação dos PRs #7 e #8. Do #8 entraram, renumerados para não colidir com o #7: R-45..R-49 (no #8 eram R-43..R-47), a agenda completa na L-06, L-07..L-09 (no #8, L-08, L-11, L-10), Q-04 (no #8, Q-06), o contexto do processo e as ressalvas na R-14 e na R-19. Saíram do #8 a L-07 (o 06 já está no data pack) e as Q-04/Q-05 dele (respondidas: R-43, R-44). Entraram as Q-05..Q-07, de threads posteriores. Links [T40]..[T43] seguem a numeração do #7; [T44]..[T48] são novos.
 
-- **17/10 14:20** — Briefing interno em áudio transcrito (faster-whisper large-v3, 36 s). Entraram a P-15 (entrada reprocessável com outro data pack, reforça a D-01 (a)) e a P-16 (o sistema registra pendências e divergências, mas não as resolve).
+- **17/10 14:15** — Briefing interno em áudio transcrito (faster-whisper large-v3, 36 s). Entraram a P-15 (entrada reprocessável com outro data pack, reforça a D-01 (a)) e a P-16 (o sistema registra pendências e divergências, mas não as resolve).
 
 ---
 
