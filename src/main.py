@@ -7,15 +7,8 @@ from rich.console import Console
 from rich.table import Table
 
 from src.config import DATA_PACK_DIR, OUTPUT_DIR, ROOT_DIR
+from src.core.entrada import carregar
 from src.core.pipeline import run_pipeline
-from src.loaders import (
-    load_extrato_aurora,
-    load_extrato_meridiano,
-    load_orbe_report,
-    load_plano_de_contas,
-    load_ponte_cambio_report,
-    load_taxas_contratadas,
-)
 from src.painel import gerar_painel
 from src.validators import validate_all_outputs
 
@@ -25,56 +18,23 @@ console = Console()
 
 @app.command()
 def status():
-    """Exibe o status dos arquivos brutos de entrada do Data Pack."""
-    console.print("\n[bold cyan]🔍 Verificando Data Pack Tarvo (Setembro/2026):[/bold cyan]\n")
+    """Exibe o que a entrada achou no Data Pack: mesma descoberta do pipeline (todos os arquivos da Orbe)."""
+    console.print("\n[bold cyan]🔍 Verificando Data Pack Tarvo:[/bold cyan]\n")
     table = Table(title="Arquivos Brutos de Entrada")
     table.add_column("Arquivo", style="bold white")
-    table.add_column("Status", style="green")
+    table.add_column("Papel", style="green")
     table.add_column("Registros Carregados", justify="right")
 
-    # Orbe
-    try:
-        orbe_df = load_orbe_report()
-        table.add_row("01_orbe_relatorio_comissoes_set2026.csv", "✓ OK", f"{len(orbe_df):,}")
-    except Exception as e:
-        table.add_row("01_orbe_relatorio_comissoes_set2026.csv", f"✗ Erro: {e}", "0")
-
-    # Taxas
-    try:
-        taxas_df = load_taxas_contratadas()
-        table.add_row("02_tabela_taxas_contratadas.xlsx", "✓ OK", f"{len(taxas_df):,}")
-    except Exception as e:
-        table.add_row("02_tabela_taxas_contratadas.xlsx", f"✗ Erro: {e}", "0")
-
-    # Ponte Câmbio
-    try:
-        ponte_df = load_ponte_cambio_report()
-        table.add_row("03_email_ponte_cambio_relatorio_set2026.eml", "✓ OK (Anexo extraído)", f"{len(ponte_df):,}")
-    except Exception as e:
-        table.add_row("03_email_ponte_cambio_relatorio_set2026.eml", f"✗ Erro: {e}", "0")
-
-    # Fênix ERP
-    try:
-        fenix_df = load_plano_de_contas()
-        table.add_row("04_plano_de_contas_fenix_erp.csv", "✓ OK", f"{len(fenix_df):,}")
-    except Exception as e:
-        table.add_row("04_plano_de_contas_fenix_erp.csv", f"✗ Erro: {e}", "0")
-
-    # Extrato Aurora
-    try:
-        aurora_df = load_extrato_aurora()
-        table.add_row("05a_extrato_banco_aurora_cc4471_set2026.csv", "✓ OK", f"{len(aurora_df):,}")
-    except Exception as e:
-        table.add_row("05a_extrato_banco_aurora_cc4471_set2026.csv", f"✗ Erro: {e}", "0")
-
-    # Extrato Meridiano
-    try:
-        meridiano_df = load_extrato_meridiano()
-        table.add_row("05b_extrato_banco_meridiano_cc90233_set2026.ofx", "✓ OK", f"{len(meridiano_df):,}")
-    except Exception as e:
-        table.add_row("05b_extrato_banco_meridiano_cc90233_set2026.ofx", f"✗ Erro: {e}", "0")
-
+    dados = carregar(DATA_PACK_DIR)
+    for nome, n in dados.orbe["arquivo_origem"].value_counts().sort_index().items():
+        table.add_row(str(nome), "orbe", f"{n:,}")
+    for papel in ("taxas", "ponte", "plano_contas", "aurora", "meridiano"):
+        df = getattr(dados, papel)
+        table.add_row(dados.arquivos.get(papel, "—"), papel, f"{len(df):,}")
     console.print(table)
+    for aviso in dados.avisos:
+        console.print(f"[yellow]Aviso: {aviso}[/yellow]")
+    console.print()
 
 
 @app.command()

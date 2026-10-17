@@ -34,6 +34,7 @@ Se dois documentos discordarem, vale o da coluna "fonte de verdade".
 | O que o desafio pede, prazos, critérios de nota | `docs/01_instrucoes_participantes.docx.md` | Oficial, não editar |
 | Regras de negócio, premissas, perguntas, números esperados | `HIPOTESES.md` | Vigente |
 | Plano de construção: frentes, portões G1–G3, cortes | `docs/plano-construcao.md` | Vigente (PR #15) |
+| O que ainda não sabemos, hipóteses abertas, anomalias nos dados e conflitos entre documentos | `docs/lacunas-e-conflitos.md` | Vigente (17/10 14h40) |
 | Tarefa de cada dev | `docs/tasks/dev1-checkout.md`, `dev2-remessa-extratos.md` | Na `main` (PR #13), mas em conflito com o plano (§3) |
 | Regras para agentes de IA | `CLAUDE.md` (o `GEMINI.md` só aponta para ele) | Vigente |
 | Princípios e onde a IA atua (base do pitch) | `docs/visao-geral.md` §3, §4 e §6 | Vigente só nessas seções. As §8 e §10 foram superadas pelo `HIPOTESES.md` |
