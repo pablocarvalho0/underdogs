@@ -55,7 +55,7 @@ com a soma). O loader atual devolve 235 porque **lê as 2 linhas de rodapé como
   operações. É uma divergência de REMESSA.
 - Demais lojistas: spread aplicado bate com o contratado; os sem valor rodam a ~1,5%.
 
-**Aurora (80 lançamentos reais):** o loader inclui `SALDO ANTERIOR` (L8) e 3 linhas de
+**Aurora (84 lançamentos reais, L9–L92):** o loader incluía `SALDO ANTERIOR` (L8) e 3 linhas de
 rodapé (L93–L95) com valor 0 — precisam sair. Padrões claros: TED Orbe, PIX ENVIADO
 lojista (repasse), transferência p/ Meridiano, folha, impostos, tarifas. Ambíguos:
 `L50 PIX RECEBIDO ... SEM IDENTIFICACAO` (R$ 7.350) e `L65 DEVOLUCAO PIX - MUNDO
@@ -173,7 +173,7 @@ nada sumiu: tudo o que entrou ou está numa saída, ou está numa pendência.
 - Resíduo → D-02 (IA ou HUMANO). Os dois ambíguos já conhecidos (L50, L65) viram
   pendência de qualquer forma.
 - Armadilha Ponte Aérea × Ponte Câmbio: a regra mais específica vem primeiro.
-- **Invariante:** 80 + 100 lançamentos de entrada = lançamentos classificados; saldo
+- **Invariante:** 84 + 100 lançamentos de entrada = lançamentos classificados; saldo
   inicial + Σ = saldo final no Aurora.
 
 ## 5. Fase 2 — integração (serial)
