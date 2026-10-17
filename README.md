@@ -145,9 +145,12 @@ Funciona de forma idêntica em **Linux**, **Arch Linux** e **Windows 11**:
 # Comando padrão via npm (agnóstico de SO):
 npm test
 
-# Ou diretamente via pytest:
-python -m pytest tests/test_blackbox_immutable.py -v
+# Ou diretamente via pytest, sempre pelo python da .venv
+# (Windows: .venv\Scripts\python.exe):
+.venv/bin/python -m pytest tests/test_blackbox_immutable.py -v
 ```
+
+> `npm test` não usa jest: o `package.json` é só um atalho que chama o pytest da `.venv`. O projeto é Python puro, sem `node_modules`.
 
 > ⚠️ **Regra Imutável:** A suíte em `tests/test_blackbox_immutable.py` e os gabaritos em `tests/fixtures/blackbox/` são **imutáveis**. Nenhuma IA está autorizada a inspecioná-los ou alterá-los para sobreajustar código. Apenas o comando de teste deve ser disparado para aferir o progresso.
 

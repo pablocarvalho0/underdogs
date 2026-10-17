@@ -13,7 +13,16 @@ As diretivas completas e detalhadas estão documentadas em [`CLAUDE.md`](./CLAUD
 > 1. **NÃO LEIA NEM INSPECIONE O ARQUIVO DE TESTE:** É terminantemente proibido inspecionar `tests/test_blackbox_immutable.py` ou os gabaritos em `tests/fixtures/blackbox/` para sobreajustar regras ou vazar respostas.
 > 2. **NÃO ALTERE NEM AFROUXE TESTES:** A suíte `tests/test_blackbox_immutable.py` e os arquivos de fixture em `tests/fixtures/blackbox/` são **IMUTÁVEIS**.
 > 3. **PAPEL DO AGENTE:** Construir a lógica de conciliação e fechamento financeiro dentro de `src/` respeitando os contratos oficiais descritos em `docs/`.
-> 4. **COMANDO PERMITIDO:** A IA deve apenas executar `npm test` ou `python -m pytest tests/test_blackbox_immutable.py -v` para avaliar o progresso.
+> 4. **COMANDO PERMITIDO:** A IA deve apenas executar `npm test` para avaliar o progresso.
+
+### Runner de testes: é pytest, não jest
+
+`npm test` é só um atalho: `scripts/runner.js` chama `.venv/bin/python -m pytest`. O projeto é Python puro, sem jest, vitest ou `node_modules`.
+
+- Não passe flags de jest (`--maxWorkers`, `--runInBand`, `--watch`) nem rode `npm install`.
+- Não rode `pytest` ou `python -m pytest` com o python do sistema: o pytest e as dependências existem **só na `.venv`**.
+- Código de saída 1 com `FAILED` é teste falhando de verdade, não problema de ambiente.
+- Detalhes na seção 5 do [`CLAUDE.md`](./CLAUDE.md).
 
 ---
 
