@@ -113,16 +113,12 @@ python -m venv .venv
 pip install -e ".[dev]"
 ```
 
-### 3. Configuração de Variáveis de Ambiente
-Copie o arquivo de exemplo caso deseje usar modelos de IA para classificação de lançamentos:
-```bash
-# Linux / Arch:
-cp .env.example .env
-
-# Windows 11 (PowerShell):
-Copy-Item .env.example .env
-```
-*(Chaves de API como `ANTHROPIC_API_KEY` ou `OPENAI_API_KEY` são opcionais; o motor possui regras determinísticas e fallback robusto).*
+### 3. Chaves e variáveis de ambiente
+**Nenhuma chave é necessária.** O pipeline é 100% determinístico: todas as classificações saem por regra
+(`metodo=REGRA`) e não há chamada a modelo de IA em `src/`. A IA atuou no desenvolvimento (análise dos
+arquivos, perguntas ao financeiro, código e conferência dos números; ver `PROMPTS/`), não no fechamento:
+assim, o mesmo data pack sempre gera os mesmos números, e cada número aponta para uma regra escrita.
+O `.env.example` não é lido pelo código hoje; pastas de entrada e saída vão por `--input`/`--output`.
 
 ### 4. Executar o Fechamento
 Para rodar a conciliação completa e gerar todos os arquivos em `saida/`:
@@ -158,6 +154,26 @@ Para validar a integridade dos arquivos gerados contra o esquema oficial:
 ```bash
 npm run validate
 ```
+
+### Como fechar outubro
+1. Crie a pasta do mês com os arquivos como chegaram (os nomes não importam; todos os arquivos da Orbe
+   entram, inclusive ajustes tardios) e rode:
+   ```bash
+   npm run run -- --input caminho/Tarvo_Data_Pack_out2026 --output saida_out2026
+   ```
+2. Leia primeiro os avisos do terminal e o `pendencias.csv`: fonte faltando ou layout novo aparece ali,
+   e o restante fecha normalmente.
+3. **Não existe mecanismo automático que leve pendência de um mês para o outro** (limitação conhecida).
+   Do fechamento de setembro, confira à mão:
+   - **Atlas Idiomas:** quando o comercial confirmar a taxa, setembro é faturado junto com o mês seguinte
+     (R-07). As 57 transações estão em `PEN-CHK-SEMCONTRATO-1076801732` no rastro de setembro.
+   - **Repasse da Ponte de 06/10:** conferir a TED contra a nota de R$ 39.543,45
+     (`PEN-REM-REPASSE-75374179000146`).
+   - **Transferência de R$ 300 mil de 01/10 (L92):** confirmar a chegada no Meridiano (R-33).
+   - **Devoluções e contestações** (Casa, Rota, Bridge, Mundo Aberto, spreads negativos): a cobrança
+     errada se repete enquanto ninguém avisar a Orbe e a Ponte (R-49).
+4. A página de conferência (`npm run conferencia`) e o painel (`npm run report`) usam os nomes e o
+   gabarito de setembro (`controle/esperado_setembro.json`); para outubro, confie no `run` e no `validate`.
 
 ### Painel visual
 Para ver input, processamento e output do pipeline numa página só:
