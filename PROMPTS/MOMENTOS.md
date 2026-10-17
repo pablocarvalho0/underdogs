@@ -26,7 +26,14 @@ Este documento registra os momentos críticos na interação com a IA durante o 
 
 ---
 
-### Momento 4: [A preencher durante a validação contra o gabarito]
+### Momento 4: Agentes confundindo o runner de testes (jest × pytest)
+- **O que foi pedido:** Investigar por que os agentes de IA tropeçavam ao rodar `npm test`, alternando entre jest, `pytest` e `python -m pytest`.
+- **O que a IA devolveu:** O diagnóstico mostrou duas causas. A primeira era um hook local de proteção de memória que tratava todo `npm test` como jest sem ler o `package.json`, então bloqueava o comando oficial e empurrava o agente a improvisar. A segunda era a documentação, que oferecia "`npm test` ou `pytest`" como equivalentes, embora o pytest e as dependências existam só na `.venv`: chamado com o python do sistema, ele falha com `ModuleNotFoundError`.
+- **O que foi feito com isso:** O hook passou a ler o script real do `package.json` e só barra quando ele chama jest ou vitest; isso ficou coberto por bateria de regressão. `CLAUDE.md`, `GEMINI.md` e `README.md` agora definem `npm test` como comando único e explicam que é um atalho para o pytest da `.venv`. Também documentam o que não fazer: flags de jest, `npm install` e `pytest` com o python do sistema. Os caminhos paralelos foram removidos: o `test.sh` e o script `test:watch`, que nunca funcionou porque dependia do `pytest-xdist`, ausente do projeto. A explicação ficou num lugar só, a seção 5 do `CLAUDE.md`.
+
+---
+
+### Momento 5: [A preencher durante a validação contra o gabarito]
 - **O que foi pedido:** *(Registrar validação final de números)*
 - **O que a IA devolveu:** *(Registrar retorno da IA)*
 - **O que foi feito com isso:** *(Registrar decisão e ajuste adotado)*

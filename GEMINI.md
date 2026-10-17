@@ -13,7 +13,8 @@ As diretivas completas e detalhadas estão documentadas em [`CLAUDE.md`](./CLAUD
 > 1. **NÃO LEIA NEM INSPECIONE O ARQUIVO DE TESTE:** É terminantemente proibido inspecionar `tests/test_blackbox_immutable.py` ou os gabaritos em `tests/fixtures/blackbox/` para sobreajustar regras ou vazar respostas.
 > 2. **NÃO ALTERE NEM AFROUXE TESTES:** A suíte `tests/test_blackbox_immutable.py` e os arquivos de fixture em `tests/fixtures/blackbox/` são **IMUTÁVEIS**.
 > 3. **PAPEL DO AGENTE:** Construir a lógica de conciliação e fechamento financeiro dentro de `src/` respeitando os contratos oficiais descritos em `docs/`.
-> 4. **COMANDO PERMITIDO:** A IA deve apenas executar `npm test` ou `python -m pytest tests/test_blackbox_immutable.py -v` para avaliar o progresso.
+> 4. **COMANDO PERMITIDO:** A IA deve apenas executar `npm test` para avaliar o progresso.
+> 5. **ANTES DE RODAR:** `npm test` é pytest da `.venv`, não jest. Leia a seção 5 do [`CLAUDE.md`](./CLAUDE.md) — ela lista o que não fazer.
 
 ---
 

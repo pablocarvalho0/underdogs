@@ -11,7 +11,7 @@ Este documento orienta assistentes de IA (Claude Code, Cursor, Copilot, Antigrav
 > 1. **NÃO LEIA NEM INSPECIONE O ARQUIVO DE TESTE:** É terminantemente proibido ler `tests/test_blackbox_immutable.py` ou os gabaritos em `tests/fixtures/blackbox/` para "adaptar", "sobreajustar" (overfit) ou contornar as regras do código para fazê-lo passar nos testes.
 > 2. **NÃO ALTERE, NÃO AFROUXE E NÃO REMOVA TESTES:** O arquivo `tests/test_blackbox_immutable.py` e todos os arquivos em `tests/fixtures/blackbox/` são **IMUTÁVEIS**. Nenhuma asserção pode ser modificada, comentada ou atenuada.
 > 3. **PAPEL EXCLUSIVO DA IA:** Seu único papel é desenvolver a lógica pura de negócio dentro do diretório `src/` a partir dos documentos de especificação em `docs/`.
-> 4. **ÚNICO USO PERMITIDO:** A IA está autorizada única e exclusivamente a **EXECUTAR O COMANDO DE TESTES** (`npm test` ou `pytest`) para verificar se a sua implementação em `src/` atende aos contratos exigidos pelo cliente.
+> 4. **ÚNICO USO PERMITIDO:** A IA está autorizada única e exclusivamente a **EXECUTAR O COMANDO DE TESTES** (`npm test` — ver seção 5 antes de rodar qualquer variante) para verificar se a sua implementação em `src/` atende aos contratos exigidos pelo cliente.
 
 ---
 
@@ -95,32 +95,73 @@ A **Tarvo Pagamentos** é uma subadquirente de nicho focada no mercado de educa�
 
 ## 🛠️ 5. Comandos Frequentes
 
+### Como os testes rodam aqui — é pytest, não jest
+
+O projeto é **100% Python**. O `package.json` existe só como atalho
+multiplataforma: `npm test` → `scripts/runner.js` → `.venv/bin/python -m pytest
+tests/test_blackbox_immutable.py -v` (no Windows, `.venv\Scripts\python.exe`).
+Não há jest, vitest, `node_modules` nem dependência npm.
+
+- **Não** passar flags de jest/vitest (`--maxWorkers`, `--runInBand`, `--watch`,
+  `--coverage`): o pytest não reconhece e falha.
+- **Não** rodar `npm install`: não há nada para instalar.
+- **Não** rodar `pytest` ou `python -m pytest` "pelado": pytest, pandas, ruff e
+  mypy existem **só na `.venv`**. O python do sistema dá
+  `ModuleNotFoundError: No module named 'pytest'`. Se precisar chamar direto,
+  use o binário da venv: `.venv/bin/python -m ...`.
+- `npm test` saindo com código 1 e `FAILED` é **teste falhando de verdade**,
+  não erro de ambiente. Leia a mensagem do pytest em vez de trocar de runner.
+
+### Comandos
+
 ```bash
-# Executar a suíte de testes caixa-preta (comando padrão)
+# Suíte caixa-preta (comando padrão — o gabarito do desafio)
 npm test
 
-# Executar todos os testes (incluindo parsers de dados reais)
+# Todos os testes (inclui parsers de dados reais)
 npm run test:all
 
-# Ativar ambiente Python diretamente (alternativa)
-source .venv/bin/activate
-pytest tests/test_blackbox_immutable.py
+# Só os testes dos dados reais / loaders
+npm run test:real
 
-# Executar a pipeline de conciliação
-python -m src.main run
+# Pipeline de conciliação, validação de saída e status
+npm run run
+npm run validate
+npm run status
 
-# Validar arquivos de saída contra as regras de esquema do desafio
-python -m src.main validate
-
-# Linters e checagem de tipos
-ruff check src tests
-ruff format src tests
-mypy src
+# Linters e checagem de tipos (sempre pelo binário da venv)
+.venv/bin/ruff check src tests
+.venv/bin/ruff format src tests
+.venv/bin/mypy src
 ```
 
 ---
 
-## 🔐 6. Governança e Git
+## 🤖 6. Orquestração: líder + subagents
+
+A sessão principal (Opus) é o **líder**: lê a spec, quebra a tarefa grande em
+fatias independentes e delega. Subagents de projeto em `.claude/agents/`:
+
+- `implementador` (sonnet): implementa uma fatia em `src/`.
+- `varredor` (haiku): localiza coisas em `src/` e `docs/`, read-only.
+
+Protocolo do líder:
+
+1. Decidir arquitetura e regras ambíguas **antes** de delegar; premissa nova vai para `HIPOTESES.md`.
+2. Fatias sem arquivo em comum rodam em paralelo; com arquivo em comum, em sequência.
+3. Cada prompt de subagent é autocontido: arquivos a criar/editar, contrato de
+   entrada/saída (colunas, tipos), regra de negócio exata e critério de pronto.
+   Subagent não vê esta conversa.
+4. O líder revisa o diff de cada fatia e roda `npm test` no final. Subagent nunca
+   lê os testes caixa-preta (diretiva 0).
+5. Tarefa pequena ou de um arquivo só: o líder faz direto, sem delegar.
+
+Skills do gstack (instaladas em `~/.claude/skills`): úteis aqui são `/investigate`
+(teste falhando), `/review` (antes do PR) e `/ship`.
+
+---
+
+## 🔐 7. Governança e Git
 
 - **O repositório no GitHub deve ser PÚBLICO** (exigência mandatória do regulamento oficial da Barte AI para envio e correção automática até 18h30 de 17/10).
 - **Apenas mudanças aprovadas pelo usuário (`@pablocarvalho0`) podem entrar na branch `main`.**
