@@ -3,6 +3,10 @@
 > **Desafio Barte AI · Hackathon de AI Services**  
 > **Equipe: Underdogs**
 
+> 🤖 **Diretriz Mandatória para IAs (Claude Code, Gemini / Antigravity):**  
+> Antes de gerar qualquer código, leia obrigatoriamente [`CLAUDE.md`](./CLAUDE.md) e [`GEMINI.md`](./GEMINI.md).  
+> **A suíte de testes de caixa-preta (`tests/test_blackbox_immutable.py` e fixtures) é IMUTÁVEL:** É proibido ler gabaritos para sobreajustar regras ou atenuar asserções. A IA deve apenas executar os testes para checar conformidade.
+
 Solução inteligente de conciliação financeira, auditoria de comissões/divergências contratuais, classificação contábil no ERP Fênix e preparação de faturamento fiscal para a **Tarvo Pagamentos**.
 
 ---
@@ -87,24 +91,40 @@ cd underdogs
 
 ### 2. Configurar o ambiente virtual e instalar dependências
 
-Com `uv`:
+**Linux / Arch Linux:**
 ```bash
+# Com uv:
 uv venv .venv
 source .venv/bin/activate
 uv pip install -e ".[dev]"
-```
 
-Ou com `pip` padrão:
-```bash
+# Ou com pip padrão:
 python3 -m venv .venv
 source .venv/bin/activate
+pip install -e ".[dev]"
+```
+
+**Windows 11 (PowerShell / CMD):**
+```powershell
+# Com uv:
+uv venv .venv
+.venv\Scripts\Activate.ps1
+uv pip install -e ".[dev]"
+
+# Ou com pip padrão:
+python -m venv .venv
+.venv\Scripts\Activate.ps1
 pip install -e ".[dev]"
 ```
 
 ### 3. Configuração de Variáveis de Ambiente
 Copie o arquivo de exemplo caso deseje usar modelos de IA para classificação de lançamentos:
 ```bash
+# Linux / Arch:
 cp .env.example .env
+
+# Windows 11 (PowerShell):
+Copy-Item .env.example .env
 ```
 *(Chaves de API como `ANTHROPIC_API_KEY` ou `OPENAI_API_KEY` são opcionais; o motor possui regras determinísticas e fallback robusto).*
 
@@ -120,12 +140,13 @@ python -m src.main validate
 ```
 
 ### 5. Executar a Suíte de Testes Caixa-Preta (Imutável)
+Funciona de forma idêntica em **Linux**, **Arch Linux** e **Windows 11**:
 ```bash
-# Comando padrão para checar se a solução atende ao contrato:
+# Comando padrão via npm (agnóstico de SO):
 npm test
 
 # Ou diretamente via pytest:
-pytest tests/test_blackbox_immutable.py -v
+python -m pytest tests/test_blackbox_immutable.py -v
 ```
 
 > ⚠️ **Regra Imutável:** A suíte em `tests/test_blackbox_immutable.py` e os gabaritos em `tests/fixtures/blackbox/` são **imutáveis**. Nenhuma IA está autorizada a inspecioná-los ou alterá-los para sobreajustar código. Apenas o comando de teste deve ser disparado para aferir o progresso.
