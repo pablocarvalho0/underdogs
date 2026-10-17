@@ -9,7 +9,7 @@ from src.config import OUTPUT_DIR, OUTPUT_FILES
 
 def validate_file_columns(file_path: Path, expected_cols: List[str]) -> List[str]:
     """Verifica se o arquivo contém exatamente as colunas obrigatórias."""
-    errors = []
+    errors: List[str] = []
     if not file_path.exists():
         return [f"Arquivo ausente: {file_path.name}"]
 
@@ -25,14 +25,14 @@ def validate_file_columns(file_path: Path, expected_cols: List[str]) -> List[str
 
 def validate_cnpj_format(df: pd.DataFrame, file_name: str, col_name: str) -> List[str]:
     """Valida se os CNPJs contêm apenas dígitos (14 números)."""
-    errors = []
+    errors: List[str] = []
     if col_name not in df.columns:
         return errors
     invalid_rows = []
     for idx, val in df[col_name].dropna().items():
         s = str(val).strip()
         if not re.match(r"^\d{14}$", s):
-            invalid_rows.append((idx + 2, s))
+            invalid_rows.append((int(str(idx)) + 2, s))
     if invalid_rows:
         errors.append(
             f"{file_name}: {len(invalid_rows)} CNPJs inválidos (ex: linha {invalid_rows[0][0]}='{invalid_rows[0][1]}')"
@@ -42,14 +42,14 @@ def validate_cnpj_format(df: pd.DataFrame, file_name: str, col_name: str) -> Lis
 
 def validate_date_format(df: pd.DataFrame, file_name: str, col_name: str) -> List[str]:
     """Valida formato de data AAAA-MM-DD."""
-    errors = []
+    errors: List[str] = []
     if col_name not in df.columns:
         return errors
     invalid_dates = []
     for idx, val in df[col_name].dropna().items():
         s = str(val).strip()
         if not re.match(r"^\d{4}-\d{2}-\d{2}$", s):
-            invalid_dates.append((idx + 2, s))
+            invalid_dates.append((int(str(idx)) + 2, s))
     if invalid_dates:
         errors.append(
             f"{file_name}: {len(invalid_dates)} datas fora do padrão AAAA-MM-DD (ex: linha {invalid_dates[0][0]}='{invalid_dates[0][1]}')"
@@ -62,7 +62,7 @@ def validate_rastro_integrity(output_dir: Path = OUTPUT_DIR) -> List[str]:
     Verifica se a soma dos valores em rastro.csv bate com os números reportados
     nos arquivos de saída.
     """
-    errors = []
+    errors: List[str] = []
     rastro_path = output_dir / "rastro.csv"
     if not rastro_path.exists():
         return ["rastro.csv não encontrado para conferência."]

@@ -2,13 +2,13 @@
 
 import re
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 import pandas as pd
 import openpyxl
 from src.config import TAXAS_XLSX
 
 
-def clean_cnpj(val: any) -> Optional[str]:
+def clean_cnpj(val: Any) -> Optional[str]:
     """Extrai apenas os 14 dígitos numéricos do CNPJ."""
     if pd.isna(val) or val is None:
         return None
